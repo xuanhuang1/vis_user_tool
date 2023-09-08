@@ -55,7 +55,7 @@ static const Vertex vertices[] =
     { {  1.0f, -1.0f, 3.0f }, { 0.8f, 0.8f, 0.8f}},
     { {  -1.0f, 1.0f, 3.0f }, { 0.8f, 0.8f, 0.8f}},
     { {  1.0f, -1.0f, 3.0f }, { 0.8f, 0.8f, 0.8f}},
-    { {  0.1f, 0.1f, 3.3f  }, { 0.5f, 0.9f, 0.5f}}
+    { {  0.1f, 0.1f, 0.3f  }, { 0.5f, 0.9f, 0.5f}}
 };
 
 static const char* vertex_shader_text =
@@ -192,7 +192,7 @@ int main(int argc, const char **argv)
         glClear(GL_COLOR_BUFFER_BIT);
 
         glm::mat4 m, p, mvp;
-        p = glm::perspective(80.f, ratio,  0.01f, 200.f);
+        p = glm::perspective(20.f, ratio,  0.01f, 200.f);
         m = glm::lookAt(eye, dir, up);
         mvp = p * m;
 
