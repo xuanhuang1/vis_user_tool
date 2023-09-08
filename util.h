@@ -19,7 +19,7 @@ std::string get_file_basepath(const std::string &path);
 
 bool starts_with(const std::string &str, const std::string &prefix);
 
-std::vector<vec3> generate_fibonacci_sphere(const size_t n_points, const float radius);
+std::vector<glm::vec3> generate_fibonacci_sphere(const size_t n_points, const float radius);
 
 inline glm::vec3 get_vec3f(const json &j)
 {
