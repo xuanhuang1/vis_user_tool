@@ -29,6 +29,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../stb_image_write.h"
+
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -55,7 +58,7 @@ static const Vertex vertices[] =
     { {  1.0f, -1.0f, 3.0f }, { 0.8f, 0.8f, 0.8f}},
     { {  -1.0f, 1.0f, 3.0f }, { 0.8f, 0.8f, 0.8f}},
     { {  1.0f, -1.0f, 3.0f }, { 0.8f, 0.8f, 0.8f}},
-    { {  0.1f, 0.1f, 0.3f  }, { 0.5f, 0.9f, 0.5f}}
+    { {  1.0f, 1.0f, 3.0f  }, { 0.5f, 0.9f, 0.5f}}
 };
 
 static const char* vertex_shader_text =
@@ -176,13 +179,12 @@ int main(int argc, const char **argv)
     vec3 dir = {0.1, 0, 1};
     vec3 up = {0, 1, 0};
     
-    for (int k=0; k<3; k++){
-	    eye[k] = cams[0].pos[k];
-	    up[k] = cams[0].up[k];
-	    dir[k] = cams[0].dir[k];
-    }
+    stbi_flip_vertically_on_write(1);
 
-    while (!glfwWindowShouldClose(window))
+
+    uint32_t renderCount = 0;
+
+    while (/* !glfwWindowShouldClose(window) &&*/ (renderCount < cams.size()))
     {
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -191,18 +193,30 @@ int main(int argc, const char **argv)
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
 
+	for (int k=0; k<3; k++){
+	    eye[k] = cams[renderCount].pos[k];
+	    up[k]  = cams[renderCount].up[k];
+	    dir[k] = cams[renderCount].dir[k];
+	}
         glm::mat4 m, p, mvp;
-        p = glm::perspective(20.f, ratio,  0.01f, 200.f);
-        m = glm::lookAt(eye, dir, up);
+        p = glm::perspective(glm::radians(60.f), ratio, 0.1f, 200.f);
+        m = glm::lookAt(eye, eye+dir, up);
         mvp = p * m;
 
         glUseProgram(program);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) &mvp);
         glBindVertexArray(vertex_array);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        std::string imgName = "outframe_gl_"+std::to_string(renderCount)+".jpg";
+	std::vector<char> buffer(width*height*3);
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+	stbi_write_jpg(imgName.c_str(), width, height, 3, buffer.data(), 90);
+
+	renderCount++;
+	
     }
 
     glfwDestroyWindow(window);

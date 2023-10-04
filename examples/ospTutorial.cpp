@@ -14,6 +14,9 @@
  * path (alter "-I <path/to/rkcommon>" appropriately).
  */
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../stb_image_write.h"
+
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -66,8 +69,8 @@ int main(int argc, const char **argv)
 
   // image size
   vec2i imgSize;
-  imgSize.x = 1024; // width
-  imgSize.y = 768; // height
+  imgSize.x = 640; // width
+  imgSize.y = 480; // height
 
   // camera
   vec3f cam_pos{0.f, 0.f, 0.f};
@@ -78,7 +81,7 @@ int main(int argc, const char **argv)
   std::vector<vec3f> vertex = {vec3f(-1.0f, -1.0f, 3.0f),
       vec3f(-1.0f, 1.0f, 3.0f),
       vec3f(1.0f, -1.0f, 3.0f),
-      vec3f(0.1f, 0.1f, 0.3f)};
+      vec3f(1.0f, 1.0f, 3.0f)};
 
   std::vector<vec4f> color = {vec4f(0.9f, 0.5f, 0.5f, 1.0f),
       vec4f(0.8f, 0.8f, 0.8f, 1.0f),
@@ -155,6 +158,7 @@ int main(int argc, const char **argv)
     ospray::cpp::FrameBuffer framebuffer(
         imgSize.x, imgSize.y, OSP_FB_SRGBA, OSP_FB_COLOR | OSP_FB_ACCUM);
     framebuffer.clear();
+    stbi_flip_vertically_on_write(1);
 
     // render frames
     for (size_t i=0; i<cams.size(); i++)
@@ -173,8 +177,9 @@ int main(int argc, const char **argv)
 
 	// access framebuffer and write its content as PPM file
 	uint32_t *fb = (uint32_t *)framebuffer.map(OSP_FB_COLOR);
-	std::string imgName = "outframe"+std::to_string(i)+".ppm";
-	rkcommon::utility::writePPM(imgName, imgSize.x, imgSize.y, fb);
+	std::string imgName = "outframe_osp_"+std::to_string(i)+".jpg";
+	//rkcommon::utility::writePPM(imgName, imgSize.x, imgSize.y, fb);
+	stbi_write_jpg(imgName.c_str(), imgSize.x, imgSize.y, 4, fb, 90);
 	framebuffer.unmap(fb);
 	framebuffer.clear();
 	std::cout << "rendering frame to " << imgName << std::endl;
