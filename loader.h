@@ -33,7 +33,7 @@ namespace visuser{
 
     std::vector<Camera> load_cameras(const std::vector<nlohmann::json> &camera_set,
 				     const float radius);
-
+    
     // actions
     struct CameraAction{};
     struct VolumeIsosurface{};

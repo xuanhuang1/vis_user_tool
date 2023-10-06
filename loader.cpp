@@ -3,29 +3,27 @@
 #include <cstdio>
 #include <iostream>
 #include "json.hpp"
+
 //#include "stb_image.h"
 //#include "util.h"
 #include "ext/glm/gtx/string_cast.hpp"
 
 using json = nlohmann::json;
 
-
-namespace visuser{
-
-    Camera::Camera(const glm::vec3 &pos, const glm::vec3 &dir, const glm::vec3 &up)
+visuser::Camera::Camera(const glm::vec3 &pos, const glm::vec3 &dir, const glm::vec3 &up)
 	: pos(pos), dir(dir), up(up)
     {
     }
 
     
-    void Camera::print(){
+void visuser::Camera::print(){
 	std::cout << "Camera: \n pos: [" <<glm::to_string(this->pos) << "], "
 		  << "\n dir: [" <<glm::to_string(this->dir) << "], "
 		  << "\n up : [" <<glm::to_string(this->up) << "]\n";
 	
     }
 
-    std::vector<Camera> load_cameras(const std::vector<json> &camera_set, const float radius)
+std::vector<visuser::Camera> visuser::load_cameras(const std::vector<json> &camera_set, const float radius)
     {
 	std::vector<Camera> cameras;
 	for (size_t i = 0; i < camera_set.size(); ++i) {
@@ -45,4 +43,5 @@ namespace visuser{
 	return cameras;
     }
 
-}
+
+

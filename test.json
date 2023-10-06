@@ -1,10 +1,10 @@
 {
-    "data" : [
+    "data" : 
 	{
-	"type": "triangle_mesh",
+	"type": "volume",
 	"name": "<path to test_mesh>"
 	}
-    ],
+    ,
     
     "camera" : [
         {
