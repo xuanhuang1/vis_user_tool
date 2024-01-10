@@ -1,0 +1,22 @@
+(version)
+6
+(box)
+0 1999 0 1999 0 2159
+(fields)
+data uint8 default_layout() default_value(0) min(0) max(0) 
+(bits)
+V2012012012012012012012012012012012
+(bitsperblock)
+16
+(blocksperfile)
+2048
+(interleave block)
+0
+(time)
+0 56 time_%04d/
+(filename_template)
+./visus/%02x/%04x.bin
+(missing_blocks)
+0
+(arco)
+0
