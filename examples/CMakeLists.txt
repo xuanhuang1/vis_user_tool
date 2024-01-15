@@ -20,13 +20,20 @@ target_include_directories(vistool_ospray
 			
 target_link_libraries(vistool_ospray /home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
 
+
+
+
 add_executable(vistool_opengl
     openglExample.cpp
     ../loader.cpp
     ../util.cpp
     glad/src/gl.c)
     
- target_include_directories(vistool_opengl 
+target_include_directories(vistool_opengl 
 			PUBLIC /home/xuanhuang/projects/vis_interface/vis_user_tool/examples/glad/include)
 			
 target_link_libraries(vistool_opengl glfw ${OPENGL_LIBRARIES})
+
+
+    
+
