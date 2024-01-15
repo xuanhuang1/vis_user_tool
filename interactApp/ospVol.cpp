@@ -37,7 +37,8 @@
 #include "rkcommon/utility/SaveImage.h"
 
 #include "../loader.h"
-
+#include "ArcballCamera.h"
+#include "TransferFunctionWidget.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GL/glew.h>
@@ -45,7 +46,7 @@
 // imgui
 #include "./glfwImgui/imgui.h"
 #include "./glfwImgui/backends/imgui_impl_glfw.h"
-#include "./glfwImgui/backends/imgui_impl_opengl2.h"
+#include "./glfwImgui/backends/imgui_impl_opengl3.h"
 
 
 using namespace rkcommon::math;
@@ -75,7 +76,8 @@ public:
   
   static GLFWOSPWindow *activeWindow;
   ospray::cpp::FrameBuffer framebuffer;
-  //std::unique_ptr<ArcballCamera> arcballCamera;
+  std::unique_ptr<ArcballCamera> arcballCamera;
+  vec2f previousMouse{vec2f(-1)};
   
   GLFWOSPWindow(){
     activeWindow = this;
@@ -88,16 +90,16 @@ public:
   }
   
   void display();
-  //void motion(double, double);
+  void motion(double, double);
   void mouse(int, int, int, int);
   void reshape(int, int);
     
   void setFunc(){
 
-    //glfwSetCursorPosCallback(
-    //  glfwWindow, [](GLFWwindow *, double x, double y) {
-//		    activeWindow->motion(x, y);
-//		  });
+  glfwSetCursorPosCallback(
+      glfwWindow, [](GLFWwindow *, double x, double y) {
+		    activeWindow->motion(x, y);
+		  });
     glfwSetFramebufferSizeCallback(
       glfwWindow, [](GLFWwindow *, int newWidth, int newHeight) {
         activeWindow->reshape(newWidth, newHeight);
@@ -116,6 +118,53 @@ public:
 };
 
 GLFWOSPWindow *GLFWOSPWindow::activeWindow = nullptr;
+
+
+void GLFWOSPWindow::motion(double x, double y)
+{
+  const vec2f mouse(x, y);
+  if (previousMouse != vec2f(-1)) {
+    const bool leftDown =
+      glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    const bool rightDown =
+      glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+    const bool middleDown =
+      glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
+    const vec2f prev = previousMouse;
+
+    bool cameraChanged = leftDown || rightDown || middleDown;
+
+    // don't modify camera with mouse on ui window
+    if (ImGui::GetIO().WantCaptureMouse){ 
+    	return;
+    }
+    
+    if (leftDown) {
+      const vec2f mouseFrom(std::clamp(prev.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
+			    std::clamp(prev.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
+      const vec2f mouseTo(std::clamp(mouse.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
+			  std::clamp(mouse.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
+      arcballCamera->rotate(mouseFrom, mouseTo);
+    } else if (rightDown) {
+      arcballCamera->zoom(mouse.y - prev.y);
+    } else if (middleDown) {
+      arcballCamera->pan(vec2f(mouse.x - prev.x, prev.y - mouse.y));
+    }
+
+    if (cameraChanged) {
+      //updateCamera();
+      //addObjectToCommit(camera.handle());
+      camera.setParam("aspect", windowSize.x / float(windowSize.y));
+      camera.setParam("position", arcballCamera->eyePos());
+      camera.setParam("direction", arcballCamera->lookDir());
+      camera.setParam("up", arcballCamera->upDir());
+      camera.commit();
+    }
+  }
+
+  previousMouse = mouse;
+
+}
 
 
 void GLFWOSPWindow::reshape(int w, int h)
@@ -184,6 +233,14 @@ void GLFWOSPWindow::display()
 
 
 void GLFWOSPWindow::buildUI(){
+	static float f = 0;
+	ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
+	ImGui::Begin("Menu Window", nullptr, flags);
+
+        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+        if (ImGui::SliderFloat("float", &f, 0.0f, 1.0f)){
+  	}
+        ImGui::End();
 }
 
 ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange)
@@ -289,8 +346,7 @@ int main(int argc, const char **argv)
 	    glfwTerminate();
 	    throw std::runtime_error("Failed to create GLFW window!");
 	}
-	// make the window's context current
-	glfwMakeContextCurrent(glfwWindow);
+
 
     
 	GLFWOSPWindow glfwOspWindow;
@@ -336,11 +392,6 @@ int main(int argc, const char **argv)
 
 
 	// construct ospray variables
-  
-	// image size
-	vec2i imgSize;
-	imgSize.x = 640; // width
-	imgSize.y = 480; // height
 
 	// camera
 	vec3f cam_pos{0.f, 0.f, 0.f};
@@ -359,16 +410,6 @@ int main(int argc, const char **argv)
 	    vec4f(0.5f, 0.9f, 0.5f, 1.0f)};
 
 	std::vector<vec3ui> index = {vec3ui(0, 1, 2), vec3ui(1, 2, 3)};
-
-
-    
-	// create and setup camera
-	ospray::cpp::Camera camera("perspective");
-	camera.setParam("aspect", imgSize.x / (float)imgSize.y);
-	camera.setParam("position", cam_pos);
-	camera.setParam("direction", cam_view);
-	camera.setParam("up", cam_up);
-	camera.commit(); // commit each object to indicate modifications are done
 
 	ospray::cpp::Group group;
 	{
@@ -412,6 +453,11 @@ int main(int argc, const char **argv)
 	//world.commit();
 	glfwOspWindow.world.setParam("light", ospray::cpp::CopiedData(light));
     	glfwOspWindow.world.commit();
+    	
+    	// set up arcball camera for ospray
+    	glfwOspWindow.arcballCamera.reset(new ArcballCamera(glfwOspWindow.world.getBounds<box3f>(), windowSize));
+    	glfwOspWindow.arcballCamera->updateWindowSize(windowSize);
+    
 	
 	// create renderer, choose Scientific Visualization renderer
 	ospray::cpp::Renderer *renderer = &glfwOspWindow.renderer;;
@@ -421,23 +467,23 @@ int main(int argc, const char **argv)
 	renderer->setParam("backgroundColor", 1.0f); // white, transparent
 	renderer->commit();
 
-
-	if (1){
-	    ospray::cpp::Camera* camera = &glfwOspWindow.camera;
-	    for (int k=0; k<3; k++){
-			cam_pos[k] = cams[0].pos[k];
-			cam_up[k] = cams[0].up[k];
-			cam_view[k] = cams[0].dir[k];
-		}
-	    camera->setParam("position", cam_pos);
-	    camera->setParam("direction", cam_view);
-	    camera->setParam("up", cam_up);
-	    camera->commit();
+	
+	ospray::cpp::Camera* camera = &glfwOspWindow.camera;
+	    
+	camera->setParam("aspect", imgSize.x / (float)imgSize.y);
+	camera->setParam("position", glfwOspWindow.arcballCamera->eyePos());
+	camera->setParam("direction", glfwOspWindow.arcballCamera->lookDir());
+	camera->setParam("up", glfwOspWindow.arcballCamera->upDir());
+	camera->commit(); // commit each object to indicate modifications are done
+	
 	    
 	    
     glfwOspWindow.renderNewFrame();
-
     
+    
+    glfwMakeContextCurrent(glfwWindow);
+    glfwSwapInterval(1); // Enable vsync
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -449,9 +495,32 @@ int main(int argc, const char **argv)
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
 
+// Decide GL+GLSL versions
+#if defined(IMGUI_IMPL_OPENGL_ES2)
+    // GL ES 2.0 + GLSL 100
+    const char* glsl_version = "#version 100";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+#elif defined(__APPLE__)
+    // GL 3.2 + GLSL 150
+    const char* glsl_version = "#version 150";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+#else
+    // GL 3.0 + GLSL 130
+    const char* glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+#endif
+
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
-    ImGui_ImplOpenGL2_Init();
+    ImGui_ImplOpenGL3_Init(glsl_version);
     
     auto fb = glfwOspWindow.framebuffer.map(OSP_FB_COLOR);
     init(fb);
@@ -464,39 +533,35 @@ int main(int argc, const char **argv)
     auto t2 = std::chrono::high_resolution_clock::now();
 
     do{
+    glfwPollEvents();
+    
       t1 = std::chrono::high_resolution_clock::now();
       
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glEnable(GL_TEXTURE_2D);
-      
-      
-      // Start the Dear ImGui frame
-      ImGui_ImplOpenGL2_NewFrame();
-      ImGui_ImplGlfw_NewFrame();
-      ImGui::NewFrame();
-      
-      
-      //glBindTexture(GL_TEXTURE_2D, h.texName);
-      glfwOspWindow.buildUI();
-      ImGui::Render();
+  
       
       glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
-      
       glfwOspWindow.display();
-      cam_pos[0] = (cam_pos[0] + 0.001);
-      camera->setParam("position", cam_pos);
-      camera->commit();
-      
       glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
-      
       glDisable(GL_TEXTURE_2D);
       
-      ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+      // need to fix this
+      //if(ImGui::GetIO().WantCaptureMouse) ImGui_ImplGlfw_InstallCallbacks(glfwWindow);
+      //else ImGui_ImplGlfw_RestoreCallbacks(glfwWindow);
+      
+      // Start the Dear ImGui frame
+      ImGui_ImplOpenGL3_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
+      glfwOspWindow.buildUI();
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
       
       // Swap buffers
+      glfwMakeContextCurrent(glfwWindow);
       glfwSwapBuffers(glfwWindow);
       
-      glfwPollEvents();
 
       t2 = std::chrono::high_resolution_clock::now();
       auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
@@ -506,67 +571,13 @@ int main(int argc, const char **argv)
     while( glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 	   glfwWindowShouldClose(glfwWindow) == 0 );
     
-   	ImGui_ImplOpenGL2_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-   	glfwTerminate();
+   		ImGui_ImplOpenGL3_Shutdown();
+    		ImGui_ImplGlfw_Shutdown();
+    		ImGui::DestroyContext();
+   		glfwTerminate();
 
-	}else{
-#if 0
-	    // create and setup framebuffer
-	    ospray::cpp::FrameBuffer framebuffer(
-						 imgSize.x, imgSize.y, OSP_FB_SRGBA, OSP_FB_COLOR | OSP_FB_ACCUM);
-	    framebuffer.clear();
-	    stbi_flip_vertically_on_write(1);
-
-	    // render frames
-	    for (size_t i=0; i<cams.size(); i++)
-		{
-		    for (int k=0; k<3; k++){
-			cam_pos[k] = cams[i].pos[k];
-			cam_up[k] = cams[i].up[k];
-			cam_view[k] = cams[i].dir[k];
-		    }
-		    camera.setParam("position", cam_pos);
-		    camera.setParam("direction", cam_view);
-		    camera.setParam("up", cam_up);
-		    camera.commit();
-	    
-		    framebuffer.renderFrame(renderer, camera, world);
-
-		    // access framebuffer and write its content as PPM file
-		    uint32_t *fb = (uint32_t *)framebuffer.map(OSP_FB_COLOR);
-		    std::string imgName = "outframe_osp_"+std::to_string(i)+".jpg";
-		    //rkcommon::utility::writePPM(imgName, imgSize.x, imgSize.y, fb);
-		    stbi_write_jpg(imgName.c_str(), imgSize.x, imgSize.y, 4, fb, 90);
-		    framebuffer.unmap(fb);
-		    framebuffer.clear();
-		    std::cout << "rendering frame to " << imgName << std::endl;
-
-		    // render 10 more frames, which are accumulated to result in a better
-		    // converged image
-		    //for (int frames = 0; frames < 10; frames++)
-		    //    framebuffer.renderFrame(renderer, camera, world);
-
-		    //fb = (uint32_t *)framebuffer.map(OSP_FB_COLOR);
-		    //rkcommon::utility::writePPM(
-		    //			    "accumulatedFrameCpp.ppm", imgSize.x, imgSize.y, fb);
-		    //framebuffer.unmap(fb);
-		    //std::cout << "rendering 10 accumulated frames to accumulatedFrameCpp.ppm"
-		    //	  << std::endl;
-
-		    ospray::cpp::PickResult res =
-			framebuffer.pick(renderer, camera, world, 0.5f, 0.5f);
-
-		    if (res.hasHit) {
-			std::cout << "picked geometry [instance: " << res.instance.handle()
-				  << ", model: " << res.model.handle()
-				  << ", primitive: " << res.primID << "]" << std::endl;
-		    }
-		    }
-		
-#endif
-		}
+	
+	
     }
     ospShutdown();
 
@@ -576,6 +587,90 @@ int main(int argc, const char **argv)
 	_getch();
     }
 #endif
+
+    return 0;
+}
+
+
+
+
+static void glfw_error_callback(int error, const char* description)
+{
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
+// Main code
+int _main(int, char**)
+{
+    glfwSetErrorCallback(glfw_error_callback);
+    if (!glfwInit())
+        return 1;
+
+    const char* glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+
+    // Create window with graphics context
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    if (window == nullptr)
+        return 1;
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1); // Enable vsync
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+
+    // Our state
+    bool show_demo_window = true;
+    bool show_another_window = false;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    while (!glfwWindowShouldClose(window))
+
+    {
+    	glfwPollEvents();
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
+
+        // Rendering
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
+    }
+
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     return 0;
 }

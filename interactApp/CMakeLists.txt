@@ -5,15 +5,18 @@ if (NOT WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 endif()
 
-find_package(OpenGL 2 REQUIRED)
+find_package(OpenGL 3 REQUIRED)
 find_package(glfw3 REQUIRED)
 
 
 add_executable(vistool_ospray_vol
     ospVol.cpp
-    ./glfwImgui/backends/imgui_impl_opengl2.cpp
+    ArcballCamera.cpp
+    TransferFunctionWidget.cpp
+    ./glfwImgui/backends/imgui_impl_opengl3.cpp
     ./glfwImgui/backends/imgui_impl_glfw.cpp
     ./glfwImgui/imgui.cpp
+    ./glfwImgui/imgui_demo.cpp
     ./glfwImgui/imgui_draw.cpp
     ./glfwImgui/imgui_tables.cpp
     ./glfwImgui/imgui_widgets.cpp
