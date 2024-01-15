@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <chrono>
+#include <limits>
 #ifdef _WIN32
 #define NOMINMAX
 #include <conio.h>
@@ -44,9 +45,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // imgui
-#include "./glfwImgui/imgui.h"
-#include "./glfwImgui/backends/imgui_impl_glfw.h"
-#include "./glfwImgui/backends/imgui_impl_opengl3.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
 
 
 using namespace rkcommon::math;
@@ -73,6 +73,7 @@ public:
   ospray::cpp::Renderer renderer{"scivis"};
   ospray::cpp::World world;
   ospray::cpp::Instance instance;
+  std::vector<float> * voxel_data; // pointer to voxels data
   
   static GLFWOSPWindow *activeWindow;
   ospray::cpp::FrameBuffer framebuffer;
@@ -358,18 +359,20 @@ int main(int argc, const char **argv)
 	std::string prefix;
 	for (int i = 1; i < argc; ++i) {
 	    if (args[i] == "-h") {
-		std::cout << "./mini_vistool <config.json> [options]\n";
+		std::cout << "./mini_vistool <config.json> x y z <file> [options]\n";
 		return 0;
 	    } else {
-		std::ifstream cfg_file(args[i].c_str());
-		if (!cfg_file) {
-		    std::cerr << "[error]: Failed to open config file " << args[i] << "\n";
-		    throw std::runtime_error("Failed to open input config file");
+	    	if (i == 1){
+			std::ifstream cfg_file(args[i].c_str());
+			if (!cfg_file) {
+		    		std::cerr << "[error]: Failed to open config file " << args[i] << "\n";
+		    		throw std::runtime_error("Failed to open input config file");
+			}
+			cfg_file >> config;
 		}
-		cfg_file >> config;
 	    }
 	}
-
+	
     
 	// load json
 	std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
@@ -389,49 +392,44 @@ int main(int argc, const char **argv)
 	    for(auto &c : cams)
 		c.print();
 	}
-
-
+	
+	vec3i volumeDimensions(std::stoi(argv[2]), std::stoi(argv[3]), std::stoi(argv[4]));
+	float min=std::numeric_limits<float>::infinity(), max=0;
+	std::vector<float> voxels(volumeDimensions.long_product());
+	
 	// construct ospray variables
-
-	// camera
-	vec3f cam_pos{0.f, 0.f, 0.f};
-	vec3f cam_up{0.f, 1.f, 0.f};
-	vec3f cam_view{0.1f, 0.f, 1.f};
-
-	// triangle mesh data
-	std::vector<vec3f> vertex = {vec3f(-1.0f, -1.0f, 3.0f),
-	    vec3f(-1.0f, 1.0f, 3.0f),
-	    vec3f(1.0f, -1.0f, 3.0f),
-	    vec3f(1.0f, 1.0f, 3.0f)};
-
-	std::vector<vec4f> color = {vec4f(0.9f, 0.5f, 0.5f, 1.0f),
-	    vec4f(0.8f, 0.8f, 0.8f, 1.0f),
-	    vec4f(0.8f, 0.8f, 0.8f, 1.0f),
-	    vec4f(0.5f, 0.9f, 0.5f, 1.0f)};
-
-	std::vector<vec3ui> index = {vec3ui(0, 1, 2), vec3ui(1, 2, 3)};
-
 	ospray::cpp::Group group;
 	{
-	    vec3i volumeDimensions(100, 100, 100);
-	    std::vector<float> voxels(volumeDimensions.long_product());
-	    for (uint32_t i =0 ; i < voxels.size(); i++)
-		voxels[i] = float(i) / volumeDimensions.long_product();
-	    
+	    std::fstream file;
+      	    file.open(argv[5], std::fstream::in | std::fstream::binary);
+    	    std::cout <<"dim "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<"\n";
+	    for (uint32_t i =0 ; i < volumeDimensions.long_product(); i++){
+	    	float buff;
+		file.read((char*)(&buff), sizeof(buff));
+		voxels[i] = float(buff);
+		if (float(buff) > max) max = float(buff);
+		if (float(buff) < min) min = float(buff);
+	    }
+	    file.close();
+	    glfwOspWindow.voxel_data = &voxels;
+	    std::cout << max <<" "<<min<<"\n";
+      	    //glfwOspWindow.tfns.push_back(makeTransferFunctionForColor(vec2f(min, max), glfwOspWindow.colors[j]));
+	 }
 	    // volume
 	    ospray::cpp::Volume volume("structuredRegular");
-	    volume.setParam("gridOrigin", vec3f(-0.5f,-0.5f,1.5f));
-	    volume.setParam("gridSpacing", vec3f(1.f / reduce_max(volumeDimensions)));
-	    volume.setParam("data", ospray::cpp::CopiedData(voxels.data(), volumeDimensions));
+	    volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
+	    volume.setParam("gridSpacing", vec3f(10.f / reduce_max(volumeDimensions)));
+	    volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), volumeDimensions));
 	    volume.setParam("dimensions", volumeDimensions);
 	    volume.commit();
 	    // put the mesh into a model
 	    ospray::cpp::VolumetricModel model(volume);
-	    model.setParam("transferFunction", makeTransferFunction(vec2f(0.f, 1.f)));
+	    model.setParam("transferFunction", makeTransferFunction(vec2f(-0.1f, 0.1f)));
 	    model.commit();
 	    
 	    group.setParam("volume", ospray::cpp::CopiedData(model));
-	}
+	
+	
 	group.commit();
 
 	// put the group into an instance (give the group a world transform)
@@ -457,6 +455,7 @@ int main(int argc, const char **argv)
     	// set up arcball camera for ospray
     	glfwOspWindow.arcballCamera.reset(new ArcballCamera(glfwOspWindow.world.getBounds<box3f>(), windowSize));
     	glfwOspWindow.arcballCamera->updateWindowSize(windowSize);
+    	std::cout << glfwOspWindow.world.getBounds<box3f>() << "\n";
     
 	
 	// create renderer, choose Scientific Visualization renderer
@@ -464,7 +463,7 @@ int main(int argc, const char **argv)
 
 	// complete setup of renderer
 	renderer->setParam("aoSamples", 1);
-	renderer->setParam("backgroundColor", 1.0f); // white, transparent
+	renderer->setParam("backgroundColor", 0.0f); // white, transparent
 	renderer->commit();
 
 	
@@ -485,42 +484,8 @@ int main(int argc, const char **argv)
     glfwSwapInterval(1); // Enable vsync
 
     // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
+    ImGui_ImplGlfwGL3_Init(glfwWindow, true);
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
-
-// Decide GL+GLSL versions
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
-    const char* glsl_version = "#version 100";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-#elif defined(__APPLE__)
-    // GL 3.2 + GLSL 150
-    const char* glsl_version = "#version 150";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
-#else
-    // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-#endif
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
     
     auto fb = glfwOspWindow.framebuffer.map(OSP_FB_COLOR);
     init(fb);
@@ -546,17 +511,11 @@ int main(int argc, const char **argv)
       glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
       glDisable(GL_TEXTURE_2D);
       
-      // need to fix this
-      //if(ImGui::GetIO().WantCaptureMouse) ImGui_ImplGlfw_InstallCallbacks(glfwWindow);
-      //else ImGui_ImplGlfw_RestoreCallbacks(glfwWindow);
-      
       // Start the Dear ImGui frame
-      ImGui_ImplOpenGL3_NewFrame();
-      ImGui_ImplGlfw_NewFrame();
-      ImGui::NewFrame();
+      ImGui_ImplGlfwGL3_NewFrame();
       glfwOspWindow.buildUI();
       ImGui::Render();
-      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+      ImGui_ImplGlfwGL3_Render();
       
       // Swap buffers
       glfwMakeContextCurrent(glfwWindow);
@@ -571,9 +530,7 @@ int main(int argc, const char **argv)
     while( glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 	   glfwWindowShouldClose(glfwWindow) == 0 );
     
-   		ImGui_ImplOpenGL3_Shutdown();
-    		ImGui_ImplGlfw_Shutdown();
-    		ImGui::DestroyContext();
+     ImGui_ImplGlfwGL3_Shutdown();
    		glfwTerminate();
 
 	

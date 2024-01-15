@@ -14,7 +14,7 @@ ArcballCamera::ArcballCamera(const rkcommon::math::box3f &worldBounds,
 {
   rkcommon::math::vec3f diag = worldBounds.size();
   zoomSpeed = rkcommon::math::max(length(diag) / 150.0, 0.001);
-  diag = rkcommon::math::max(diag, rkcommon::math::vec3f(0.8f * length(diag)));
+  diag = rkcommon::math::max(diag, rkcommon::math::vec3f(0.3f * length(diag)));
 
   centerTranslation =
       rkcommon::math::AffineSpace3f::translate(-worldBounds.center());

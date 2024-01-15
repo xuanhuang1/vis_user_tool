@@ -13,13 +13,11 @@ add_executable(vistool_ospray_vol
     ospVol.cpp
     ArcballCamera.cpp
     TransferFunctionWidget.cpp
-    ./glfwImgui/backends/imgui_impl_opengl3.cpp
-    ./glfwImgui/backends/imgui_impl_glfw.cpp
-    ./glfwImgui/imgui.cpp
-    ./glfwImgui/imgui_demo.cpp
-    ./glfwImgui/imgui_draw.cpp
-    ./glfwImgui/imgui_tables.cpp
-    ./glfwImgui/imgui_widgets.cpp
+    imgui/imgui.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_tables.cpp
+    imgui/imgui_widgets.cpp
+    imgui/imgui_impl_glfw_gl3.cpp
     ../loader.cpp
     ../util.cpp)
 
