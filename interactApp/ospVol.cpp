@@ -73,12 +73,16 @@ public:
   ospray::cpp::Renderer renderer{"scivis"};
   ospray::cpp::World world;
   ospray::cpp::Instance instance;
+  ospray::cpp::VolumetricModel model;
   std::vector<float> * voxel_data; // pointer to voxels data
   
   static GLFWOSPWindow *activeWindow;
   ospray::cpp::FrameBuffer framebuffer;
   std::unique_ptr<ArcballCamera> arcballCamera;
   vec2f previousMouse{vec2f(-1)};
+  
+  ospray::cpp::TransferFunction tfn{"piecewiseLinear"};
+  tfnw::TransferFunctionWidget tfn_widget;
   
   GLFWOSPWindow(){
     activeWindow = this;
@@ -241,6 +245,25 @@ void GLFWOSPWindow::buildUI(){
         ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
         if (ImGui::SliderFloat("float", &f, 0.0f, 1.0f)){
   	}
+  	
+  	if (tfn_widget.changed()) {
+	    std::vector<float> tmpOpacities;
+	    auto alphaOpacities = tfn_widget.get_alpha_control_pts();
+	    for (uint32_t i=0;i<alphaOpacities.size();i++){
+	      tmpOpacities.push_back((alphaOpacities[i].y*50.f));
+	    }
+	    tfn_widget.setUnchanged();
+    
+	    tfn.setParam("opacity", ospray::cpp::CopiedData(tmpOpacities));
+	    tfn.commit();
+	    model.commit();
+	  }
+
+  
+	  tfn_widget.draw_ui();
+	  
+	  
+	  
         ImGui::End();
 }
 
@@ -413,8 +436,25 @@ int main(int argc, const char **argv)
 	    file.close();
 	    glfwOspWindow.voxel_data = &voxels;
 	    std::cout << max <<" "<<min<<"\n";
+	    //glfwOspWindow.tfn = makeTransferFunction(vec2f(-0.1f, 0.1f))
       	    //glfwOspWindow.tfns.push_back(makeTransferFunctionForColor(vec2f(min, max), glfwOspWindow.colors[j]));
 	 }
+	 std::vector<float> tfn_colors;
+    	    std::vector<float> tfn_opacities;
+    	    std::vector<vec3f> tfn_colors_3f;
+    	    glfwOspWindow.tfn_widget.get_colormapf(tfn_colors, tfn_opacities);
+    	    for (uint32_t i=0; i<tfn_colors.size() / 3; i++)
+    	    	tfn_colors_3f.emplace_back(tfn_colors[3*i], tfn_colors[3*i+1], tfn_colors[3*i+2]);
+    	    tfn_opacities.push_back(0.f);
+    	    tfn_opacities.push_back(1.f);
+    		
+    	    ospray::cpp::TransferFunction tfn("piecewiseLinear");
+    	    tfn.setParam("color", ospray::cpp::CopiedData(tfn_colors_3f));
+            tfn.setParam("opacity", ospray::cpp::CopiedData(tfn_opacities));
+            tfn.setParam("valueRange", vec2f(-0.1f, 0.1f));
+    	    tfn.commit();
+    	    glfwOspWindow.tfn = tfn;
+    	    
 	    // volume
 	    ospray::cpp::Volume volume("structuredRegular");
 	    volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
@@ -424,8 +464,10 @@ int main(int argc, const char **argv)
 	    volume.commit();
 	    // put the mesh into a model
 	    ospray::cpp::VolumetricModel model(volume);
-	    model.setParam("transferFunction", makeTransferFunction(vec2f(-0.1f, 0.1f)));
+	    
+	    model.setParam("transferFunction", glfwOspWindow.tfn);
 	    model.commit();
+	    glfwOspWindow.model = model;
 	    
 	    group.setParam("volume", ospray::cpp::CopiedData(model));
 	
