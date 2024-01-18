@@ -243,15 +243,15 @@ void GLFWOSPWindow::buildUI(){
 	ImGui::Begin("Menu Window", nullptr, flags);
 
         ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        if (ImGui::SliderFloat("float", &f, 0.0f, 1.0f)){
-  	}
-  	
+        if (ImGui::SliderFloat("float", &f, 0.0f, 1.0f)){}
+        
+  	if (ImGui::TreeNode("Transfer Function")){
   	if (tfn_widget.changed()) {
-	    std::vector<float> tmpOpacities;
-	    auto alphaOpacities = tfn_widget.get_alpha_control_pts();
-	    for (uint32_t i=0;i<alphaOpacities.size();i++){
-	      tmpOpacities.push_back((alphaOpacities[i].y*50.f));
-	    }
+	    std::vector<float> tmpOpacities, tmpColors;
+	    tfn_widget.get_colormapf(tmpColors, tmpOpacities);
+	    for (uint32_t i=0;i<tmpOpacities.size();i++)
+	      tmpOpacities[i] *= 10.f;
+	    
 	    tfn_widget.setUnchanged();
     
 	    tfn.setParam("opacity", ospray::cpp::CopiedData(tmpOpacities));
@@ -261,6 +261,8 @@ void GLFWOSPWindow::buildUI(){
 
   
 	  tfn_widget.draw_ui();
+	  ImGui::TreePop();
+	  }
 	  
 	  
 	  
