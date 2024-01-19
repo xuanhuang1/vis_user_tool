@@ -69,57 +69,57 @@ std::string dataTypeString[] = {"triangle_mesh", "volume"};
 
 class GLFWOSPWindow{
 public:
-  ospray::cpp::Camera camera{"perspective"};
-  ospray::cpp::Renderer renderer{"scivis"};
-  ospray::cpp::World world;
-  ospray::cpp::Instance instance;
-  ospray::cpp::VolumetricModel model;
-  std::vector<float> * voxel_data; // pointer to voxels data
+    ospray::cpp::Camera camera{"perspective"};
+    ospray::cpp::Renderer renderer{"scivis"};
+    ospray::cpp::World world;
+    ospray::cpp::Instance instance;
+    ospray::cpp::VolumetricModel model;
+    std::vector<float> * voxel_data; // pointer to voxels data
   
-  static GLFWOSPWindow *activeWindow;
-  ospray::cpp::FrameBuffer framebuffer;
-  std::unique_ptr<ArcballCamera> arcballCamera;
-  vec2f previousMouse{vec2f(-1)};
+    static GLFWOSPWindow *activeWindow;
+    ospray::cpp::FrameBuffer framebuffer;
+    std::unique_ptr<ArcballCamera> arcballCamera;
+    vec2f previousMouse{vec2f(-1)};
   
-  ospray::cpp::TransferFunction tfn{"piecewiseLinear"};
-  tfnw::TransferFunctionWidget tfn_widget;
+    ospray::cpp::TransferFunction tfn{"piecewiseLinear"};
+    tfnw::TransferFunctionWidget tfn_widget;
   
-  GLFWOSPWindow(){
-    activeWindow = this;
+    GLFWOSPWindow(){
+	activeWindow = this;
     
-    /// prepare framebuffer
-    auto buffers = OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM | OSP_FB_ALBEDO
-      | OSP_FB_NORMAL;
-    framebuffer = ospray::cpp::FrameBuffer(imgSize.x, imgSize.y, OSP_FB_RGBA32F, buffers);
+	/// prepare framebuffer
+	auto buffers = OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM | OSP_FB_ALBEDO
+	    | OSP_FB_NORMAL;
+	framebuffer = ospray::cpp::FrameBuffer(imgSize.x, imgSize.y, OSP_FB_RGBA32F, buffers);
     
-  }
+    }
   
-  void display();
-  void motion(double, double);
-  void mouse(int, int, int, int);
-  void reshape(int, int);
+    void display();
+    void motion(double, double);
+    void mouse(int, int, int, int);
+    void reshape(int, int);
     
-  void setFunc(){
+    void setFunc(){
 
-  glfwSetCursorPosCallback(
-      glfwWindow, [](GLFWwindow *, double x, double y) {
-		    activeWindow->motion(x, y);
-		  });
-    glfwSetFramebufferSizeCallback(
-      glfwWindow, [](GLFWwindow *, int newWidth, int newHeight) {
-        activeWindow->reshape(newWidth, newHeight);
-      });
+	glfwSetCursorPosCallback(
+				 glfwWindow, [](GLFWwindow *, double x, double y) {
+				     activeWindow->motion(x, y);
+				 });
+	glfwSetFramebufferSizeCallback(
+				       glfwWindow, [](GLFWwindow *, int newWidth, int newHeight) {
+					   activeWindow->reshape(newWidth, newHeight);
+				       });
 
     
-  }
+    }
 
-  void renderNewFrame(){
-    framebuffer.clear();
-    // render one frame
-    framebuffer.renderFrame(renderer, camera, world);
-  }
+    void renderNewFrame(){
+	framebuffer.clear();
+	// render one frame
+	framebuffer.renderFrame(renderer, camera, world);
+    }
 
-  void buildUI();
+    void buildUI();
 };
 
 GLFWOSPWindow *GLFWOSPWindow::activeWindow = nullptr;
@@ -127,47 +127,47 @@ GLFWOSPWindow *GLFWOSPWindow::activeWindow = nullptr;
 
 void GLFWOSPWindow::motion(double x, double y)
 {
-  const vec2f mouse(x, y);
-  if (previousMouse != vec2f(-1)) {
-    const bool leftDown =
-      glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-    const bool rightDown =
-      glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
-    const bool middleDown =
-      glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
-    const vec2f prev = previousMouse;
+    const vec2f mouse(x, y);
+    if (previousMouse != vec2f(-1)) {
+	const bool leftDown =
+	    glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+	const bool rightDown =
+	    glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+	const bool middleDown =
+	    glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
+	const vec2f prev = previousMouse;
 
-    bool cameraChanged = leftDown || rightDown || middleDown;
+	bool cameraChanged = leftDown || rightDown || middleDown;
 
-    // don't modify camera with mouse on ui window
-    if (ImGui::GetIO().WantCaptureMouse){ 
-    	return;
-    }
+	// don't modify camera with mouse on ui window
+	if (ImGui::GetIO().WantCaptureMouse){ 
+	    return;
+	}
     
-    if (leftDown) {
-      const vec2f mouseFrom(std::clamp(prev.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
-			    std::clamp(prev.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
-      const vec2f mouseTo(std::clamp(mouse.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
-			  std::clamp(mouse.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
-      arcballCamera->rotate(mouseFrom, mouseTo);
-    } else if (rightDown) {
-      arcballCamera->zoom(mouse.y - prev.y);
-    } else if (middleDown) {
-      arcballCamera->pan(vec2f(mouse.x - prev.x, prev.y - mouse.y));
+	if (leftDown) {
+	    const vec2f mouseFrom(std::clamp(prev.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
+				  std::clamp(prev.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
+	    const vec2f mouseTo(std::clamp(mouse.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
+				std::clamp(mouse.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
+	    arcballCamera->rotate(mouseFrom, mouseTo);
+	} else if (rightDown) {
+	    arcballCamera->zoom(mouse.y - prev.y);
+	} else if (middleDown) {
+	    arcballCamera->pan(vec2f(mouse.x - prev.x, prev.y - mouse.y));
+	}
+
+	if (cameraChanged) {
+	    //updateCamera();
+	    //addObjectToCommit(camera.handle());
+	    camera.setParam("aspect", windowSize.x / float(windowSize.y));
+	    camera.setParam("position", arcballCamera->eyePos());
+	    camera.setParam("direction", arcballCamera->lookDir());
+	    camera.setParam("up", arcballCamera->upDir());
+	    camera.commit();
+	}
     }
 
-    if (cameraChanged) {
-      //updateCamera();
-      //addObjectToCommit(camera.handle());
-      camera.setParam("aspect", windowSize.x / float(windowSize.y));
-      camera.setParam("position", arcballCamera->eyePos());
-      camera.setParam("direction", arcballCamera->lookDir());
-      camera.setParam("up", arcballCamera->upDir());
-      camera.commit();
-    }
-  }
-
-  previousMouse = mouse;
+    previousMouse = mouse;
 
 }
 
@@ -175,142 +175,157 @@ void GLFWOSPWindow::motion(double x, double y)
 void GLFWOSPWindow::reshape(int w, int h)
 {
   
-  windowSize.x = w;
-  windowSize.y = h;
+    windowSize.x = w;
+    windowSize.y = h;
   
-  // create new frame buffer
-  auto buffers = OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM | OSP_FB_ALBEDO
-      | OSP_FB_NORMAL;
-  framebuffer =
-    ospray::cpp::FrameBuffer(imgSize.x, imgSize.y, OSP_FB_RGBA32F, buffers);
-  framebuffer.commit();
+    // create new frame buffer
+    auto buffers = OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM | OSP_FB_ALBEDO
+	| OSP_FB_NORMAL;
+    framebuffer =
+	ospray::cpp::FrameBuffer(imgSize.x, imgSize.y, OSP_FB_RGBA32F, buffers);
+    framebuffer.commit();
   
-  glViewport(0, 0, windowSize.x, windowSize.y);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(0.0, windowSize.x, 0.0, windowSize.y, -1.0, 1.0);
+    glViewport(0, 0, windowSize.x, windowSize.y);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0, windowSize.x, 0.0, windowSize.y, -1.0, 1.0);
 
-  // update camera
-  //arcballCamera->updateWindowSize(windowSize);
+    // update camera
+    //arcballCamera->updateWindowSize(windowSize);
 
-  camera.setParam("aspect", windowSize.x / float(windowSize.y));
-  camera.commit();
+    camera.setParam("aspect", windowSize.x / float(windowSize.y));
+    camera.commit();
 
 }
 
 void GLFWOSPWindow::display()
 { 
   
-   glBindTexture(GL_TEXTURE_2D, texture);
-   // render textured quad with OSPRay frame buffer contents
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // render textured quad with OSPRay frame buffer contents
    
-   renderNewFrame();
-   auto fb = framebuffer.map(OSP_FB_COLOR);
+    renderNewFrame();
+    auto fb = framebuffer.map(OSP_FB_COLOR);
 
-   glTexImage2D(GL_TEXTURE_2D,
-		0,
-		GL_RGBA32F,
-		imgSize.x,
-		imgSize.y,
-		0,
-		GL_RGBA,
-		GL_FLOAT,
-		fb);
-   framebuffer.unmap(fb);
+    glTexImage2D(GL_TEXTURE_2D,
+		 0,
+		 GL_RGBA32F,
+		 imgSize.x,
+		 imgSize.y,
+		 0,
+		 GL_RGBA,
+		 GL_FLOAT,
+		 fb);
+    framebuffer.unmap(fb);
    
    
-   glBegin(GL_QUADS);
+    glBegin(GL_QUADS);
 
-   glTexCoord2f(0.f, 0.f);
-   glVertex2f(0.f, 0.f);
+    glTexCoord2f(0.f, 0.f);
+    glVertex2f(0.f, 0.f);
 
-   glTexCoord2f(0.f, 1.f);
-   glVertex2f(0.f, windowSize.y);
+    glTexCoord2f(0.f, 1.f);
+    glVertex2f(0.f, windowSize.y);
 
-   glTexCoord2f(1.f, 1.f);
-   glVertex2f(windowSize.x, windowSize.y);
+    glTexCoord2f(1.f, 1.f);
+    glVertex2f(windowSize.x, windowSize.y);
 
-   glTexCoord2f(1.f, 0.f);
-   glVertex2f(windowSize.x, 0.f);
+    glTexCoord2f(1.f, 0.f);
+    glVertex2f(windowSize.x, 0.f);
 
-   glEnd();
+    glEnd();
 }
 
 
 void GLFWOSPWindow::buildUI(){
-	static float f = 0;
-	ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
-	ImGui::Begin("Menu Window", nullptr, flags);
+    static float f = 1.f;
+    static bool changeF = false;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
+    ImGui::Begin("Menu Window", nullptr, flags);
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        if (ImGui::SliderFloat("float", &f, 0.0f, 1.0f)){}
+    ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+    if (ImGui::SliderFloat("float", &f, 1.0f, 10.0f)){changeF = true;}
         
-  	if (ImGui::TreeNode("Transfer Function")){
-  	if (tfn_widget.changed()) {
-	    std::vector<float> tmpOpacities, tmpColors;
+    if (ImGui::TreeNode("Transfer Function")){
+  	if (tfn_widget.changed() || changeF) {
+	    std::vector<float> tmpOpacities, tmpColors; //color not used
 	    tfn_widget.get_colormapf(tmpColors, tmpOpacities);
 	    for (uint32_t i=0;i<tmpOpacities.size();i++)
-	      tmpOpacities[i] *= 10.f;
+	    	tmpOpacities[i] *= f;
 	    
 	    tfn_widget.setUnchanged();
     
 	    tfn.setParam("opacity", ospray::cpp::CopiedData(tmpOpacities));
 	    tfn.commit();
 	    model.commit();
-	  }
+	}
 
   
-	  tfn_widget.draw_ui();
-	  ImGui::TreePop();
-	  }
+	tfn_widget.draw_ui();
+	ImGui::TreePop();
+    }
 	  
 	  
 	  
-        ImGui::End();
+    ImGui::End();
 }
 
-ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange)
+ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw::TransferFunctionWidget& widget)
 {
-  ospray::cpp::TransferFunction transferFunction("piecewiseLinear");
-  std::string tfColorMap{"rgb"};
-  std::string tfOpacityMap{"linear"};
+    ospray::cpp::TransferFunction transferFunction("piecewiseLinear");
+    std::string tfColorMap{"jet"};
+    std::string tfOpacityMap{"opaque"};
   
-  std::vector<vec3f> colors;
-  std::vector<float> opacities;
+    std::vector<vec3f> colors;
+    std::vector<float> opacities;
 
-  if (tfColorMap == "jet") {
-    colors.emplace_back(0, 0, 0.562493);
-    colors.emplace_back(0, 0, 1);
-    colors.emplace_back(0, 1, 1);
-    colors.emplace_back(0.500008, 1, 0.500008);
-    colors.emplace_back(1, 1, 0);
-    colors.emplace_back(1, 0, 0);
-    colors.emplace_back(0.500008, 0, 0);
-  } else if (tfColorMap == "rgb") {
-    colors.emplace_back(0, 0, 1);
-    colors.emplace_back(0, 1, 0);
-    colors.emplace_back(1, 0, 0);
-  } else {
-    colors.emplace_back(0.f, 0.f, 0.f);
-    colors.emplace_back(1.f, 1.f, 1.f);
-  }
+    if (tfColorMap == "jet") {
+	colors.emplace_back(0, 0, 0.562493);
+	colors.emplace_back(0, 0, 1);
+	colors.emplace_back(0, 1, 1);
+	colors.emplace_back(0.500008, 1, 0.500008);
+	colors.emplace_back(1, 1, 0);
+	colors.emplace_back(1, 0, 0);
+	colors.emplace_back(0.500008, 0, 0);
+    } else if (tfColorMap == "rgb") {
+	colors.emplace_back(0, 0, 1);
+	colors.emplace_back(0, 1, 0);
+	colors.emplace_back(1, 0, 0);
+    } else {
+	colors.emplace_back(0.f, 0.f, 0.f);
+	colors.emplace_back(1.f, 1.f, 1.f);
+    }
 
-  if (tfOpacityMap == "linear") {
-    opacities.emplace_back(0.f);
-    opacities.emplace_back(1.f);
-  } else if (tfOpacityMap == "linearInv") {
-    opacities.emplace_back(1.f);
-    opacities.emplace_back(0.f);
-  } else if (tfOpacityMap == "opaque") {
-    opacities.emplace_back(1.f);
-  }
+    if (tfOpacityMap == "linear") {
+	opacities.emplace_back(0.f);
+	opacities.emplace_back(1.f);
+	widget.alpha_control_pts[0].x = 0.f;
+	widget.alpha_control_pts[0].y = 0.f;
+        widget.alpha_control_pts[1].x = 1.f;
+	widget.alpha_control_pts[1].y = 1.f;
+    } else if (tfOpacityMap == "linearInv") {
+	opacities.emplace_back(1.f);
+	opacities.emplace_back(0.f);
+        widget.alpha_control_pts[0].x = 1.f;
+	widget.alpha_control_pts[0].y = 1.f;
+        widget.alpha_control_pts[1].x = 0.f;
+	widget.alpha_control_pts[1].y = 0.f;
+    } else if (tfOpacityMap == "opaque") {
+	opacities.emplace_back(1.f);
+	opacities.emplace_back(1.f);
+        widget.alpha_control_pts[0].x = 0.f;
+	widget.alpha_control_pts[0].y = 1.f;
+        widget.alpha_control_pts[1].x = 1.f;
+	widget.alpha_control_pts[1].y = 1.f;
+    }
 
-  transferFunction.setParam("color", ospray::cpp::CopiedData(colors));
-  transferFunction.setParam("opacity", ospray::cpp::CopiedData(opacities));
-  transferFunction.setParam("valueRange", valueRange);
-  transferFunction.commit();
+    transferFunction.setParam("color", ospray::cpp::CopiedData(colors));
+    transferFunction.setParam("opacity", ospray::cpp::CopiedData(opacities));
+    transferFunction.setParam("valueRange", valueRange);
+    transferFunction.commit();
+    //    widget.update_colormap();
 
-  return transferFunction;
+    return transferFunction;
 }
 
 void init (void* fb){
@@ -388,12 +403,12 @@ int main(int argc, const char **argv)
 		return 0;
 	    } else {
 	    	if (i == 1){
-			std::ifstream cfg_file(args[i].c_str());
-			if (!cfg_file) {
-		    		std::cerr << "[error]: Failed to open config file " << args[i] << "\n";
-		    		throw std::runtime_error("Failed to open input config file");
-			}
-			cfg_file >> config;
+		    std::ifstream cfg_file(args[i].c_str());
+		    if (!cfg_file) {
+			std::cerr << "[error]: Failed to open config file " << args[i] << "\n";
+			throw std::runtime_error("Failed to open input config file");
+		    }
+		    cfg_file >> config;
 		}
 	    }
 	}
@@ -427,51 +442,41 @@ int main(int argc, const char **argv)
 	{
 	    std::fstream file;
       	    file.open(argv[5], std::fstream::in | std::fstream::binary);
-    	    std::cout <<"dim "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<"\n";
-	    for (uint32_t i =0 ; i < volumeDimensions.long_product(); i++){
+    	    std::cout <<"dim "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<"\nLoad "<< voxels.size()<< " :";
+	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
 	    	float buff;
 		file.read((char*)(&buff), sizeof(buff));
 		voxels[i] = float(buff);
 		if (float(buff) > max) max = float(buff);
 		if (float(buff) < min) min = float(buff);
+		
+		for (int k=0; k<10; k++)
+		    if (i == (volumeDimensions.long_product()/10)*k)
+			std::cout <<i<<" "<< k<<"0% \n";
 	    }
+	    std::cout <<"End load \n";
 	    file.close();
 	    glfwOspWindow.voxel_data = &voxels;
-	    std::cout << max <<" "<<min<<"\n";
-	    //glfwOspWindow.tfn = makeTransferFunction(vec2f(-0.1f, 0.1f))
-      	    //glfwOspWindow.tfns.push_back(makeTransferFunctionForColor(vec2f(min, max), glfwOspWindow.colors[j]));
-	 }
-	 std::vector<float> tfn_colors;
-    	    std::vector<float> tfn_opacities;
-    	    std::vector<vec3f> tfn_colors_3f;
-    	    glfwOspWindow.tfn_widget.get_colormapf(tfn_colors, tfn_opacities);
-    	    for (uint32_t i=0; i<tfn_colors.size() / 3; i++)
-    	    	tfn_colors_3f.emplace_back(tfn_colors[3*i], tfn_colors[3*i+1], tfn_colors[3*i+2]);
-    	    tfn_opacities.push_back(0.f);
-    	    tfn_opacities.push_back(1.f);
+	    std::cout <<"range: "<< max <<" "<<min<<"\n";
+	}
     		
-    	    ospray::cpp::TransferFunction tfn("piecewiseLinear");
-    	    tfn.setParam("color", ospray::cpp::CopiedData(tfn_colors_3f));
-            tfn.setParam("opacity", ospray::cpp::CopiedData(tfn_opacities));
-            tfn.setParam("valueRange", vec2f(-0.1f, 0.1f));
-    	    tfn.commit();
-    	    glfwOspWindow.tfn = tfn;
+	glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
     	    
-	    // volume
-	    ospray::cpp::Volume volume("structuredRegular");
-	    volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
-	    volume.setParam("gridSpacing", vec3f(10.f / reduce_max(volumeDimensions)));
-	    volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), volumeDimensions));
-	    volume.setParam("dimensions", volumeDimensions);
-	    volume.commit();
-	    // put the mesh into a model
-	    ospray::cpp::VolumetricModel model(volume);
+	// volume
+	ospray::cpp::Volume volume("structuredRegular");
+	volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
+	volume.setParam("gridSpacing", vec3f(10.f / reduce_max(volumeDimensions)));
+	volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), volumeDimensions));
+	volume.setParam("dimensions", volumeDimensions);
+	volume.commit();
+	// put the mesh into a model
+	ospray::cpp::VolumetricModel model(volume);
 	    
-	    model.setParam("transferFunction", glfwOspWindow.tfn);
-	    model.commit();
-	    glfwOspWindow.model = model;
+	model.setParam("transferFunction", glfwOspWindow.tfn);
+	model.commit();
+	glfwOspWindow.model = model;
 	    
-	    group.setParam("volume", ospray::cpp::CopiedData(model));
+	group.setParam("volume", ospray::cpp::CopiedData(model));
 	
 	
 	group.commit();
@@ -499,7 +504,7 @@ int main(int argc, const char **argv)
     	// set up arcball camera for ospray
     	glfwOspWindow.arcballCamera.reset(new ArcballCamera(glfwOspWindow.world.getBounds<box3f>(), windowSize));
     	glfwOspWindow.arcballCamera->updateWindowSize(windowSize);
-    	std::cout << glfwOspWindow.world.getBounds<box3f>() << "\n";
+    	std::cout << "boundbox: "<< glfwOspWindow.world.getBounds<box3f>() << "\n";
     
 	
 	// create renderer, choose Scientific Visualization renderer
@@ -520,62 +525,63 @@ int main(int argc, const char **argv)
 	camera->commit(); // commit each object to indicate modifications are done
 	
 	    
-	    
-    glfwOspWindow.renderNewFrame();
+	std::cout << "All osp objects committed\n";
+	glfwOspWindow.renderNewFrame();
     
     
-    glfwMakeContextCurrent(glfwWindow);
-    glfwSwapInterval(1); // Enable vsync
+	glfwMakeContextCurrent(glfwWindow);
+	glfwSwapInterval(1); // Enable vsync
 
-    // Setup Dear ImGui context
-    ImGui_ImplGlfwGL3_Init(glfwWindow, true);
-    ImGui::StyleColorsDark();
+	// Setup Dear ImGui context
+	ImGui_ImplGlfwGL3_Init(glfwWindow, true);
+	ImGui::StyleColorsDark();
     
-    auto fb = glfwOspWindow.framebuffer.map(OSP_FB_COLOR);
-    init(fb);
-    glfwOspWindow.framebuffer.unmap(fb);
-    glfwOspWindow.setFunc();
-    glfwOspWindow.reshape(windowSize.x, windowSize.y);
-    glfwSetInputMode(glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
+	auto fb = glfwOspWindow.framebuffer.map(OSP_FB_COLOR);
+	init(fb);
+	glfwOspWindow.framebuffer.unmap(fb);
+	glfwOspWindow.setFunc();
+	glfwOspWindow.reshape(windowSize.x, windowSize.y);
+	glfwSetInputMode(glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
     
-    auto t1 = std::chrono::high_resolution_clock::now();
-    auto t2 = std::chrono::high_resolution_clock::now();
-
-    do{
-    glfwPollEvents();
+	auto t1 = std::chrono::high_resolution_clock::now();
+	auto t2 = std::chrono::high_resolution_clock::now();
+	
+	std::cout << "Begin render loop\n";
+	do{
+	    glfwPollEvents();
     
-      t1 = std::chrono::high_resolution_clock::now();
+	    t1 = std::chrono::high_resolution_clock::now();
       
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glEnable(GL_TEXTURE_2D);
+	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	    glEnable(GL_TEXTURE_2D);
   
       
-      glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
-      glfwOspWindow.display();
-      glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
-      glDisable(GL_TEXTURE_2D);
+	    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+	    glfwOspWindow.display();
+	    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+	    glDisable(GL_TEXTURE_2D);
       
-      // Start the Dear ImGui frame
-      ImGui_ImplGlfwGL3_NewFrame();
-      glfwOspWindow.buildUI();
-      ImGui::Render();
-      ImGui_ImplGlfwGL3_Render();
+	    // Start the Dear ImGui frame
+	    ImGui_ImplGlfwGL3_NewFrame();
+	    glfwOspWindow.buildUI();
+	    ImGui::Render();
+	    ImGui_ImplGlfwGL3_Render();
       
-      // Swap buffers
-      glfwMakeContextCurrent(glfwWindow);
-      glfwSwapBuffers(glfwWindow);
+	    // Swap buffers
+	    glfwMakeContextCurrent(glfwWindow);
+	    glfwSwapBuffers(glfwWindow);
       
 
-      t2 = std::chrono::high_resolution_clock::now();
-      auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-      glfwSetWindowTitle(glfwWindow, (std::string("Render FPS:")+std::to_string(int(1.f / time_span.count()))).c_str());
+	    t2 = std::chrono::high_resolution_clock::now();
+	    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+	    glfwSetWindowTitle(glfwWindow, (std::string("Render FPS:")+std::to_string(int(1.f / time_span.count()))).c_str());
 
-    } // Check if the ESC key was pressed or the window was closed
-    while( glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-	   glfwWindowShouldClose(glfwWindow) == 0 );
+	} // Check if the ESC key was pressed or the window was closed
+	while( glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+	       glfwWindowShouldClose(glfwWindow) == 0 );
     
-     ImGui_ImplGlfwGL3_Shutdown();
-   		glfwTerminate();
+	ImGui_ImplGlfwGL3_Shutdown();
+	glfwTerminate();
 
 	
 	
