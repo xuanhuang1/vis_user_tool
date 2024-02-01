@@ -1,3 +1,13 @@
+#include <pybind11/stl.h>
+#include <pybind11/pybind11.h>
+#include <iostream>
+
+namespace py = pybind11;
+
+void echo(int i) {
+    std::cout << i <<std::endl;
+}
+
 // Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,7 +25,7 @@
  */
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../stb_image_write.h"
+#include "../../stb_image_write.h"
 
 #include <errno.h>
 #include <stdint.h>
@@ -37,16 +47,16 @@
 #include "ospray/ospray_cpp/ext/rkcommon.h"
 #include "rkcommon/utility/SaveImage.h"
 
-#include "../loader.h"
-#include "ArcballCamera.h"
-#include "TransferFunctionWidget.h"
+#include "../../loader.h"
+#include "../ArcballCamera.h"
+#include "../TransferFunctionWidget.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // imgui
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_glfw_gl3.h"
 
 
 using namespace rkcommon::math;
@@ -368,7 +378,34 @@ void init (void* fb){
 
 }
 
-int main(int argc, const char **argv)
+static std::vector<std::string>
+init_app(const std::vector<std::string>& args)
+{
+    int argc = args.size();
+    const char **argv = new const char*[argc];
+    
+    for (int i = 0; i < argc; i++)
+        argv[i] = args[i].c_str();
+    
+    OSPError res = ospInit(&argc, argv);
+    
+    if (res != OSP_NO_ERROR)
+    {
+        delete [] argv;
+	std::cout <<"ospInit() failed";
+    }
+    
+    std::vector<std::string> newargs;
+    
+    for (int i = 0; i < argc; i++)
+        newargs.push_back(std::string(argv[i]));
+    
+    delete [] argv;
+    
+    return newargs;
+}
+
+int run_app()
 {
 
 
@@ -380,12 +417,6 @@ int main(int argc, const char **argv)
 	waitForKey = csbi.dwCursorPosition.X == 0 && csbi.dwCursorPosition.Y == 0;
     }
 #endif
-
-    // initialize OSPRay; OSPRay parses (and removes) its commandline parameters,
-    // e.g. "--osp:debug"
-    OSPError init_error = ospInit(&argc, argv);
-    if (init_error != OSP_NO_ERROR)
-	return init_error;
 	
     // use scoped lifetimes of wrappers to release everything before ospShutdown()
     {
@@ -407,76 +438,23 @@ int main(int argc, const char **argv)
 
     
 	GLFWOSPWindow glfwOspWindow;
-
-
-	std::vector<std::string> args(argv, argv + argc);
-    
-	json config;
-	std::string prefix;
-	for (int i = 1; i < argc; ++i) {
-	    if (args[i] == "-h") {
-		std::cout << "./mini_vistool <config.json> x y z <file> [options]\n";
-		return 0;
-	    } else {
-	    	if (i == 1){
-		    std::ifstream cfg_file(args[i].c_str());
-		    if (!cfg_file) {
-			std::cerr << "[error]: Failed to open config file " << args[i] << "\n";
-			throw std::runtime_error("Failed to open input config file");
-		    }
-		    cfg_file >> config;
-		}
-	    }
-	}
 	
-    
-	// load json
-	std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
-	std::string dataType = config["data"]["type"];
-
-	// log out json info
-	{
-	    bool foundDataType = false;
-	    for( uint32_t i=0; i<TOTAL_DATA_TYPES; i++){
-		if (dataType == dataTypeString[i]){
-		    std::cout << "data type: " << dataType <<"\n";
-		    foundDataType = true;
-		}
-	    }
-	    if (!foundDataType) std::cerr << "Unsupported data type " << dataType <<"\n";
-      
-	    for(auto &c : cams)
-		c.print();
-	}
-	
-	vec3i volumeDimensions(std::stoi(argv[2]), std::stoi(argv[3]), std::stoi(argv[4]));
+	vec3i volumeDimensions(100, 100, 100);
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
 	
 	// construct ospray variables
 	ospray::cpp::Group group;
 	{
-	    std::fstream file;
-      	    file.open(argv[5], std::fstream::in | std::fstream::binary);
-    	    std::cout <<"dim "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<"\nLoad "<< voxels.size()<< " :";
 	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
-	    	float buff;
-		file.read((char*)(&buff), sizeof(buff));
-		voxels[i] = float(buff);
-		if (float(buff) > max) max = float(buff);
-		if (float(buff) < min) min = float(buff);
-		
-		for (int k=0; k<10; k++)
-		    if (i == (volumeDimensions.long_product()/10)*k)
-			std::cout <<i<<" "<< k<<"0% \n";
-	    }
+        	voxels[i] = float(i)/100.f;
+	        
+            }
 	    std::cout <<"End load \n";
-	    file.close();
 	    glfwOspWindow.voxel_data = &voxels;
-	    std::cout <<"range: "<< max <<" "<<min<<"\n";
-	}
+        }
     		
-	glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
+	glfwOspWindow.tfn = makeTransferFunction(vec2f(0.f, 1.f), glfwOspWindow. tfn_widget);
     	    
 	// volume
 	//ospray::cpp::Volume volume("structuredSpherical");
@@ -616,3 +594,12 @@ int main(int argc, const char **argv)
     return 0;
 }
 
+
+
+PYBIND11_MODULE(vistool_py, m) {
+    // Optional docstring
+    m.doc() = "the renderer's py library";
+        
+    m.def("init_app", &init_app, "init render app");
+    m.def("run_app", &run_app, "run render app");
+}
