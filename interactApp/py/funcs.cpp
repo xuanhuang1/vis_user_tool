@@ -1,5 +1,6 @@
 #include <pybind11/stl.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <iostream>
 
 namespace py = pybind11;
@@ -405,9 +406,12 @@ init_app(const std::vector<std::string>& args)
     return newargs;
 }
 
-int run_app()
+int run_app(py::array_t<float> input_array, int x, int y, int z)
 {
+    py::buffer_info buf_info = input_array.request();
+    float *ptr = static_cast<float *>(buf_info.ptr);
 
+    std::cout << "shape:"<< x <<" "<<y<<" "<<z <<std::endl;
 
 #ifdef _WIN32
     bool waitForKey = false;
@@ -439,7 +443,7 @@ int run_app()
     
 	GLFWOSPWindow glfwOspWindow;
 	
-	vec3i volumeDimensions(100, 100, 100);
+	vec3i volumeDimensions(x, y, z);
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
 	
@@ -447,14 +451,16 @@ int run_app()
 	ospray::cpp::Group group;
 	{
 	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
-        	voxels[i] = float(i)/100.f;
+        	voxels[i] = ptr[i];
+		min = std::min(min, voxels[i]);
+		max = std::max(max, voxels[i]);
 	        
             }
-	    std::cout <<"End load \n";
+	    std::cout <<"End load max: "<< max <<" min: "<<min<< "\n";
 	    glfwOspWindow.voxel_data = &voxels;
         }
     		
-	glfwOspWindow.tfn = makeTransferFunction(vec2f(0.f, 1.f), glfwOspWindow. tfn_widget);
+	glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
     	    
 	// volume
 	//ospray::cpp::Volume volume("structuredSpherical");
