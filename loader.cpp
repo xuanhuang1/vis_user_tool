@@ -10,12 +10,18 @@
 
 using json = nlohmann::json;
 
-visuser::Camera::Camera(): pos(glm::vec3(1,0,0)), dir(glm::vec3(-1,0,0)), up(glm::vec3(0,0,1)){}
+visuser::Camera::Camera(): pos(glm::vec3(1,0,0)), dir(glm::vec3(-1,0,0)), up(glm::vec3(0,0,1)){
+	frame = 0;
+}
 
 visuser::Camera::Camera(const glm::vec3 &pos, const glm::vec3 &dir, const glm::vec3 &up)
-	: pos(pos), dir(dir), up(up)
-    {
-    }
+	: pos(pos), dir(dir), up(up){
+	frame = 0;	
+}
+
+visuser::Camera::Camera(const glm::vec3 &pos, const glm::vec3 &dir, const glm::vec3 &up, uint32_t f)
+	: pos(pos), dir(dir), up(up), frame(f){
+}
 
     
 void visuser::Camera::print(){
@@ -27,7 +33,7 @@ void visuser::Camera::print(){
 
 visuser::Camera interpolate(visuser::Camera &a, visuser::Camera &b, glm::vec2 range, uint32_t f){
 	float val = (f - range[0]) / float(range[1] - range[0]);
-	glm::vec3 pos = glm::normalize(mix(a.pos, b.pos, val));
+	glm::vec3 pos = mix(a.pos, b.pos, val);
 	glm::vec3 dir = glm::normalize(mix(a.dir, b.dir, val));
 	glm::vec3 up  = glm::normalize(mix(a.up, b.up, val));
 	return visuser::Camera(pos, dir, up);
@@ -68,7 +74,8 @@ void visuser::AniObjWidget::load_cameras(){
 	    const auto &c = camera_set[i];
 	    cameras.push_back(Camera(get_vec3f(c["pos"]),
 					 get_vec3f(c["dir"]),
-					 get_vec3f(c["up"])));
+					 get_vec3f(c["up"]),
+					 c["frame"].get<uint32_t>()));
 	}
 	currentCam = cameras[0];
 }
