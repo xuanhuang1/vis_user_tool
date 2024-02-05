@@ -10,41 +10,52 @@
 #include "util.h"
 #include "ext/glm/glm.hpp"
 
-//using json = nlohmann::json;
-
 namespace visuser{
-    // data
-    struct Volume{
-    };
 
-    struct Mesh{
-    };	
-
-    // initial setting
     struct Camera {
     	glm::vec3 pos;
     	glm::vec3 dir;
     	glm::vec3 up;
 
+	Camera();
     	Camera(const glm::vec3 &pos, const glm::vec3 &dir, const glm::vec3 &up);
 
 	void print();
     };
-
-    std::vector<Camera> load_cameras(const std::vector<nlohmann::json> &camera_set,
-				     const float radius);
     
-    // actions
-    struct CameraAction{};
-    struct VolumeIsosurface{};
-    struct TfEdit{};
+    
+    struct AniObjWidget{
+    	// input data
+    	nlohmann::json config;
+    	std::string file_name;		// path to input raw file
+    	std::string type_name;		// unstructured grid for now
+    	glm::vec3 dims;			// x, y, z
+    	std::vector<float> zMapping;	// physical depth mapping, size()==dim.z
+    	
+    	// animation widget settings
+    	glm::vec2 frameRange;				// the range of animating this object
+    	std::vector<Camera> cameras; 			// list of camera keyframes
+    	glm::vec2 tfRange;				// TF range 
+    	
+    	// init
+    	AniObjWidget(const nlohmann::json in_file);
+    	void load_info();
+    	void print_info();
+    	void load_cameras();
+    	void load_tfs();
+    	
+    	// animation
+    	void getFrameCam(Camera &cam){cam = currentCam;}
+    	void getFrameTF(std::vector<float> &c, std::vector<float> &o){c = colors; o = opacities;}
+    	void advanceFrame();
+    	
+    	private:
+    	uint32_t currentF = 0;
+    	Camera currentCam;
+    	std::vector<float> colors;
+    	std::vector<float> opacities;
+    	
+    };
 }
 
-//std::vector<cpp::TransferFunction> load_colormaps(const std::vector<std::string> &files,
-//                                                  const vec2f &value_range);
 
-//std::shared_ptr<std::vector<uint8_t>> load_raw_volume(const std::string &file,
-//                                                      const std::string &dtype,
-//                                                      const vec3i &vol_dims,
-//                                                      const vec3i &brick_dims,
-//                                                      const vec3i &brick_offset);

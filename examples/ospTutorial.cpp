@@ -113,8 +113,13 @@ int main(int argc, const char **argv)
 
     
     // load json
-    std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
-    std::string dataType = config["data"]["type"];
+    //std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
+    //std::string dataType = config["data"]["type"];
+    AniObjWidget widget(config);
+    widget.load_info();
+    widget.load_cameras();
+    std::vector<Camera> cams = widget.cameras;
+    std::string dataType = dataTypeString[0];
 
     // log out json info
     {

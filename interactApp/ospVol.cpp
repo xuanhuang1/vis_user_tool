@@ -431,11 +431,11 @@ int main(int argc, const char **argv)
 	
     
 	// load json
-	std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
-	std::string dataType = config["data"]["type"];
+	//std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
+	//std::string dataType = config["data"]["type"];
 
 	// log out json info
-	{
+	/*{
 	    bool foundDataType = false;
 	    for( uint32_t i=0; i<TOTAL_DATA_TYPES; i++){
 		if (dataType == dataTypeString[i]){
@@ -447,7 +447,7 @@ int main(int argc, const char **argv)
       
 	    for(auto &c : cams)
 		c.print();
-	}
+	}*/
 	
 	vec3i volumeDimensions(std::stoi(argv[2]), std::stoi(argv[3]), std::stoi(argv[4]));
 	float min=std::numeric_limits<float>::infinity(), max=0;

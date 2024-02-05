@@ -88,8 +88,12 @@ int main(int argc, const char **argv)
         }
     }
     
-  std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
-
+  //std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
+  AniObjWidget widget(config);
+  widget.load_info();
+  widget.load_cameras();
+  std::vector<Camera> cams = widget.cameras;
+    
   for(auto &c : cams)
 	c.print();
 	

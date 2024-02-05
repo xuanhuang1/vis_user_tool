@@ -5,12 +5,6 @@
 #include <fstream>
 #include "loader.h"
 
-
-//#define STB_IMAGE_WRITE_IMPLEMENTATION
-//#define STB_IMAGE_IMPLEMENTATION
-//#include "stb_image.h"
-//#include "stb_image_write.h"
-
 using json = nlohmann::json;
 using namespace visuser;
 
@@ -45,9 +39,16 @@ int main(int argc, char **argv)
         }
     }
     
-    std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
-
-    for(auto &c : cams)
-	c.print();
+    AniObjWidget widget(config);
+    widget.load_info();
+    widget.load_cameras();
+    widget.load_tfs();
+    std::vector<Camera> cams = widget.cameras;
+    
+    {
+    	widget.print_info();
+	for(auto &c : widget.cameras)
+	    c.print();
+    }
     return 0;
 }

@@ -30,3 +30,23 @@ inline glm::vec3 get_vec3f(const json &j)
     return v;
 }
 
+inline glm::vec3 get_vec3i(const json &j)
+{
+    glm::vec3 v;
+    for (size_t i = 0; i < 3; ++i) {
+        v[i] = j[i].get<int>();
+    }
+    return v;
+}
+
+inline glm::vec2 get_vec2i(const json &j)
+{
+    glm::vec3 v;
+    for (size_t i = 0; i < 2; ++i) {
+        v[i] = j[i].get<int>();
+    }
+    return v;
+}
+
+
+

@@ -73,6 +73,7 @@ unsigned int guiTextures[128];
 unsigned int guiTextureSize = 0;
 
 GLFWwindow *glfwWindow = nullptr;
+static int data_time = 0;
 
 enum DATATYPE{TRI_MESH, VOL, TOTAL_DATA_TYPES};
 std::string dataTypeString[] = {"triangle_mesh", "volume"};
@@ -85,7 +86,11 @@ public:
     ospray::cpp::World world;
     ospray::cpp::Instance instance;
     ospray::cpp::VolumetricModel model;
+    ospray::cpp::Volume volume;
     std::vector<float> * voxel_data; // pointer to voxels data
+    vec3i volumeDimensions;
+    float* all_data_ptr; // pointer to all data
+    int count = 1;
   
     static GLFWOSPWindow *activeWindow;
     ospray::cpp::FrameBuffer framebuffer;
@@ -277,7 +282,18 @@ void GLFWOSPWindow::buildUI(){
 	tfn_widget.draw_ui();
 	ImGui::TreePop();
     }
-
+    
+    if (ImGui::TreeNode("Data time")){
+  	if (ImGui::SliderInt("time", &data_time, 0, count-1)) {
+	    long long offset = data_time * volumeDimensions.long_product();
+	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
+                (*voxel_data)[i] = all_data_ptr[i+offset];
+            }
+	    
+	}
+	ImGui::TreePop();
+    }
+    
     if (ImGui::TreeNode("Animation keyframe")){
   	if (ImGui::SliderInt("time", &curTime, 0, maxTime)) {
 	    
@@ -379,6 +395,7 @@ void init (void* fb){
 
 }
 
+
 static std::vector<std::string>
 init_app(const std::vector<std::string>& args)
 {
@@ -406,13 +423,9 @@ init_app(const std::vector<std::string>& args)
     return newargs;
 }
 
-int run_app(py::array_t<float> input_array, int x, int y, int z)
+int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
 {
-    py::buffer_info buf_info = input_array.request();
-    float *ptr = static_cast<float *>(buf_info.ptr);
-
-    std::cout << "shape:"<< x <<" "<<y<<" "<<z <<std::endl;
-
+ 
 #ifdef _WIN32
     bool waitForKey = false;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -439,19 +452,24 @@ int run_app(py::array_t<float> input_array, int x, int y, int z)
 	    throw std::runtime_error("Failed to create GLFW window!");
 	}
 
-
-    
 	GLFWOSPWindow glfwOspWindow;
+	py::buffer_info buf_info = input_array.request();
+	glfwOspWindow.all_data_ptr = static_cast<float *>(buf_info.ptr);
+	glfwOspWindow.count = count;
+	std::cout << "shape:" <<count <<" of "<< x <<" "<<y<<" "<<z <<std::endl;
+
 	
-	vec3i volumeDimensions(x, y, z);
+	glfwOspWindow.volumeDimensions[0] = x; 
+	glfwOspWindow.volumeDimensions[1] = y; 
+	glfwOspWindow.volumeDimensions[2] = z; 
 	float min=std::numeric_limits<float>::infinity(), max=0;
-	std::vector<float> voxels(volumeDimensions.long_product());
+	std::vector<float> voxels(glfwOspWindow.volumeDimensions.long_product());
 	
 	// construct ospray variables
 	ospray::cpp::Group group;
 	{
-	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
-        	voxels[i] = ptr[i];
+	    for (long long i =0 ; i < glfwOspWindow.volumeDimensions.long_product(); i++){
+        	voxels[i] = glfwOspWindow.all_data_ptr[i];
 		min = std::min(min, voxels[i]);
 		max = std::max(max, voxels[i]);
 	        
@@ -460,17 +478,19 @@ int run_app(py::array_t<float> input_array, int x, int y, int z)
 	    glfwOspWindow.voxel_data = &voxels;
         }
     		
-	glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
+	glfwOspWindow.tfn = makeTransferFunction(vec2f(-0.2f, 0.2f), glfwOspWindow. tfn_widget);
     	    
 	// volume
 	//ospray::cpp::Volume volume("structuredSpherical");
 	ospray::cpp::Volume volume("structuredRegular");
 	volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
-	volume.setParam("gridSpacing", vec3f(10.f / reduce_max(volumeDimensions)));
+	volume.setParam("gridSpacing", vec3f(10.f / reduce_max(glfwOspWindow.volumeDimensions)));
 	//volume.setParam("gridSpacing", vec3f(10.f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
-	volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), volumeDimensions));
-	volume.setParam("dimensions", volumeDimensions);
+	volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), glfwOspWindow.volumeDimensions));
+	volume.setParam("dimensions", glfwOspWindow.volumeDimensions);
 	volume.commit();
+	glfwOspWindow.volume = volume;
+	
 	// put the mesh into a model
 	ospray::cpp::VolumetricModel model(volume);
 	    
@@ -584,8 +604,6 @@ int run_app(py::array_t<float> input_array, int x, int y, int z)
     
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
-
-	
 	
     }
     ospShutdown();

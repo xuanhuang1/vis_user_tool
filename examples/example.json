@@ -1,8 +1,11 @@
 {
     "data" : 
 	{
-	"type": "volume",
-	"name": "<path to test_mesh>"
+	"type": "unstructured",
+	"name": "<path to test_mesh>",
+	"dims": [2180, 810, 12],
+	"zMapping": [0, 1, 1.5, 3, 4, 5, 6, 7, 8, 9, 10, 15],
+	"frameRange": [0, 10]
 	}
     ,
     
@@ -27,11 +30,9 @@
     "transferFunc" : [
     	{
     		"range" : [0, 1],
-    		"cpoints" : [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-    	},
-    	{
-    		"range" : [0, 1],
-    		"cpoints" : [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0]
+    		"colors" : [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
+    		"opacities": [0.0, 1.0]
     	}
     ]
+    
 }
