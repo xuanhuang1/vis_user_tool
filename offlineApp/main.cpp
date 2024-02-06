@@ -88,7 +88,12 @@ int main(int argc, const char **argv)
     
     // init renderer
 
+    // create ospray renderer
+    OSPError init_error = ospInit(&argc, argv);
+    if (init_error != OSP_NO_ERROR)
+        return init_error;
 
+    
 
 
 
@@ -120,7 +125,8 @@ int main(int argc, const char **argv)
 
     	
     }
-  
 
+    ospShutdown();
+    
     return 0;
 }
