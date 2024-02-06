@@ -8,15 +8,24 @@ endif()
 find_package(OpenGL 3 REQUIRED)
 find_package(ospray 3.0.0 REQUIRED)
 
+#-------------------- umesh -------------------------
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../ext/umesh" ${CMAKE_CURRENT_BINARY_DIR}/umesh EXCLUDE_FROM_ALL) #kind of hacky, but it works
+add_definitions(${UMESH_DEFINITIONS})
+include_directories(submodules/umesh)
+set(UMESH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+#----------------------------------------------------
+
 
 add_executable(vistool_osp_offline
     main.cpp
+    renderer.cpp
     ../loader.cpp
     ../util.cpp)
 
 			
 target_link_libraries(vistool_osp_offline
 			${OPENGL_LIBRARIES}
+            umesh
             ospray::ospray)
 
 

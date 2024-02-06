@@ -2,7 +2,7 @@
     "data" : 
 	{
 	"type": "unstructured",
-	"name": "<path to test_mesh>",
+	"name": "/home/alpers/Desktop/Data/jets.umesh",
 	"dims": [2180, 810, 12],
 	"zMapping": [0, 1, 1.5, 3, 4, 5, 6, 7, 8, 9, 10, 15],
 	"frameRange": [0, 10]
