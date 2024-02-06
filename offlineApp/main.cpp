@@ -87,7 +87,7 @@ int main(int argc, const char **argv)
     // init renderer
 
     // create ospray renderer
-    Renderer renderer(argc, argv, widget);
+    Renderer renderer(widget);
 
     std::cout << "\nStart rendering... \n\n";
 
@@ -109,6 +109,7 @@ int main(int argc, const char **argv)
 #endif
 
         // render
+        renderer.Render();
 
         // output
         std::string image_name = "output-f" + std::to_string(i) + ".jpg";

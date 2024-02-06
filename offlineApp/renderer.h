@@ -14,7 +14,7 @@ namespace visuser
     class Renderer
     {
     public:
-        Renderer(int argc, const char **argv, const AniObjWidget &config);
+        Renderer(const AniObjWidget &config);
         ~Renderer();
 
         void Render();
