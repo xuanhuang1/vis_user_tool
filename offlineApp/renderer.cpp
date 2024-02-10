@@ -239,6 +239,16 @@ namespace visuser
         model.commit();
     }
 
+    void Renderer::SetCamera(const Camera &cam)
+    {
+        framebuffer.clear();
+
+        camera.setParam("position", rkm::vec3f(cam.pos.x, cam.pos.y, cam.pos.z));
+        camera.setParam("direction", rkm::vec3f(cam.dir.x, cam.dir.y, cam.dir.z));
+        camera.setParam("up", rkm::vec3f(cam.up.x, cam.up.y, cam.up.z));
+        camera.commit();
+    }
+
     Renderer::~Renderer()
     {
         ospDeviceRelease(device);

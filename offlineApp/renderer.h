@@ -22,7 +22,11 @@ namespace visuser
         void SaveFrame(const std::string &filename);
         void InitializeVolumeModel(
             const std::shared_ptr<umesh::UMesh> umeshPtr);
-
+        void SetCamera(const Camera &cam);
+        
+        void SetTFColors(const std::vector<rkcommon::math::vec3f> colors);
+        void SetTFOpacities(const std::vector<float> opacities);
+        void SetTFRange(const rkm::vec2f &range);
     private:
         inline void InitializeOSPRay(int argc, const char **argv, bool errorsFatal = true);
         

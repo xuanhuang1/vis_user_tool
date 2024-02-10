@@ -88,30 +88,33 @@ int main(int argc, const char **argv)
 
     // create ospray renderer
     Renderer renderer(widget);
+    widget.advanceFrame();
 
     std::cout << "\nStart rendering... \n\n";
 
     // start rendering into images
     for (uint32_t i = widget.frameRange[0]; i <= widget.frameRange[1]; i++)
     {
+        // render
+        renderer.Render();
+        const std::string filename = "frame_" + std::to_string(i);
+        renderer.SaveFrame(filename);
+
         // get this frame
         widget.advanceFrame();
 
         // load camera and tf
         Camera cam;
+        widget.getFrameCam(cam);
+        renderer.SetCamera(cam);
         std::vector<float> c, o;
         glm::vec2 valueRange = widget.tfRange;
-        widget.getFrameCam(cam);
         widget.getFrameTF(c, o);
 #ifdef DEBUG_LOG
         cam.print();
         std::cout << valueRange[0] << " " << valueRange[1] << "\n";
 #endif
 
-        // render
-        renderer.Render();
-        std::string filename = "frame_" + std::to_string(i);
-        renderer.SaveFrame(filename);
     }
 
     return 0;
