@@ -9,7 +9,8 @@
 
 namespace visuser
 {
-
+    namespace rkm = rkcommon::math;
+    namespace ospray = ospray::cpp;
     // ospray based volume renderer
     class Renderer
     {
@@ -18,11 +19,23 @@ namespace visuser
         ~Renderer();
 
         void Render();
-        void TakeSnapShot(const std::string &filename);
+        void SaveFrame(const std::string &filename);
+        void InitializeVolumeModel(
+            const std::shared_ptr<umesh::UMesh> umeshPtr);
 
     private:
         inline void InitializeOSPRay(int argc, const char **argv, bool errorsFatal = true);
-        std::shared_ptr<umesh::UMesh> umeshHdlPtr;
+        
+        ospray::Renderer renderer;
+        ospray::FrameBuffer framebuffer;
+        rkm::vec2i imgSize = rkm::vec2i(1024, 1024);
+
+        ospray::Volume volume;
+        ospray::VolumetricModel model;
+        ospray::Camera camera;
+        ospray::World world;
+
+        OSPDevice device;
     };
 
 } // namespace visuser

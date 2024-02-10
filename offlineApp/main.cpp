@@ -110,10 +110,8 @@ int main(int argc, const char **argv)
 
         // render
         renderer.Render();
-
-        // output
-        std::string image_name = "output-f" + std::to_string(i) + ".jpg";
-        std::cout << "rendering frame " << i << " into " << image_name << "\n";
+        std::string filename = "frame_" + std::to_string(i);
+        renderer.SaveFrame(filename);
     }
 
     return 0;
