@@ -1,66 +1,5 @@
 #include "renderer.h"
 
-// temporary
-std::string tfColorMap{"jet"};
-std::string tfOpacityMap{"linear"};
-ospray::cpp::TransferFunction makeTransferFunction(
-    const rkcommon::math::range1f &valueRange)
-{
-    ospray::cpp::TransferFunction transferFunction("piecewiseLinear");
-
-    std::vector<rkcommon::math::vec3f> colors;
-    std::vector<float> opacities;
-
-    if (tfColorMap == "jet")
-    {
-        colors.emplace_back(0, 0, 0.562493);
-        colors.emplace_back(0, 0, 1);
-        colors.emplace_back(0, 1, 1);
-        colors.emplace_back(0.500008, 1, 0.500008);
-        colors.emplace_back(1, 1, 0);
-        colors.emplace_back(1, 0, 0);
-        colors.emplace_back(0.500008, 0, 0);
-    }
-    else if (tfColorMap == "rgb")
-    {
-        colors.emplace_back(0, 0, 1);
-        colors.emplace_back(0, 1, 0);
-        colors.emplace_back(1, 0, 0);
-    }
-    else
-    {
-        colors.emplace_back(0.f, 0.f, 0.f);
-        colors.emplace_back(1.f, 1.f, 1.f);
-    }
-
-    if (tfOpacityMap == "linear")
-    {
-        opacities.emplace_back(1.f);
-        opacities.emplace_back(1.f);
-        opacities.emplace_back(0.f);
-        opacities.emplace_back(0.f);
-        opacities.emplace_back(0.f);
-        opacities.emplace_back(1.f);
-        opacities.emplace_back(1.f);
-    }
-    else if (tfOpacityMap == "linearInv")
-    {
-        opacities.emplace_back(1.f);
-        opacities.emplace_back(0.f);
-    }
-    else if (tfOpacityMap == "opaque")
-    {
-        opacities.emplace_back(1.f);
-    }
-
-    transferFunction.setParam("color", ospray::cpp::CopiedData(colors));
-    transferFunction.setParam("opacity", ospray::cpp::CopiedData(opacities));
-    transferFunction.setParam("value", valueRange);
-    transferFunction.commit();
-
-    return transferFunction;
-}
-
 namespace visuser
 {
     Renderer::Renderer(const AniObjWidget &config)
@@ -69,15 +8,56 @@ namespace visuser
         const char *argv[] = {"vistool_osp_offline"};
         InitializeOSPRay(1, argv);
 
+        //renderer
         renderer = ospray::Renderer("scivis");
-        renderer.setParam("aoSamples", 5);
+        //renderer.setParam("aoSamples", 00);
+        //renderer.setParam("aoDistance", 1e20f);
+        //renderer.setParam("shadows", true);
         renderer.setParam("volumeSamplingRate", 0.008f);
         renderer.setParam("backgroundColor", rkm::vec3f(0.3f, 0.3f, 0.3f));
         renderer.commit();
 
-        // get model bounds and print using ospGetBounds
+        //framebuffer
+        framebuffer = ospray::FrameBuffer(imgSize.x, imgSize.y,
+                                          OSP_FB_SRGBA, OSP_FB_COLOR | OSP_FB_ACCUM);
+
         auto umeshPtr = umesh::io::loadBinaryUMesh(config.file_name);
+
+        //transfer function
+        transferFunction = ospray::TransferFunction("piecewiseLinear");
+        if(config.tfRange.x == 0.f && config.tfRange.y == 0.f)
+        {
+            printf("using default tf\n");
+            std::vector<rkcommon::math::vec3f> colors =
+            {
+                rkm::vec3f(1.f, 0.f, 0.f),
+                rkm::vec3f(0.f, 1.f, 0.f),
+                rkm::vec3f(0.f, 0.f, 1.f)
+            };
+            std::vector<float> opacities = 
+            {
+                0.0f, 1.0f
+            };
+            transferFunction.setParam("color", ospray::CopiedData(colors));
+            transferFunction.setParam("opacity", ospray::CopiedData(opacities));
+            SetTFRange(rkm::range1f(umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper));
+            printf("tf range: %f %f\n", umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper);
+        }
+        else
+        {
+            printf("using custom tf\n");
+            printf("tf range: %f %f\n", umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper);
+            std::vector<float> colors, opacities;
+            config.getFrameTF(colors, opacities);
+            //print size of opacities and colors
+            transferFunction.setParam("opacity", ospray::CopiedData(opacities));
+            transferFunction.setParam("value", 
+                                rkm::range1f(config.tfRange[0], config.tfRange[1]));
+            SetTFColors(colors);
+        }
+        //volume
         InitializeVolumeModel(umeshPtr);
+
 
         ospray::Group group;
 
@@ -96,14 +76,14 @@ namespace visuser
         // light.setParam("angularDiameter", 100.f);
         // light.commit();
         // ospray::Light ambient("ambient");
-        // ambient.setParam("intensity", 0.35f);
-        // ambient.setParam("visible", true);
+        // ambient.setParam("intensity", 15.f);
+        // ambient.setParam("visible", false);
         // ambient.commit();
         // std::vector<ospray::Light> lights{light, ambient};
 
         world = ospray::World();
         world.setParam("instance", ospray::CopiedData(inst));
-        // world.setParam("light", ospray::CopiedData(lights));
+        //world.setParam("light", ospray::CopiedData(lights));
         world.commit();
 
         auto bounds = world.getBounds<rkm::box3f>();
@@ -111,14 +91,13 @@ namespace visuser
                   << " " << bounds.lower.z << ", " << bounds.upper.x << " " << bounds.upper.y
                   << " " << bounds.upper.z << std::endl;
 
+        //camera                                
         camera = ospray::Camera("perspective");
         camera.setParam("aspect", float(imgSize.x) / float(imgSize.y));
         if (config.cameras.size() > 0)
         {
             auto &cam = config.cameras[0];
-            camera.setParam("position", rkm::vec3f(cam.pos.x, cam.pos.y, cam.pos.z));
-            camera.setParam("direction", rkm::vec3f(cam.dir.x, cam.dir.y, cam.dir.z));
-            camera.setParam("up", rkm::vec3f(cam.up.x, cam.up.y, cam.up.z));
+            SetCamera(cam);
         }
         else
         {
@@ -133,11 +112,6 @@ namespace visuser
         }
 
         camera.commit();
-
-        // Render frame
-        framebuffer = ospray::FrameBuffer(imgSize.x, imgSize.y,
-                                          OSP_FB_SRGBA, OSP_FB_COLOR | OSP_FB_ACCUM);
-        framebuffer.clear();
     }
 
     void Renderer::Render()
@@ -233,9 +207,7 @@ namespace visuser
         volume.commit();
 
         model = ospray::VolumetricModel(volume);
-        model.setParam("transferFunction",
-                       makeTransferFunction({umeshPtr->perVertex->valueRange.lower,
-                                             umeshPtr->perVertex->valueRange.upper}));
+        model.setParam("transferFunction", transferFunction);
         model.commit();
     }
 
@@ -247,6 +219,39 @@ namespace visuser
         camera.setParam("direction", rkm::vec3f(cam.dir.x, cam.dir.y, cam.dir.z));
         camera.setParam("up", rkm::vec3f(cam.up.x, cam.up.y, cam.up.z));
         camera.commit();
+    }
+
+    void Renderer::SetTFColors(const std::vector<rkcommon::math::vec3f> colors)
+    {
+        framebuffer.clear();
+        transferFunction.setParam("color", ospray::CopiedData(colors));
+        transferFunction.commit();
+    }
+
+    void Renderer::SetTFColors(const std::vector<float> colors)
+    {
+        framebuffer.clear();
+        //loop over the colors and convert them to vec3f
+        std::vector<rkm::vec3f> colorVec;
+        for (size_t i = 0; i < colors.size(); i += 3)
+        {
+            colorVec.push_back(rkm::vec3f(colors[i], colors[i + 1], colors[i + 2]));
+        }
+        SetTFColors(colorVec);
+    }
+
+    void Renderer::SetTFOpacities(const std::vector<float> opacities)
+    {
+        framebuffer.clear();
+        transferFunction.setParam("opacity", ospray::CopiedData(opacities));
+        transferFunction.commit();
+    }
+
+    void Renderer::SetTFRange(const rkm::range1f &range)
+    {
+        framebuffer.clear();
+        transferFunction.setParam("value", range);
+        transferFunction.commit();
     }
 
     Renderer::~Renderer()

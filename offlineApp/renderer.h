@@ -23,10 +23,11 @@ namespace visuser
         void InitializeVolumeModel(
             const std::shared_ptr<umesh::UMesh> umeshPtr);
         void SetCamera(const Camera &cam);
-        
+
         void SetTFColors(const std::vector<rkcommon::math::vec3f> colors);
+        void SetTFColors(const std::vector<float> colors);
         void SetTFOpacities(const std::vector<float> opacities);
-        void SetTFRange(const rkm::vec2f &range);
+        void SetTFRange(const rkm::range1f &range);
     private:
         inline void InitializeOSPRay(int argc, const char **argv, bool errorsFatal = true);
         
@@ -38,6 +39,7 @@ namespace visuser
         ospray::VolumetricModel model;
         ospray::Camera camera;
         ospray::World world;
+        ospray::TransferFunction transferFunction;
 
         OSPDevice device;
     };

@@ -45,8 +45,8 @@ namespace visuser{
     	void load_tfs();
     	
     	// animation
-    	void getFrameCam(Camera &cam){cam = currentCam;}
-    	void getFrameTF(std::vector<float> &c, std::vector<float> &o){c = colors; o = opacities;}
+    	void getFrameCam(Camera &cam) const {cam = currentCam;}
+    	void getFrameTF (std::vector<float> &c, std::vector<float> &o) const {c = colors; o = opacities;} 
     	void advanceFrame();
     	
     	private:
