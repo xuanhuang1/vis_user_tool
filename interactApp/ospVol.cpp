@@ -344,6 +344,33 @@ ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw
     return transferFunction;
 }
 
+ospray::cpp::TransferFunction loadTransferFunction(AniObjWidget &widget, tfnw::TransferFunctionWidget& tfWidget)
+{
+    ospray::cpp::TransferFunction transferFunction("piecewiseLinear");
+    
+    std::vector<float> colors;
+    std::vector<vec3f> colors3f;
+    std::vector<float> opacities;
+    const vec2f valueRange(widget.tfRange[0], widget.tfRange[1]);
+    widget.getFrameTF(colors, opacities);
+    for (uint32_t i=0; i<colors.size()/3; i++) 
+    	colors3f.emplace_back(colors[i*3], colors[i*3+1], colors[i*3+2]);
+    
+    tfWidget.alpha_control_pts[0].x = 1.f;
+    tfWidget.alpha_control_pts[0].y = 1.f;
+    tfWidget.alpha_control_pts[1].x = 0.f;
+    tfWidget.alpha_control_pts[1].y = 0.f;
+    std::cout << colors.size() <<" c\n";
+    
+    transferFunction.setParam("color", ospray::cpp::CopiedData(colors3f));
+    transferFunction.setParam("opacity", ospray::cpp::CopiedData(opacities));
+    transferFunction.setParam("valueRange", valueRange);
+    transferFunction.commit();
+
+    return transferFunction;
+    
+}
+
 void init (void* fb){
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_LIGHTING);
@@ -415,7 +442,7 @@ int main(int argc, const char **argv)
 	std::string prefix;
 	for (int i = 1; i < argc; ++i) {
 	    if (args[i] == "-h") {
-		std::cout << "./mini_vistool <config.json> x y z <file> [options]\n";
+		std::cout << "./mini_vistool <config.json> [options]\n";
 		return 0;
 	    } else {
 	    	if (i == 1){
@@ -433,23 +460,15 @@ int main(int argc, const char **argv)
 	// load json
 	//std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
 	//std::string dataType = config["data"]["type"];
-
-	// log out json info
-	/*{
-	    bool foundDataType = false;
-	    for( uint32_t i=0; i<TOTAL_DATA_TYPES; i++){
-		if (dataType == dataTypeString[i]){
-		    std::cout << "data type: " << dataType <<"\n";
-		    foundDataType = true;
-		}
-	    }
-	    if (!foundDataType) std::cerr << "Unsupported data type " << dataType <<"\n";
-      
-	    for(auto &c : cams)
-		c.print();
-	}*/
+	std::cout << "\n\nStart json loading ... \n";
+    	AniObjWidget widget(config);
+    	widget.load_info();
+    	widget.load_cameras();
+    	widget.load_tfs();
+    	std::cout << "\nEnd json loading ... \n\n";
+    
 	
-	vec3i volumeDimensions(std::stoi(argv[2]), std::stoi(argv[3]), std::stoi(argv[4]));
+	vec3i volumeDimensions(widget.dims[0], widget.dims[1], widget.dims[2]);
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
 	
@@ -457,8 +476,8 @@ int main(int argc, const char **argv)
 	ospray::cpp::Group group;
 	{
 	    std::fstream file;
-      	    file.open(argv[5], std::fstream::in | std::fstream::binary);
-    	    std::cout <<"dim "<<argv[2]<<" "<<argv[3]<<" "<<argv[4]<<"\nLoad "<< voxels.size()<< " :";
+      	    file.open(widget.file_name, std::fstream::in | std::fstream::binary);
+    	    std::cout <<"dim "<<widget.dims[0]<<" "<<widget.dims[1]<<" "<<widget.dims[2]<<"\nLoad "<< voxels.size()<< " :";
 	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
 	    	float buff;
 		file.read((char*)(&buff), sizeof(buff));
@@ -476,7 +495,8 @@ int main(int argc, const char **argv)
 	    std::cout <<"range: "<< max <<" "<<min<<"\n";
 	}
     		
-	glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
+	//glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
+    	glfwOspWindow.tfn = loadTransferFunction(widget, glfwOspWindow.tfn_widget);
     	    
 	// volume
 	//ospray::cpp::Volume volume("structuredSpherical");
@@ -507,23 +527,26 @@ int main(int argc, const char **argv)
 
 	// put the instance in the world
 	ospray::cpp::World world;
-	//world.setParam("instance", ospray::cpp::CopiedData(instance));
 	glfwOspWindow.world.setParam("instance", ospray::cpp::CopiedData(glfwOspWindow.instance));
 
 	// create and setup light for Ambient Occlusion
 	ospray::cpp::Light light("ambient");
 	light.commit();
 	
-	//world.setParam("light", ospray::cpp::CopiedData(light));
-	//world.commit();
 	glfwOspWindow.world.setParam("light", ospray::cpp::CopiedData(light));
     	glfwOspWindow.world.commit();
     	
     	// set up arcball camera for ospray
     	glfwOspWindow.arcballCamera.reset(new ArcballCamera(glfwOspWindow.world.getBounds<box3f>(), windowSize));
     	glfwOspWindow.arcballCamera->updateWindowSize(windowSize);
-    	std::cout << "boundbox: "<< glfwOspWindow.world.getBounds<box3f>() << "\n";
-    
+    	std::cout << glfwOspWindow.arcballCamera->eyePos() <<"\n";
+    	std::cout << glfwOspWindow.arcballCamera->lookDir() <<"\n";
+    	std::cout << glfwOspWindow.arcballCamera->upDir() <<"\n";
+    	
+    	auto c = widget.cameras[0];
+    	vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+    	vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+    	vec3f up(c.up[0], c.up[1], c.up[2]);
 	
 	// create renderer, choose Scientific Visualization renderer
 	ospray::cpp::Renderer *renderer = &glfwOspWindow.renderer;;
@@ -537,9 +560,12 @@ int main(int argc, const char **argv)
 	ospray::cpp::Camera* camera = &glfwOspWindow.camera;
 	    
 	camera->setParam("aspect", imgSize.x / (float)imgSize.y);
-	camera->setParam("position", glfwOspWindow.arcballCamera->eyePos());
-	camera->setParam("direction", glfwOspWindow.arcballCamera->lookDir());
-	camera->setParam("up", glfwOspWindow.arcballCamera->upDir());
+	//camera->setParam("position", glfwOspWindow.arcballCamera->eyePos());
+	//camera->setParam("direction", glfwOspWindow.arcballCamera->lookDir());
+	//camera->setParam("up", glfwOspWindow.arcballCamera->upDir());
+	camera->setParam("position", pos);
+	camera->setParam("direction", dir);
+	camera->setParam("up", up);
 	camera->commit(); // commit each object to indicate modifications are done
 	
 	    
