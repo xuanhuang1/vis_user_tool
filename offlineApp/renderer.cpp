@@ -13,7 +13,7 @@ namespace visuser
         //renderer.setParam("aoSamples", 00);
         //renderer.setParam("aoDistance", 1e20f);
         //renderer.setParam("shadows", true);
-        renderer.setParam("volumeSamplingRate", 0.008f);
+        renderer.setParam("volumeSamplingRate", 10.f);
         renderer.setParam("backgroundColor", rkm::vec3f(0.3f, 0.3f, 0.3f));
         renderer.commit();
 
@@ -21,7 +21,10 @@ namespace visuser
         framebuffer = ospray::FrameBuffer(imgSize.x, imgSize.y,
                                           OSP_FB_SRGBA, OSP_FB_COLOR | OSP_FB_ACCUM);
 
-        auto umeshPtr = umesh::io::loadBinaryUMesh(config.file_name);
+        //auto umeshPtr = umesh::io::loadBinaryUMesh(config.file_name);
+
+        rkcommon::math::vec3ui dimensions(config.dims.x, config.dims.y, config.dims.z);
+        std::shared_ptr<RectMesh> mesh = std::make_shared<RectMesh>(dimensions, config.zMapping, config.file_name);
 
         //transfer function
         transferFunction = ospray::TransferFunction("piecewiseLinear");
@@ -40,13 +43,13 @@ namespace visuser
             };
             transferFunction.setParam("color", ospray::CopiedData(colors));
             transferFunction.setParam("opacity", ospray::CopiedData(opacities));
-            SetTFRange(rkm::range1f(umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper));
-            printf("tf range: %f %f\n", umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper);
+            SetTFRange(rkm::range1f(0.0f,1.0f));
+            printf("tf range: %f %f\n", 0.0f,1.0f);
         }
         else
         {
             printf("using custom tf\n");
-            printf("tf range: %f %f\n", umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper);
+            //printf("tf range: %f %f\n", umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper);
             std::vector<float> colors, opacities;
             config.getFrameTF(colors, opacities);
             //print size of opacities and colors
@@ -56,7 +59,8 @@ namespace visuser
             SetTFColors(colors);
         }
         //volume
-        InitializeVolumeModel(umeshPtr);
+        //InitializeVolumeModel(umeshPtr);
+        InitializeVolumeModel(mesh);
 
 
         ospray::Group group;
@@ -197,6 +201,51 @@ namespace visuser
             indices.push_back(h[5]);
             indices.push_back(h[6]);
             indices.push_back(h[7]);
+        }
+        printf("#cells: %d #cell types %d\n", cells.size(), cellTypes.size());
+
+        volume.setParam("index", ospray::CopiedData(indices));
+        volume.setParam("cell.index", ospray::CopiedData(cells));
+        volume.setParam("cell.type", ospray::CopiedData(cellTypes));
+
+        volume.commit();
+
+        model = ospray::VolumetricModel(volume);
+        model.setParam("transferFunction", transferFunction);
+        model.commit();
+    }
+
+    void Renderer::InitializeVolumeModel(const std::shared_ptr<RectMesh> rectMeshPtr)
+    {
+        volume = ospray::Volume("unstructured");
+        std::cout << "found " << rectMeshPtr->indices.size() << " indices" << std::endl;
+        std::cout << "found " << rectMeshPtr->vertices.size() << " vertices" << std::endl;
+        std::cout << "found " << rectMeshPtr->scalars.size() << " scalars" << std::endl;
+
+        // set data objects for volume object
+        volume.setParam("vertex.position", ospray::CopiedData(rectMeshPtr->vertices));
+        volume.setParam("vertex.data", ospray::CopiedData(rectMeshPtr->scalars));
+        volume.setParam("background", ospray::CopiedData(rkm::vec3f(1.0f, 0.0f, 1.0f)));
+
+        // define cell offsets in indices array
+        std::vector<size_t> cells;
+
+        // define cell types
+        std::vector<uint8_t> cellTypes;
+
+        std::vector<uint64> indices;
+        for (size_t i = 0; i < rectMeshPtr->indices.size(); i += 8)
+        {
+            cellTypes.push_back(OSP_HEXAHEDRON);
+            cells.push_back(indices.size());
+            indices.push_back(rectMeshPtr->indices[i + 0]);
+            indices.push_back(rectMeshPtr->indices[i + 1]);
+            indices.push_back(rectMeshPtr->indices[i + 2]);
+            indices.push_back(rectMeshPtr->indices[i + 3]);
+            indices.push_back(rectMeshPtr->indices[i + 4]);
+            indices.push_back(rectMeshPtr->indices[i + 5]);
+            indices.push_back(rectMeshPtr->indices[i + 6]);
+            indices.push_back(rectMeshPtr->indices[i + 7]);
         }
         printf("#cells: %d #cell types %d\n", cells.size(), cellTypes.size());
 

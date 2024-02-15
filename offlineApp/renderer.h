@@ -5,6 +5,8 @@
 #include "umesh/io/UMesh.h"
 #include "rkcommon/utility/SaveImage.h"
 
+#include "rectMesh.h"
+
 #include "../loader.h"
 
 namespace visuser
@@ -22,6 +24,8 @@ namespace visuser
         void SaveFrame(const std::string &filename);
         void InitializeVolumeModel(
             const std::shared_ptr<umesh::UMesh> umeshPtr);
+        void InitializeVolumeModel( 
+            const std::shared_ptr<RectMesh> rectMeshPtr);
         void SetCamera(const Camera &cam);
 
         void SetTFColors(const std::vector<rkcommon::math::vec3f> colors);

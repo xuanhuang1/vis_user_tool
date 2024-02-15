@@ -79,16 +79,9 @@ int main(int argc, const char **argv)
     // end of json load
     //
 
-    // construct the unstructured mesh
-    // grid with uniform x and y
-    // but varying z from widget.zMapping
-    // i.e. the physical depth for this data
-
-    // init renderer
 
     // create ospray renderer
     Renderer renderer(widget);
-    widget.advanceFrame();
 
     std::cout << "\nStart rendering... \n\n";
 

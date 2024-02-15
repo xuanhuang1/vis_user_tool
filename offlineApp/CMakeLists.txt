@@ -19,6 +19,7 @@ set(UMESH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_executable(vistool_osp_offline
     main.cpp
     renderer.cpp
+    rectMesh.cpp
     ../loader.cpp
     ../util.cpp)
 
