@@ -16,10 +16,12 @@ namespace visuser{
     	glm::vec3 pos;
     	glm::vec3 dir;
     	glm::vec3 up;
+    	uint32_t frame; 
 
 	Camera();
     	Camera(const glm::vec3 &pos, const glm::vec3 &dir, const glm::vec3 &up);
-
+    	Camera(const glm::vec3 &pos, const glm::vec3 &dir, const glm::vec3 &up, uint32_t f);
+    	
 	void print();
     };
     
