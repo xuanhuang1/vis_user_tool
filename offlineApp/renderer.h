@@ -2,7 +2,10 @@
 #include "ospray/ospray_cpp.h"
 #include "ospray/ospray_cpp/ext/rkcommon.h"
 
+#ifdef OFFLINE_WITH_UMESH
 #include "umesh/io/UMesh.h"
+#endif
+
 #include "rkcommon/utility/SaveImage.h"
 
 #include "rectMesh.h"
@@ -22,8 +25,10 @@ namespace visuser
 
         void Render();
         void SaveFrame(const std::string &filename);
+#ifdef OFFLINE_WITH_UMESH
         void InitializeVolumeModel(
             const std::shared_ptr<umesh::UMesh> umeshPtr);
+#endif
         void InitializeVolumeModel( 
             const std::shared_ptr<RectMesh> rectMeshPtr);
         void SetCamera(const Camera &cam);

@@ -129,7 +129,7 @@ namespace visuser
         const uint32_t *fb = (uint32_t *)framebuffer.map(OSP_FB_COLOR);
         rkcommon::utility::writePPM(filename + ".ppm", imgSize.x, imgSize.y, fb);
     }
-
+#ifdef OFFLINE_WITH_UMESH
     void Renderer::InitializeVolumeModel(const std::shared_ptr<umesh::UMesh> umeshPtr)
     {
         volume = ospray::Volume("unstructured");
@@ -214,6 +214,7 @@ namespace visuser
         model.setParam("transferFunction", transferFunction);
         model.commit();
     }
+#endif
 
     void Renderer::InitializeVolumeModel(const std::shared_ptr<RectMesh> rectMeshPtr)
     {
