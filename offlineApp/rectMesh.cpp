@@ -1,11 +1,11 @@
 #include "rectMesh.h"
 #include <fstream>
-#define DEFAULT_CELL_EDGE 1.0f
 
 namespace visuser
 {
     RectMesh::RectMesh(rkm::vec3ui dimensions, 
-        std::vector<float> z_mapping, std::string rawFilePath)
+        std::vector<float> z_mapping, std::string rawFilePath,
+        rkm::vec2f xy_scaling)
     {
         // create vertices
         for (int k = 0; k < dimensions.z; k++)
@@ -14,7 +14,7 @@ namespace visuser
             {
                 for (int i = 0; i < dimensions.x; i++)
                 {
-                    vertices.push_back(rkm::vec3f(i * DEFAULT_CELL_EDGE, j * DEFAULT_CELL_EDGE, z_mapping[k]));
+                    vertices.push_back(rkm::vec3f(i * xy_scaling.x, j * xy_scaling.y, z_mapping[k]));
                 }
             }
         }
