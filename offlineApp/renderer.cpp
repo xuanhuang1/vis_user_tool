@@ -1,4 +1,6 @@
 #include "renderer.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../stb_image_write.h"
 
 namespace visuser
 {
@@ -14,7 +16,7 @@ namespace visuser
         //renderer.setParam("aoDistance", 1e20f);
         //renderer.setParam("shadows", true);
         renderer.setParam("volumeSamplingRate", 10.f);
-        renderer.setParam("backgroundColor", rkm::vec3f(0.3f, 0.3f, 0.3f));
+        renderer.setParam("backgroundColor", rkm::vec4f(0.3f, 0.3f, 0.3f, 1.0f));
         renderer.commit();
 
         //framebuffer
@@ -123,11 +125,19 @@ namespace visuser
         framebuffer.renderFrame(renderer, camera, world);
     }
 
-    void Renderer::SaveFrame(const std::string &filename)
+    void Renderer::SaveFramePPM(const std::string &filename)
     {
         // Access and save rendered image
         const uint32_t *fb = (uint32_t *)framebuffer.map(OSP_FB_COLOR);
         rkcommon::utility::writePPM(filename + ".ppm", imgSize.x, imgSize.y, fb);
+    }
+
+    void Renderer::SaveFramePNG(const std::string &filename)
+    {
+        // Access and save rendered image
+        const uint32_t *fb = (uint32_t *)framebuffer.map(OSP_FB_COLOR);
+        stbi_write_png((filename + ".png").c_str(), imgSize.x, imgSize.y, 4, fb ,4 * imgSize.x);
+
     }
 #ifdef OFFLINE_WITH_UMESH
     void Renderer::InitializeVolumeModel(const std::shared_ptr<umesh::UMesh> umeshPtr)

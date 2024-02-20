@@ -24,7 +24,8 @@ namespace visuser
         ~Renderer();
 
         void Render();
-        void SaveFrame(const std::string &filename);
+        void SaveFramePPM(const std::string &filename);
+        void SaveFramePNG(const std::string &filename);
 #ifdef OFFLINE_WITH_UMESH
         void InitializeVolumeModel(
             const std::shared_ptr<umesh::UMesh> umeshPtr);

@@ -1,6 +1,3 @@
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../stb_image_write.h"
-
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -91,7 +88,7 @@ int main(int argc, const char **argv)
         // render
         renderer.Render();
         const std::string filename = "frame_" + std::to_string(i);
-        renderer.SaveFrame(filename);
+        renderer.SaveFramePNG(filename);
 
         // get this frame
         widget.advanceFrame();
