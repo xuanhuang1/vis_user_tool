@@ -2,10 +2,12 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../stb_image_write.h"
 
+
 namespace visuser
 {
     Renderer::Renderer(const AniObjWidget &config)
     {
+        stbi__flip_vertically_on_write = true;  
         // initialize OSPRay
         const char *argv[] = {"vistool_osp_offline"};
         InitializeOSPRay(1, argv);
