@@ -31,11 +31,12 @@
 #include <alloca.h>
 #endif
 
+
+/*
 #include <vector>
 
 #include "ospray/ospray_cpp.h"
 #include "ospray/ospray_cpp/ext/rkcommon.h"
-#include "rkcommon/utility/SaveImage.h"
 
 #include "../loader.h"
 #include "ArcballCamera.h"
@@ -48,26 +49,30 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
+*/
+//using namespace rkcommon::math;
+#include "rkcommon/utility/SaveImage.h"
+#include "GLFWOSPWindow.h"
 
-using namespace rkcommon::math;
 using json = nlohmann::json;
 using namespace visuser;
 
 
 // image size
-vec2i imgSize{800, 600};
+/*vec2i imgSize{800, 600};
 vec2i windowSize{800,600};
 unsigned int texture;
 unsigned int guiTextures[128];
 unsigned int guiTextureSize = 0;
-
-GLFWwindow *glfwWindow = nullptr;
+*/
+//GLFWwindow *glfwWindow = nullptr;
 
 enum DATATYPE{TRI_MESH, VOL, TOTAL_DATA_TYPES};
 std::string dataTypeString[] = {"triangle_mesh", "volume"};
 
+GLFWOSPWindow *GLFWOSPWindow::activeWindow = nullptr;
 
-class GLFWOSPWindow{
+/*class GLFWOSPWindow{
 public:
     ospray::cpp::Camera camera{"perspective"};
     ospray::cpp::Renderer renderer{"scivis"};
@@ -284,7 +289,7 @@ void GLFWOSPWindow::buildUI(){
 	  
 	  
     ImGui::End();
-}
+    }*/
 
 ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw::TransferFunctionWidget& widget)
 {
@@ -371,13 +376,13 @@ ospray::cpp::TransferFunction loadTransferFunction(AniObjWidget &widget, tfnw::T
     
 }
 
-void init (void* fb){
+void init (void* fb, GLFWOSPWindow &glfwOspWindow){
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_LIGHTING);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     //glEnable( GL_BLEND );
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glGenTextures(1, &glfwOspWindow.texture);
+    glBindTexture(GL_TEXTURE_2D, glfwOspWindow.texture);
     // set the texture wrapping/filtering options (on the currently bound texture object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -386,13 +391,12 @@ void init (void* fb){
     glTexImage2D(GL_TEXTURE_2D,
 		 0,
 		 GL_RGBA32F,
-		 imgSize.x,
-		 imgSize.y,
+		 glfwOspWindow.imgSize.x,
+		 glfwOspWindow.imgSize.y,
 		 0,
 		 GL_RGBA,
 		 GL_FLOAT,
 		 fb);
-
 }
 
 int main(int argc, const char **argv)
@@ -423,17 +427,16 @@ int main(int argc, const char **argv)
 	}
 
 	glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
-	// create GLFW window
-	glfwWindow = glfwCreateWindow(windowSize.x, windowSize.y, "Viewer", nullptr, nullptr);
 
-	if (!glfwWindow) {
+	GLFWOSPWindow glfwOspWindow;
+
+	// create GLFW window
+	glfwOspWindow.glfwWindow = glfwCreateWindow(glfwOspWindow.windowSize.x, glfwOspWindow.windowSize.y, "Viewer", nullptr, nullptr);
+
+	if (!glfwOspWindow.glfwWindow) {
 	    glfwTerminate();
 	    throw std::runtime_error("Failed to create GLFW window!");
 	}
-
-
-    
-	GLFWOSPWindow glfwOspWindow;
 
 
 	std::vector<std::string> args(argv, argv + argc);
@@ -537,8 +540,8 @@ int main(int argc, const char **argv)
     	glfwOspWindow.world.commit();
     	
     	// set up arcball camera for ospray
-    	glfwOspWindow.arcballCamera.reset(new ArcballCamera(glfwOspWindow.world.getBounds<box3f>(), windowSize));
-    	glfwOspWindow.arcballCamera->updateWindowSize(windowSize);
+    	glfwOspWindow.arcballCamera.reset(new ArcballCamera(glfwOspWindow.world.getBounds<box3f>(), glfwOspWindow.windowSize));
+    	glfwOspWindow.arcballCamera->updateWindowSize(glfwOspWindow.windowSize);
     	std::cout << glfwOspWindow.arcballCamera->eyePos() <<"\n";
     	std::cout << glfwOspWindow.arcballCamera->lookDir() <<"\n";
     	std::cout << glfwOspWindow.arcballCamera->upDir() <<"\n";
@@ -559,7 +562,7 @@ int main(int argc, const char **argv)
 	
 	ospray::cpp::Camera* camera = &glfwOspWindow.camera;
 	    
-	camera->setParam("aspect", imgSize.x / (float)imgSize.y);
+	camera->setParam("aspect", glfwOspWindow.imgSize.x / (float)glfwOspWindow.imgSize.y);
 	//camera->setParam("position", glfwOspWindow.arcballCamera->eyePos());
 	//camera->setParam("direction", glfwOspWindow.arcballCamera->lookDir());
 	//camera->setParam("up", glfwOspWindow.arcballCamera->upDir());
@@ -573,19 +576,19 @@ int main(int argc, const char **argv)
 	glfwOspWindow.renderNewFrame();
     
     
-	glfwMakeContextCurrent(glfwWindow);
+	glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
 	glfwSwapInterval(1); // Enable vsync
 
 	// Setup Dear ImGui context
-	ImGui_ImplGlfwGL3_Init(glfwWindow, true);
+	ImGui_ImplGlfwGL3_Init(glfwOspWindow.glfwWindow, true);
 	ImGui::StyleColorsDark();
     
 	auto fb = glfwOspWindow.framebuffer.map(OSP_FB_COLOR);
-	init(fb);
+	init(fb, glfwOspWindow);
 	glfwOspWindow.framebuffer.unmap(fb);
 	glfwOspWindow.setFunc();
-	glfwOspWindow.reshape(windowSize.x, windowSize.y);
-	glfwSetInputMode(glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
+	glfwOspWindow.reshape(glfwOspWindow.windowSize.x, glfwOspWindow.windowSize.y);
+	glfwSetInputMode(glfwOspWindow.glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
     
 	auto t1 = std::chrono::high_resolution_clock::now();
 	auto t2 = std::chrono::high_resolution_clock::now();
@@ -612,17 +615,17 @@ int main(int argc, const char **argv)
 	    ImGui_ImplGlfwGL3_Render();
       
 	    // Swap buffers
-	    glfwMakeContextCurrent(glfwWindow);
-	    glfwSwapBuffers(glfwWindow);
+	    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+	    glfwSwapBuffers(glfwOspWindow.glfwWindow);
       
 
 	    t2 = std::chrono::high_resolution_clock::now();
 	    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-	    glfwSetWindowTitle(glfwWindow, (std::string("Render FPS:")+std::to_string(int(1.f / time_span.count()))).c_str());
+	    glfwSetWindowTitle(glfwOspWindow.glfwWindow, (std::string("Render FPS:")+std::to_string(int(1.f / time_span.count()))).c_str());
 
 	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-	       glfwWindowShouldClose(glfwWindow) == 0 );
+	while( glfwGetKey(glfwOspWindow.glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+	       glfwWindowShouldClose(glfwOspWindow.glfwWindow) == 0 );
     
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
