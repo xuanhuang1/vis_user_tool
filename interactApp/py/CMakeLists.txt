@@ -10,7 +10,8 @@ find_package(glfw3 REQUIRED)
 
 file (GLOB SOURCE_FILES
   "../ArcballCamera.cpp"
-  "../TransferFunctionWidget.cpp" 
+  "../TransferFunctionWidget.cpp"
+  "../GLFWOSPWindow.cpp"
   "../imgui/*.cpp" "../../loader.cpp" "../../util.cpp")
 
 file (GLOB PYTHON_FILES "funcs.cpp" "")
