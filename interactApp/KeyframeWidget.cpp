@@ -33,6 +33,15 @@ namespace keyframe {
 	}
     }
 
+    Keyframe::Keyframe(float cam_params[9], std::vector<float> &c_in, std::vector<float> &o_in, uint32_t timeFrame, std::string filename)
+    {
+	for (uint32_t i=0; i<9; i++) cam_params[i] = cam_params[i];
+	for (uint32_t i=0; i<c_in.size(); i++) tf_colors.push_back(c_in[i]);
+	for (uint32_t i=0; i<o_in.size(); i++) tf_opacities.push_back(o_in[i]);
+	timeFrame = timeFrame;
+	filename = filename;
+    }
+
 
     KeyframeWidget::vec2f::vec2f(float c) : x(c), y(c) {}
 
@@ -101,9 +110,7 @@ namespace keyframe {
 	const ImGuiIO &io = ImGui::GetIO();
 
 	ImGui::Text(guiText.c_str());
-	ImGui::TextWrapped(
-			   "Left click to add a point, right click remove. "
-			   "Left click + drag to move points.");
+	ImGui::TextWrapped("Left click to add a point, right click remove. ");
 	//update_colormap();
 
 	vec2f canvas_size = ImGui::GetContentRegionAvail();
@@ -170,6 +177,7 @@ namespace keyframe {
 			dataIndex_ctrl_points.push_back(mouse_pos.x);
 			cam_ctrl_points.push_back(mouse_pos.x);
 			tfn_ctrl_points.push_back(mouse_pos.x);
+			record_frame = mouse_pos.x * timeFrameMax;
 		    }
 		}
 
@@ -231,6 +239,12 @@ namespace keyframe {
 	}
 	draw_list->PopClipRect();
 	
+    }
+
+    
+    void KeyframeWidget::recordKeyFrame(float cam_params[9]){
+
+	record_frame = -1;
     }
 
 }

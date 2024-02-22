@@ -212,13 +212,22 @@ void GLFWOSPWindow::buildUI(){
 	
         ImGui::Text("keyframe:");
 	ImGui::SameLine();
-	if (ImGui::Button("add")) {}
+        if (ImGui::Button("play")) {}
 	ImGui::SameLine();
-	if (ImGui::Button("remove")) {}
-	ImGui::SameLine();
-	if (ImGui::Button("play")) {}
+        if (ImGui::Button("export")) {}
 	
 	kf_widget.draw_ui();
+	if (kf_widget.record_frame != -1){
+	    float cam_params[9] =
+		{arcballCamera->eyePos()[0], arcballCamera->eyePos()[1], arcballCamera->eyePos()[2],
+	        arcballCamera->lookDir()[0], arcballCamera->lookDir()[1], arcballCamera->lookDir()[2],
+	        arcballCamera->upDir()[0], arcballCamera->upDir()[1], arcballCamera->upDir()[2]
+		};
+	    
+	    kf_widget.recordKeyFrame(cam_params);
+
+	    std::cout << "add kf:" << kf_widget.kfs.size() << std::endl;
+	}
 	
 	ImGui::TreePop();
     }
