@@ -1,5 +1,90 @@
 #include "GLFWOSPWindow.h"
 
+//
+// Lower level rendering contents
+//
+
+
+void GLFWOSPWindow::display()
+{ 
+  
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // render textured quad with OSPRay frame buffer contents
+   
+    renderNewFrame();
+    auto fb = framebuffer.map(OSP_FB_COLOR);
+
+    glTexImage2D(GL_TEXTURE_2D,
+		 0,
+		 GL_RGBA32F,
+		 imgSize.x,
+		 imgSize.y,
+		 0,
+		 GL_RGBA,
+		 GL_FLOAT,
+		 fb);
+    framebuffer.unmap(fb);
+   
+   
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(0.f, 0.f);
+    glVertex2f(0.f, 0.f);
+
+    glTexCoord2f(0.f, 1.f);
+    glVertex2f(0.f, windowSize.y);
+
+    glTexCoord2f(1.f, 1.f);
+    glVertex2f(windowSize.x, windowSize.y);
+
+    glTexCoord2f(1.f, 0.f);
+    glVertex2f(windowSize.x, 0.f);
+
+    glEnd();
+}
+
+void GLFWOSPWindow::preRenderInit(){
+    renderNewFrame();
+		
+    glfwMakeContextCurrent(glfwWindow);
+    glfwSwapInterval(1); // Enable vsync
+
+    // Setup Dear ImGui context
+    ImGui_ImplGlfwGL3_Init(glfwWindow, true);
+    ImGui::StyleColorsDark();
+    
+    auto fb = framebuffer.map(OSP_FB_COLOR);
+	
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_LIGHTING);
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+
+    glTexImage2D(GL_TEXTURE_2D,
+		 0,
+		 GL_RGBA32F,
+		 imgSize.x,
+		 imgSize.y,
+		 0,
+		 GL_RGBA,
+		 GL_FLOAT,
+		 fb);
+
+    framebuffer.unmap(fb);
+    setFunc();
+    reshape(windowSize.x, windowSize.y);
+    glfwSetInputMode(glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
+}
+
+
+
+//
+//               User input
+//
 
 void GLFWOSPWindow::motion(double x, double y)
 {
@@ -74,50 +159,16 @@ void GLFWOSPWindow::reshape(int w, int h)
 
 }
 
-void GLFWOSPWindow::display()
-{ 
-  
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // render textured quad with OSPRay frame buffer contents
-   
-    renderNewFrame();
-    auto fb = framebuffer.map(OSP_FB_COLOR);
-
-    glTexImage2D(GL_TEXTURE_2D,
-		 0,
-		 GL_RGBA32F,
-		 imgSize.x,
-		 imgSize.y,
-		 0,
-		 GL_RGBA,
-		 GL_FLOAT,
-		 fb);
-    framebuffer.unmap(fb);
-   
-   
-    glBegin(GL_QUADS);
-
-    glTexCoord2f(0.f, 0.f);
-    glVertex2f(0.f, 0.f);
-
-    glTexCoord2f(0.f, 1.f);
-    glVertex2f(0.f, windowSize.y);
-
-    glTexCoord2f(1.f, 1.f);
-    glVertex2f(windowSize.x, windowSize.y);
-
-    glTexCoord2f(1.f, 0.f);
-    glVertex2f(windowSize.x, 0.f);
-
-    glEnd();
-}
-
+//
+//               GUI
+//
 
 void GLFWOSPWindow::buildUI(){
     static float f = 1.f;
     static bool changeF = false;
     static int maxTime = 10;
     static int curTime = 0;
+    static int data_time = 0;
     ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
     ImGui::Begin("Menu Window", nullptr, flags);
 
@@ -144,13 +195,13 @@ void GLFWOSPWindow::buildUI(){
     }
     
     if (ImGui::TreeNode("Data time")){
-  	/*if (ImGui::SliderInt("time", &data_time, 0, count-1)) {
+  	if (ImGui::SliderInt("time", &data_time, 0, count-1)) {
 	    long long offset = data_time * volumeDimensions.long_product();
-	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
-                (*voxel_data)[i] = all_data_ptr[i+offset];
-            }
+	    //for (long long i =0 ; i < volumeDimensions.long_product(); i++){
+            //    (*voxel_data)[i] = all_data_ptr[i+offset];
+            //}
 	    
-	    }*/
+	}
 	ImGui::TreePop();
     }
     
@@ -158,6 +209,7 @@ void GLFWOSPWindow::buildUI(){
   	if (ImGui::SliderInt("time", &curTime, 0, maxTime)) {
 	    
 	}
+	
         ImGui::Text("keyframe:");
 	ImGui::SameLine();
 	if (ImGui::Button("add")) {}
@@ -165,6 +217,9 @@ void GLFWOSPWindow::buildUI(){
 	if (ImGui::Button("remove")) {}
 	ImGui::SameLine();
 	if (ImGui::Button("play")) {}
+	
+	kf_widget.draw_ui();
+	
 	ImGui::TreePop();
     }
 	  

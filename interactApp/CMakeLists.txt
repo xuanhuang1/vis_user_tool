@@ -13,6 +13,7 @@ add_executable(vistool_ospray_vol
     ospVol.cpp
     ArcballCamera.cpp
     TransferFunctionWidget.cpp
+    KeyframeWidget.cpp
     GLFWOSPWindow.cpp
     imgui/imgui.cpp
     imgui/imgui_draw.cpp

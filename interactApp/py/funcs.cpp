@@ -290,28 +290,12 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
 	camera->setParam("up", glfwOspWindow.arcballCamera->upDir());
 	camera->commit(); // commit each object to indicate modifications are done
 	
-	    
 	std::cout << "All osp objects committed\n";
-	glfwOspWindow.renderNewFrame();
-    
-    
-	glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
-	glfwSwapInterval(1); // Enable vsync
-
-	// Setup Dear ImGui context
-	ImGui_ImplGlfwGL3_Init(glfwOspWindow.glfwWindow, true);
-	ImGui::StyleColorsDark();
-    
-	auto fb = glfwOspWindow.framebuffer.map(OSP_FB_COLOR);
-	init(fb, glfwOspWindow);
-	glfwOspWindow.framebuffer.unmap(fb);
-	glfwOspWindow.setFunc();
-	glfwOspWindow.reshape(glfwOspWindow.windowSize.x, glfwOspWindow.windowSize.y);
-	glfwSetInputMode(glfwOspWindow.glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
-    
+	glfwOspWindow.preRenderInit();	
+	
 	auto t1 = std::chrono::high_resolution_clock::now();
 	auto t2 = std::chrono::high_resolution_clock::now();
-	
+
 	std::cout << "Begin render loop\n";
 	do{
 	    glfwPollEvents();

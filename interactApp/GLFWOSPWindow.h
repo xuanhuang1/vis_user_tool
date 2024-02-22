@@ -13,7 +13,7 @@
 #include "../loader.h"
 #include "ArcballCamera.h"
 #include "TransferFunctionWidget.h"
-
+#include "KeyframeWidget.h"
 
 using namespace rkcommon::math;
 
@@ -46,6 +46,7 @@ public:
   
     ospray::cpp::TransferFunction tfn{"piecewiseLinear"};
     tfnw::TransferFunctionWidget tfn_widget;
+    keyframe::KeyframeWidget kf_widget;
   
     GLFWOSPWindow(){
 	activeWindow = this;
@@ -76,6 +77,7 @@ public:
     
     }
 
+    void preRenderInit();    
     void renderNewFrame(){
 	framebuffer.clear();
 	// render one frame
@@ -83,4 +85,5 @@ public:
     }
 
     void buildUI();
+
 };

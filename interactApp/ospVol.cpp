@@ -31,265 +31,16 @@
 #include <alloca.h>
 #endif
 
-
-/*
-#include <vector>
-
-#include "ospray/ospray_cpp.h"
-#include "ospray/ospray_cpp/ext/rkcommon.h"
-
-#include "../loader.h"
-#include "ArcballCamera.h"
-#include "TransferFunctionWidget.h"
-
-#define GLFW_INCLUDE_NONE
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-// imgui
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw_gl3.h"
-
-*/
-//using namespace rkcommon::math;
 #include "rkcommon/utility/SaveImage.h"
 #include "GLFWOSPWindow.h"
 
 using json = nlohmann::json;
 using namespace visuser;
 
-
-// image size
-/*vec2i imgSize{800, 600};
-vec2i windowSize{800,600};
-unsigned int texture;
-unsigned int guiTextures[128];
-unsigned int guiTextureSize = 0;
-*/
-//GLFWwindow *glfwWindow = nullptr;
-
 enum DATATYPE{TRI_MESH, VOL, TOTAL_DATA_TYPES};
 std::string dataTypeString[] = {"triangle_mesh", "volume"};
 
 GLFWOSPWindow *GLFWOSPWindow::activeWindow = nullptr;
-
-/*class GLFWOSPWindow{
-public:
-    ospray::cpp::Camera camera{"perspective"};
-    ospray::cpp::Renderer renderer{"scivis"};
-    ospray::cpp::World world;
-    ospray::cpp::Instance instance;
-    ospray::cpp::VolumetricModel model;
-    std::vector<float> * voxel_data; // pointer to voxels data
-  
-    static GLFWOSPWindow *activeWindow;
-    ospray::cpp::FrameBuffer framebuffer;
-    std::unique_ptr<ArcballCamera> arcballCamera;
-    vec2f previousMouse{vec2f(-1)};
-  
-    ospray::cpp::TransferFunction tfn{"piecewiseLinear"};
-    tfnw::TransferFunctionWidget tfn_widget;
-  
-    GLFWOSPWindow(){
-	activeWindow = this;
-    
-	/// prepare framebuffer
-	auto buffers = OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM | OSP_FB_ALBEDO
-	    | OSP_FB_NORMAL;
-	framebuffer = ospray::cpp::FrameBuffer(imgSize.x, imgSize.y, OSP_FB_RGBA32F, buffers);
-    
-    }
-  
-    void display();
-    void motion(double, double);
-    void mouse(int, int, int, int);
-    void reshape(int, int);
-    
-    void setFunc(){
-
-	glfwSetCursorPosCallback(
-				 glfwWindow, [](GLFWwindow *, double x, double y) {
-				     activeWindow->motion(x, y);
-				 });
-	glfwSetFramebufferSizeCallback(
-				       glfwWindow, [](GLFWwindow *, int newWidth, int newHeight) {
-					   activeWindow->reshape(newWidth, newHeight);
-				       });
-
-    
-    }
-
-    void renderNewFrame(){
-	framebuffer.clear();
-	// render one frame
-	framebuffer.renderFrame(renderer, camera, world);
-    }
-
-    void buildUI();
-};
-
-GLFWOSPWindow *GLFWOSPWindow::activeWindow = nullptr;
-
-
-void GLFWOSPWindow::motion(double x, double y)
-{
-    const vec2f mouse(x, y);
-    if (previousMouse != vec2f(-1)) {
-	const bool leftDown =
-	    glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-	const bool rightDown =
-	    glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
-	const bool middleDown =
-	    glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
-	const vec2f prev = previousMouse;
-
-	bool cameraChanged = leftDown || rightDown || middleDown;
-
-	// don't modify camera with mouse on ui window
-	if (ImGui::GetIO().WantCaptureMouse){ 
-	    return;
-	}
-    
-	if (leftDown) {
-	    const vec2f mouseFrom(std::clamp(prev.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
-				  std::clamp(prev.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
-	    const vec2f mouseTo(std::clamp(mouse.x * 2.f / windowSize.x - 1.f, -1.f, 1.f),
-				std::clamp(mouse.y * 2.f / windowSize.y - 1.f, -1.f, 1.f));
-	    arcballCamera->rotate(mouseFrom, mouseTo);
-	} else if (rightDown) {
-	    arcballCamera->zoom(mouse.y - prev.y);
-	} else if (middleDown) {
-	    arcballCamera->pan(vec2f(mouse.x - prev.x, prev.y - mouse.y));
-	}
-
-	if (cameraChanged) {
-	    //updateCamera();
-	    //addObjectToCommit(camera.handle());
-	    camera.setParam("aspect", windowSize.x / float(windowSize.y));
-	    camera.setParam("position", arcballCamera->eyePos());
-	    camera.setParam("direction", arcballCamera->lookDir());
-	    camera.setParam("up", arcballCamera->upDir());
-	    camera.commit();
-	}
-    }
-
-    previousMouse = mouse;
-
-}
-
-
-void GLFWOSPWindow::reshape(int w, int h)
-{
-  
-    windowSize.x = w;
-    windowSize.y = h;
-  
-    // create new frame buffer
-    auto buffers = OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM | OSP_FB_ALBEDO
-	| OSP_FB_NORMAL;
-    framebuffer =
-	ospray::cpp::FrameBuffer(imgSize.x, imgSize.y, OSP_FB_RGBA32F, buffers);
-    framebuffer.commit();
-  
-    glViewport(0, 0, windowSize.x, windowSize.y);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0, windowSize.x, 0.0, windowSize.y, -1.0, 1.0);
-
-    // update camera
-    //arcballCamera->updateWindowSize(windowSize);
-
-    camera.setParam("aspect", windowSize.x / float(windowSize.y));
-    camera.commit();
-
-}
-
-void GLFWOSPWindow::display()
-{ 
-  
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // render textured quad with OSPRay frame buffer contents
-   
-    renderNewFrame();
-    auto fb = framebuffer.map(OSP_FB_COLOR);
-
-    glTexImage2D(GL_TEXTURE_2D,
-		 0,
-		 GL_RGBA32F,
-		 imgSize.x,
-		 imgSize.y,
-		 0,
-		 GL_RGBA,
-		 GL_FLOAT,
-		 fb);
-    framebuffer.unmap(fb);
-   
-   
-    glBegin(GL_QUADS);
-
-    glTexCoord2f(0.f, 0.f);
-    glVertex2f(0.f, 0.f);
-
-    glTexCoord2f(0.f, 1.f);
-    glVertex2f(0.f, windowSize.y);
-
-    glTexCoord2f(1.f, 1.f);
-    glVertex2f(windowSize.x, windowSize.y);
-
-    glTexCoord2f(1.f, 0.f);
-    glVertex2f(windowSize.x, 0.f);
-
-    glEnd();
-}
-
-
-void GLFWOSPWindow::buildUI(){
-    static float f = 1.f;
-    static bool changeF = false;
-    static int maxTime = 10;
-    static int curTime = 0;
-    ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
-    ImGui::Begin("Menu Window", nullptr, flags);
-
-    ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-    if (ImGui::SliderFloat("float", &f, 1.0f, 10.0f)){changeF = true;}
-        
-    if (ImGui::TreeNode("Transfer Function")){
-  	if (tfn_widget.changed() || changeF) {
-	    std::vector<float> tmpOpacities, tmpColors; //color not used
-	    tfn_widget.get_colormapf(tmpColors, tmpOpacities);
-	    for (uint32_t i=0;i<tmpOpacities.size();i++)
-	    	tmpOpacities[i] *= f;
-	    
-	    tfn_widget.setUnchanged();
-    
-	    tfn.setParam("opacity", ospray::cpp::CopiedData(tmpOpacities));
-	    tfn.commit();
-	    model.commit();
-	}
-
-  
-	tfn_widget.draw_ui();
-	ImGui::TreePop();
-    }
-
-    if (ImGui::TreeNode("Animation keyframe")){
-  	if (ImGui::SliderInt("time", &curTime, 0, maxTime)) {
-	    
-	}
-        ImGui::Text("keyframe:");
-	ImGui::SameLine();
-	if (ImGui::Button("add")) {}
-	ImGui::SameLine();
-	if (ImGui::Button("remove")) {}
-	ImGui::SameLine();
-	if (ImGui::Button("play")) {}
-	ImGui::TreePop();
-    }
-	  
-	  
-	  
-    ImGui::End();
-    }*/
 
 ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw::TransferFunctionWidget& widget)
 {
@@ -573,23 +324,9 @@ int main(int argc, const char **argv)
 	
 	    
 	std::cout << "All osp objects committed\n";
-	glfwOspWindow.renderNewFrame();
-    
-    
-	glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
-	glfwSwapInterval(1); // Enable vsync
 
-	// Setup Dear ImGui context
-	ImGui_ImplGlfwGL3_Init(glfwOspWindow.glfwWindow, true);
-	ImGui::StyleColorsDark();
-    
-	auto fb = glfwOspWindow.framebuffer.map(OSP_FB_COLOR);
-	init(fb, glfwOspWindow);
-	glfwOspWindow.framebuffer.unmap(fb);
-	glfwOspWindow.setFunc();
-	glfwOspWindow.reshape(glfwOspWindow.windowSize.x, glfwOspWindow.windowSize.y);
-	glfwSetInputMode(glfwOspWindow.glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
-    
+	glfwOspWindow.preRenderInit();
+	
 	auto t1 = std::chrono::high_resolution_clock::now();
 	auto t2 = std::chrono::high_resolution_clock::now();
 	
@@ -600,9 +337,7 @@ int main(int argc, const char **argv)
 	    t1 = std::chrono::high_resolution_clock::now();
       
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	    glEnable(GL_TEXTURE_2D);
-  
-      
+	    glEnable(GL_TEXTURE_2D);      
 	    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
 	    glfwOspWindow.display();
 	    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
