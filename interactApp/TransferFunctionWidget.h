@@ -43,7 +43,6 @@ class TransferFunctionWidget {
     std::vector<Colormap> colormaps;
     size_t selected_colormap = 0;
     std::vector<uint8_t> current_colormap;
-
   
     size_t selected_point = -1;
 
@@ -51,11 +50,13 @@ class TransferFunctionWidget {
     bool gpu_image_stale = true;
     bool colormap_changed = false;
     GLuint colormap_img = -1;
-  std::string guiText = "color map";
+    std::string guiText = "color map";
 
 public:
     TransferFunctionWidget();
     std::vector<vec2f> alpha_control_pts = {vec2f(0.f), vec2f(1.f)};
+    std::vector<float> osp_colors;
+    
     // Add a colormap preset. The image should be a 1D RGBA8 image, if the image
     // is provided in sRGBA colorspace it will be linearized
     void add_colormap(const Colormap &map);
@@ -67,7 +68,7 @@ public:
     // call to draw_ui
     bool changed() const;
 
-  void setUnchanged(){colormap_changed = false;}
+    void setUnchanged(){colormap_changed = false;}
 
     // Get back the RGBA8 color data for the transfer function
     std::vector<uint8_t> get_colormap();
@@ -78,6 +79,10 @@ public:
     // Get back the RGBA32F color data for the transfer function
     // as separate color and opacity vectors
     void get_colormapf(std::vector<float> &color, std::vector<float> &opacity);
+
+    // get piecewise linear colormap
+    void set_osp_colormapf(std::vector<float> &color, std::vector<float> &opacity);
+    void get_osp_colormapf(std::vector<float> &color, std::vector<float> &opacity);
 
   std::vector<vec2f> get_alpha_control_pts(){ return alpha_control_pts;}
 

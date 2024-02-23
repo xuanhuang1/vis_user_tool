@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include "KeyframeWidget.h"
+#include "../loader.h"
 //#ifndef TFN_WIDGET_NO_STB_IMAGE_IMPL
 //#define STB_IMAGE_IMPLEMENTATION
 //#endif
@@ -33,13 +34,13 @@ namespace keyframe {
 	}
     }
 
-    Keyframe::Keyframe(float cam_params[9], std::vector<float> &c_in, std::vector<float> &o_in, uint32_t timeFrame, std::string filename)
+    Keyframe::Keyframe(ArcballCamera &cam, std::vector<float> &c_in, std::vector<float> &o_in, int time_in, int data_i_in)
     {
-	for (uint32_t i=0; i<9; i++) cam_params[i] = cam_params[i];
+        arcballCam.set(cam);
 	for (uint32_t i=0; i<c_in.size(); i++) tf_colors.push_back(c_in[i]);
 	for (uint32_t i=0; i<o_in.size(); i++) tf_opacities.push_back(o_in[i]);
-	timeFrame = timeFrame;
-	filename = filename;
+	timeFrame = time_in;
+	data_i = data_i_in;
     }
 
 
@@ -55,25 +56,25 @@ namespace keyframe {
     }
 
     KeyframeWidget::vec2f KeyframeWidget::vec2f::operator+(
-									   const KeyframeWidget::vec2f &b) const
+							   const KeyframeWidget::vec2f &b) const
     {
 	return vec2f(x + b.x, y + b.y);
     }
 
     KeyframeWidget::vec2f KeyframeWidget::vec2f::operator-(
-									   const KeyframeWidget::vec2f &b) const
+							   const KeyframeWidget::vec2f &b) const
     {
 	return vec2f(x - b.x, y - b.y);
     }
 
     KeyframeWidget::vec2f KeyframeWidget::vec2f::operator/(
-									   const KeyframeWidget::vec2f &b) const
+							   const KeyframeWidget::vec2f &b) const
     {
 	return vec2f(x / b.x, y / b.y);
     }
 
     KeyframeWidget::vec2f KeyframeWidget::vec2f::operator*(
-									   const KeyframeWidget::vec2f &b) const
+							   const KeyframeWidget::vec2f &b) const
     {
 	return vec2f(x * b.x, y * b.y);
     }
@@ -96,12 +97,15 @@ namespace keyframe {
 	const float point_radius = 5.f;
 	std::vector<ImVec2> polyline_pts;
 	draw_list->AddText(ImVec2(view_offset + vec2f(0.f, display_offsets[index]+0.15f)* view_scale), 0xFFFFFFFF, txt.c_str());
-	for (const auto &pt : pts) {
-	    const vec2f pt_pos = vec2f(pt, display_offsets[index]) * view_scale + view_offset;
-	    polyline_pts.push_back(pt_pos);
-	    draw_list->AddCircleFilled(pt_pos, point_radius, 0xFFFFFFFF);
-	}
+	polyline_pts.push_back(vec2f(0, display_offsets[index]) * view_scale + view_offset);
+	polyline_pts.push_back(vec2f(1, display_offsets[index]) * view_scale + view_offset);
 	draw_list->AddPolyline(polyline_pts.data(), (int)polyline_pts.size(), 0xFFFFFFFF, false, 2.f);
+	
+	for (size_t i=0; i<pts.size()-1; i++) {
+	    const vec2f pt_pos = vec2f(pts[i], display_offsets[index]) * view_scale + view_offset;
+	    if (i == selected_point) draw_list->AddCircleFilled(pt_pos, point_radius, IM_COL32(255,255,0,255));
+	    else draw_list->AddCircleFilled(pt_pos, point_radius, 0xFFFFFFFF);
+	}
     }
 
     void KeyframeWidget::draw_ui()
@@ -156,31 +160,28 @@ namespace keyframe {
 	    mouse_pos.y = clamp(mouse_pos.y, 0.f, 1.f);
 
 	    if (io.MouseDown[0]) {
-		if (selected_point != (size_t)-1) {
-		    time_ctrl_points[selected_point] = mouse_pos.x;
-
-		    // Keep the first and last control points at the edges
-		    if (selected_point == 0) {
-			time_ctrl_points[selected_point] = 0.f;
-		    } else if (selected_point == time_ctrl_points.size() - 1) {
-			time_ctrl_points[selected_point] = 1.f;
-		    }
-		} else {
+		vec2f v_line_start = vec2f(0, display_offsets[0]) * view_scale + view_offset;
+	        if (abs(clipped_mouse_pos.y - v_line_start.y) <= point_radius){
 		    auto fnd = std::find_if(time_ctrl_points.begin(), time_ctrl_points.end(), [&](const float &p) {
 						const vec2f pt_pos = vec2f(p, display_offsets[0]) * view_scale + view_offset;
 						float dist = (pt_pos - vec2f(clipped_mouse_pos)).length();
 						return dist <= point_radius;
 					    });
+		    
 		    // No nearby point, we're adding a new one
 		    if (fnd == time_ctrl_points.end()) {
 			time_ctrl_points.push_back(mouse_pos.x);
 			dataIndex_ctrl_points.push_back(mouse_pos.x);
 			cam_ctrl_points.push_back(mouse_pos.x);
 			tfn_ctrl_points.push_back(mouse_pos.x);
+			// mark this frame to get param from osp
 			record_frame = mouse_pos.x * timeFrameMax;
-		    }
+		    }else // there is a selected point, reset value
+			selected_point = -1;
 		}
 
+		// set selected point
+		
 		// Keep alpha control points ordered by x coordinate, update
 		// selected point index to match
 		std::sort(time_ctrl_points.begin(), time_ctrl_points.end());
@@ -199,8 +200,7 @@ namespace keyframe {
 	    } else if (ImGui::IsMouseClicked(1)) {
 		selected_point = -1;
 		// Find and remove the point
-		auto fnd = std::find_if(
-					time_ctrl_points.begin(), time_ctrl_points.end(), [&](const float &p) {
+		auto fnd = std::find_if(time_ctrl_points.begin(), time_ctrl_points.end(), [&](const float &p) {
 					    const vec2f pt_pos = vec2f(p, display_offsets[0]) * view_scale + view_offset;
 					    float dist = (pt_pos - vec2f(clipped_mouse_pos)).length();
 					    return dist <= point_radius;
@@ -208,16 +208,24 @@ namespace keyframe {
 		// We also want to prevent erasing the first and last points
 		if (fnd != time_ctrl_points.end() && fnd != time_ctrl_points.begin() &&
 		    fnd != time_ctrl_points.end() - 1) {
+		    dataIndex_ctrl_points.erase(std::remove(dataIndex_ctrl_points.begin(),
+							    dataIndex_ctrl_points.end(), *fnd),
+						dataIndex_ctrl_points.end());
+		    cam_ctrl_points.erase(std::remove(cam_ctrl_points.begin(),
+						      cam_ctrl_points.end(), *fnd),
+					  cam_ctrl_points.end());
+		    tfn_ctrl_points.erase(std::remove(tfn_ctrl_points.begin(),
+						      tfn_ctrl_points.end(), *fnd),
+						      tfn_ctrl_points.end());
+		    
 		    time_ctrl_points.erase(fnd);
-		    //dataIndex_ctrl_points.erase(fnd);
-		    //cam_ctrl_points.erase(fnd);
-		    //tfn_ctrl_points.erase(fnd);
 		}
 	    } else {
+		// other mouse click, clear selected point
 		selected_point = -1;
 	    }
 	} else {
-	    selected_point = -1;
+	    // not clicking
 	}
 
 	// Draw the alpha control points, and build the points for the polyline
@@ -242,9 +250,74 @@ namespace keyframe {
     }
 
     
-    void KeyframeWidget::recordKeyFrame(float cam_params[9]){
+    void KeyframeWidget::recordKeyFrame(ArcballCamera &cam,
+					std::vector<float> &tf_colors,
+					std::vector<float> &tf_opacities,
+					int data_i)
+    {
+        
+	kfs.push_back(Keyframe(cam, tf_colors, tf_opacities, record_frame, data_i));
+	std::cout << "adding frame[" << kfs.back().timeFrame<<"] with cam ";
+        kfs.back().arcballCam.print();
 
+	// sort key frame by record time
+	std::sort(kfs.begin(), kfs.end(), [](Keyframe a, Keyframe b)
+	{return a.timeFrame < b.timeFrame;});
+	
 	record_frame = -1;
+    }
+
+    void KeyframeWidget::loadKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i){
+	if (selected_point > time_ctrl_points.size()-2) return;
+	if (selected_point < 0) return;
+
+	// find keyframe in list, both vector sorted by time
+	Keyframe thisKF = kfs[selected_point];
+	data_i = thisKF.data_i;
+	cam.set(thisKF.arcballCam);
+	for (uint32_t i=0; i<tf_colors.size(); i++) tf_colors.push_back(thisKF.tf_colors[i]);
+	for (uint32_t i=0; i<tf_opacities.size(); i++) tf_opacities.push_back(thisKF.tf_opacities[i]);
+
+	std::cout << "load frame["<<thisKF.timeFrame<<"]  with cam ";
+        cam.print();
+    }
+
+    void KeyframeWidget::getFrameFromKF(float cam_params[9], std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i, int f){
+	if (f > kfs.back().timeFrame) return;
+
+	int i_prev=0, i_next=0;
+	for (size_t i=0; i<kfs.size()-1;i++){
+	    if (( f >= kfs[i].timeFrame) && (f <= kfs[i+1].timeFrame))
+		{ i_prev = i; i_next = i+1;}
+	}
+
+	glm::vec2 range(kfs[i_prev].timeFrame, kfs[i_next].timeFrame);
+	visuser::Camera a, b;
+	
+	for (uint32_t i=0; i<3; i++){
+	    a.pos[i] = kfs[i_prev].arcballCam.eyePos()[i];
+	    a.dir[i] = kfs[i_prev].arcballCam.lookDir()[i];
+	    a.up[i] = kfs[i_prev].arcballCam.upDir()[i];
+	    b.pos[i] = kfs[i_next].arcballCam.eyePos()[i];
+	    b.dir[i] = kfs[i_next].arcballCam.lookDir()[i];
+	    b.up[i] = kfs[i_next].arcballCam.upDir()[i];
+	}
+	visuser::Camera currentCam = visuser::interpolate(a, b, range, f);
+
+	for (uint32_t i=0; i<3; i++){
+	    cam_params[i] = currentCam.pos[i];
+	    cam_params[3+i] = currentCam.dir[i];
+	    cam_params[6+i] = currentCam.up[i];
+	}
+	
+	// select previous keyframe's tf and data id
+	tf_colors.resize(kfs[i_prev].tf_colors.size());	
+	tf_opacities.resize(kfs[i_prev].tf_opacities.size());
+	for (uint32_t i=0; i<kfs[i_prev].tf_colors.size(); i++)
+	    tf_colors[i] = kfs[i_prev].tf_colors[i];
+	for (uint32_t i=0; i<kfs[i_prev].tf_opacities.size(); i++)
+	    tf_opacities[i] = kfs[i_prev].tf_opacities[i];
+	data_i = kfs[i_prev].data_i;
     }
 
 }

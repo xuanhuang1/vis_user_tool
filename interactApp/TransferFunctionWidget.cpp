@@ -118,15 +118,6 @@ namespace tfnw {
 			   "Left click to add a point, right click remove. "
 			   "Left click + drag to move points.");
 	//update_colormap();
-	/*if (ImGui::BeginCombo(guiText.c_str(), colormaps[selected_colormap].name.c_str())) {
-	  for (size_t i = 0; i < colormaps.size(); ++i) {
-	  if (ImGui::Selectable(colormaps[i].name.c_str(), selected_colormap == i)) {
-	  selected_colormap = i;
-	  update_colormap();
-	  }
-	  }
-	  ImGui::EndCombo();
-	  }*/
 
 	vec2f canvas_size = ImGui::GetContentRegionAvail();
 	canvas_size.y = 100;
@@ -274,6 +265,49 @@ namespace tfnw {
 	    opacity[i] = current_colormap[i * 4 + 3] / 255.f;
 	}
     }
+    void TransferFunctionWidget::set_osp_colormapf(std::vector<float> &colors, std::vector<float> &opacities)
+    {
+	osp_colors.resize(colors.size());
+	
+	for (uint32_t i=0; i<colors.size(); i++){
+	    osp_colors[i] = colors[i];
+	}
+
+	if (opacities.size() > 1){
+	    alpha_control_pts.resize(opacities.size());
+	    for (uint32_t i=0; i<opacities.size(); i++){
+		float cur_x = i/float(opacities.size()-1);
+		float cur_y = clamp(float(opacities[i]), 0.f, 1.f);
+	        alpha_control_pts[i].x = cur_x;
+	        alpha_control_pts[i].y = cur_y;
+	    }
+	}else{
+	    alpha_control_pts.resize(2);
+	    alpha_control_pts[0].x = 0.f;
+	    alpha_control_pts[0].y = clamp(float(opacities[0]), 0.f, 1.f);
+	    alpha_control_pts[1].x = 1.f;
+	    alpha_control_pts[1].y = clamp(float(opacities[0]), 0.f, 1.f);
+	}
+	update_colormap();
+
+    }
+
+
+    void TransferFunctionWidget::get_osp_colormapf(std::vector<float> &color,
+					       std::vector<float> &opacity)
+    {
+	colormap_changed = false;
+	color.resize(osp_colors.size());
+	opacity.resize(current_colormap.size() / 4);
+	for (size_t i = 0; i < current_colormap.size() / 4; ++i) {
+	    opacity[i] = current_colormap[i * 4 + 3] / 255.f;
+	}
+	for (size_t i = 0; i < color.size() ; ++i) {
+	    color[i] = osp_colors[i];
+	}
+	
+    }
+
 
     void TransferFunctionWidget::update_gpu_image()
     {

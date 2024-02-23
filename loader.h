@@ -24,6 +24,8 @@ namespace visuser{
     	
 	void print();
     };
+
+    Camera interpolate(Camera &a, Camera &b, glm::vec2 range, uint32_t f);
     
     
     struct AniObjWidget{

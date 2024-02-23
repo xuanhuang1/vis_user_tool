@@ -6,11 +6,11 @@
 
 
 void GLFWOSPWindow::display()
-{ 
+{
+    if (kf_widget.play) playAnimationFrame(); 
   
     glBindTexture(GL_TEXTURE_2D, texture);
     // render textured quad with OSPRay frame buffer contents
-   
     renderNewFrame();
     auto fb = framebuffer.map(OSP_FB_COLOR);
 
@@ -166,24 +166,30 @@ void GLFWOSPWindow::reshape(int w, int h)
 void GLFWOSPWindow::buildUI(){
     static float f = 1.f;
     static bool changeF = false;
-    static int maxTime = 10;
     static int curTime = 0;
     static int data_time = 0;
     ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
+    bool camera_need_commit = false;
+    bool tf_need_commit = false;
+
     ImGui::Begin("Menu Window", nullptr, flags);
 
     ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-    if (ImGui::SliderFloat("float", &f, 1.0f, 10.0f)){changeF = true;}
         
     if (ImGui::TreeNode("Transfer Function")){
+	if (ImGui::SliderFloat("float", &f, 1.0f, 10.0f)){changeF = true;}
+    
   	if (tfn_widget.changed() || changeF) {
-	    std::vector<float> tmpOpacities, tmpColors; //color not used
-	    tfn_widget.get_colormapf(tmpColors, tmpOpacities);
-	    for (uint32_t i=0;i<tmpOpacities.size();i++)
-	    	tmpOpacities[i] *= f;
+	    std::vector<float> tmpOpacities, tmpColors; 
+	    tfn_widget.get_osp_colormapf(tmpColors, tmpOpacities);
+	    for (uint32_t i=0;i<tmpOpacities.size();i++){
+	    	tmpOpacities[i] = tmpOpacities[i]*f;
+	    }
 	    
 	    tfn_widget.setUnchanged();
-    
+	    changeF = false;
+
+	    // update opacities only
 	    tfn.setParam("opacity", ospray::cpp::CopiedData(tmpOpacities));
 	    tfn.commit();
 	    model.commit();
@@ -206,27 +212,54 @@ void GLFWOSPWindow::buildUI(){
     }
     
     if (ImGui::TreeNode("Animation keyframe")){
-  	if (ImGui::SliderInt("time", &curTime, 0, maxTime)) {
-	    
-	}
+  	//if (ImGui::SliderInt("time", &curTime, 0, kf_widget.timeFrameMax)) {
+	//
+	//}
 	
-        ImGui::Text("keyframe:");
-	ImGui::SameLine();
-        if (ImGui::Button("play")) {}
-	ImGui::SameLine();
-        if (ImGui::Button("export")) {}
+	//ImGui::SameLine();
+        //if (ImGui::Button("export")) {}
 	
 	kf_widget.draw_ui();
-	if (kf_widget.record_frame != -1){
-	    float cam_params[9] =
-		{arcballCamera->eyePos()[0], arcballCamera->eyePos()[1], arcballCamera->eyePos()[2],
-	        arcballCamera->lookDir()[0], arcballCamera->lookDir()[1], arcballCamera->lookDir()[2],
-	        arcballCamera->upDir()[0], arcballCamera->upDir()[1], arcballCamera->upDir()[2]
-		};
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,0,255));
+	ImGui::Text("active kf:");
+	ImGui::PopStyleColor();
+	ImGui::SameLine();
+	if (ImGui::Button("setF")) {}
+	ImGui::SameLine();
+	if (ImGui::Button("loadF")) {
+	  
+	    ArcballCamera cam;
+	    std::vector<float> tmpOpacities, tmpColors;
+	    int data_index;
+	    kf_widget.loadKeyFrame(cam, tmpColors, tmpOpacities, data_index);
 	    
-	    kf_widget.recordKeyFrame(cam_params);
+	    // update camera
+	    arcballCamera->set(cam);
+	    camera_need_commit = true;
 
-	    std::cout << "add kf:" << kf_widget.kfs.size() << std::endl;
+	    //update tf
+	    //tfn_widget.set_osp_colormapf(tmpColors, tmpOpacities);
+	    //tfn_widget.changed();
+        }
+	ImGui::SameLine();
+        if (ImGui::Button("play")) {kf_widget.play = true;}
+
+	if (kf_widget.kfs.size() == 0) kf_widget.record_frame = 0;
+	
+	// record keyframe if requested
+	if (kf_widget.record_frame != -1){
+	    std::vector<float> tmpOpacities, tmpColors; 
+	    tfn_widget.get_osp_colormapf(tmpColors, tmpOpacities);
+	    kf_widget.recordKeyFrame(*arcballCamera, tmpColors, tmpOpacities, data_time);
+
+	}
+
+	if (camera_need_commit){
+	    camera.setParam("aspect", windowSize.x / float(windowSize.y));
+	    camera.setParam("position", arcballCamera->eyePos());
+	    camera.setParam("direction", arcballCamera->lookDir());
+	    camera.setParam("up", arcballCamera->upDir());
+	    camera.commit();
 	}
 	
 	ImGui::TreePop();
@@ -235,4 +268,35 @@ void GLFWOSPWindow::buildUI(){
 	  
 	  
     ImGui::End();
+}
+
+void GLFWOSPWindow::playAnimationFrame(){
+    if (kf_widget.playFrame >= kf_widget.kfs.back().timeFrame){
+	kf_widget.playFrame = -1;
+	kf_widget.play = false;
+    }
+    
+    // load current frame info
+    float cam[9];
+    std::vector<float> tmpOpacities, tmpColors;
+    int data_index;
+    kf_widget.getFrameFromKF(cam, tmpColors, tmpOpacities, data_index, kf_widget.playFrame);
+    vec3f pos(cam[0], cam[1], cam[2]);
+    vec3f dir(cam[3], cam[4], cam[5]);
+    vec3f up(cam[6], cam[7], cam[8]);
+
+    
+    // update camera
+    camera.setParam("aspect", windowSize.x / float(windowSize.y));
+    camera.setParam("position", pos);
+    camera.setParam("direction", dir);
+    camera.setParam("up", up);
+    camera.commit();
+	    
+    // update opacities only
+    tfn.setParam("opacity", ospray::cpp::CopiedData(tmpOpacities));
+    tfn.commit();
+    model.commit();
+
+    kf_widget.playFrame++;
 }

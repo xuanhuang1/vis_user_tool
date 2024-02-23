@@ -26,7 +26,6 @@ public:
     unsigned int guiTextures[128];
     unsigned int guiTextureSize = 0;
     GLFWwindow *glfwWindow = nullptr;
-    //static int data_time = 0;
 
     ospray::cpp::Camera camera{"perspective"};
     ospray::cpp::Renderer renderer{"scivis"};
@@ -85,5 +84,6 @@ public:
     }
 
     void buildUI();
+    void playAnimationFrame();
 
 };

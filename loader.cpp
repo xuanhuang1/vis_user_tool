@@ -31,7 +31,7 @@ void visuser::Camera::print(){
 	
 }
 
-visuser::Camera interpolate(visuser::Camera &a, visuser::Camera &b, glm::vec2 range, uint32_t f){
+visuser::Camera visuser::interpolate(visuser::Camera &a, visuser::Camera &b, glm::vec2 range, uint32_t f){
 	float val = (f - range[0]) / float(range[1] - range[0]);
 	glm::vec3 pos = mix(a.pos, b.pos, val);
 	glm::vec3 dir = glm::normalize(mix(a.dir, b.dir, val));

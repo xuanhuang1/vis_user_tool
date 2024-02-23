@@ -8,15 +8,18 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "ArcballCamera.h"
+
 namespace keyframe {
     struct Keyframe{
-	float cam_params[9];
+	ArcballCamera arcballCam;
 	std::vector<float> tf_colors;
 	std::vector<float> tf_opacities;
-	uint32_t timeFrame;
+	int timeFrame;
+	int data_i;
 	std::string filename;
 	Keyframe(){};
-	Keyframe(float cam_params[9], std::vector<float> &tf_colors, std::vector<float> &tf_opacities, uint32_t timeFrame, std::string filename);
+	Keyframe(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int timeFrame, int data_i);
     };
     
     class KeyframeWidget {
@@ -49,12 +52,21 @@ namespace keyframe {
 	std::vector<float> tfn_ctrl_points = {0.f, 1.f};
 	std::vector<Keyframe> kfs;
 	uint32_t timeFrameMax = 100;
+	uint32_t viewFrame = 0;
 	int record_frame = -1;
+	uint32_t playFrame = 0;
+	bool play = false;
 
 	void draw_ui();
-	void recordKeyFrame(float cam_params[9]);
 	void setGuiText(std::string in) { guiText = in;}
-    private:
+
+	void recordKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int i);
+	
+	void loadKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i);
+
+	void getFrameFromKF(float cam[9], std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i, int f);
+	
+private:
 	void draw_attribute_line(ImDrawList *draw_list, const vec2f view_scale, const vec2f view_offset, std::vector<float>& pts, uint32_t index, std::string txt);
 	float display_offsets[4]  = {0.85f, 0.5f, 0.3f, 0.1f};
     };

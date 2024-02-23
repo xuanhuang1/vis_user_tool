@@ -42,6 +42,19 @@ std::string dataTypeString[] = {"triangle_mesh", "volume"};
 
 GLFWOSPWindow *GLFWOSPWindow::activeWindow = nullptr;
 
+float clamp(float x)
+{
+    if (x < 0.f) {
+	return 0.f;
+    }
+    if (x > 1.f) {
+	return 1.f;
+    }
+    return x;
+}
+
+
+
 ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw::TransferFunctionWidget& widget)
 {
     ospray::cpp::TransferFunction transferFunction("piecewiseLinear");
@@ -109,14 +122,14 @@ ospray::cpp::TransferFunction loadTransferFunction(AniObjWidget &widget, tfnw::T
     std::vector<float> opacities;
     const vec2f valueRange(widget.tfRange[0], widget.tfRange[1]);
     widget.getFrameTF(colors, opacities);
-    for (uint32_t i=0; i<colors.size()/3; i++) 
+
+    for (uint32_t i=0; i<colors.size()/3; i++){
     	colors3f.emplace_back(colors[i*3], colors[i*3+1], colors[i*3+2]);
+    }
     
-    tfWidget.alpha_control_pts[0].x = 1.f;
-    tfWidget.alpha_control_pts[0].y = 1.f;
-    tfWidget.alpha_control_pts[1].x = 0.f;
-    tfWidget.alpha_control_pts[1].y = 0.f;
-    std::cout << colors.size() <<" c\n";
+    tfWidget.set_osp_colormapf(colors, opacities);
+    std::cout << "load tf col sz="<< tfWidget.osp_colors.size()<<" "
+	      <<tfWidget.alpha_control_pts.size() <<" \n";
     
     transferFunction.setParam("color", ospray::cpp::CopiedData(colors3f));
     transferFunction.setParam("opacity", ospray::cpp::CopiedData(opacities));

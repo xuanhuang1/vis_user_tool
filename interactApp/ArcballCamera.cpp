@@ -6,8 +6,7 @@
 ArcballCamera::ArcballCamera(const rkcommon::math::box3f &worldBounds,
     const rkcommon::math::vec2i &windowSize)
     : zoomSpeed(1),
-      invWindowSize(
-          rkcommon::math::vec2f(1.0) / rkcommon::math::vec2f(windowSize)),
+      invWindowSize(rkcommon::math::vec2f(1.0) / rkcommon::math::vec2f(windowSize)),
       centerTranslation(rkcommon::math::one),
       translation(rkcommon::math::one),
       rotation(rkcommon::math::one)
@@ -22,6 +21,7 @@ ArcballCamera::ArcballCamera(const rkcommon::math::box3f &worldBounds,
       rkcommon::math::vec3f(0, 0, length(diag)));
   updateCamera();
 }
+
 
 void ArcballCamera::rotate(
     const rkcommon::math::vec2f &from, const rkcommon::math::vec2f &to)

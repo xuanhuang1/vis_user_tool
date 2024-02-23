@@ -11,6 +11,7 @@ find_package(glfw3 REQUIRED)
 file (GLOB SOURCE_FILES
   "../ArcballCamera.cpp"
   "../TransferFunctionWidget.cpp"
+  "../KeyframeWidget.cpp"
   "../GLFWOSPWindow.cpp"
   "../imgui/*.cpp" "../../loader.cpp" "../../util.cpp")
 

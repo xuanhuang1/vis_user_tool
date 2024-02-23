@@ -49,4 +49,3 @@ inline glm::vec2 get_vec2i(const json &j)
 }
 
 
-
