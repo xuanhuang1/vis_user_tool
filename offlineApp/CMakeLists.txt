@@ -6,20 +6,44 @@ if (NOT WIN32)
 endif()
 
 find_package(OpenGL 3 REQUIRED)
+find_package(ospray 3.0.0)
+add_library(ospray INTERFACE)
+if(ospray_FOUND)
+   target_link_libraries(ospray INTERFACE ospray::ospray)
+else()
+    target_include_directories(ospray
+        INTERFACE /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
+        INTERFACE /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
+
+    target_link_libraries(ospray
+        INTERFACE /home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
+endif()
+
+#-------------------- umesh -------------------------
+if (DEFINED OFFLINE_WITH_UMESH)
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../ext/umesh" ${CMAKE_CURRENT_BINARY_DIR}/umesh EXCLUDE_FROM_ALL) #kind of hacky, but it works
+    add_definitions(${UMESH_DEFINITIONS})
+    include_directories(submodules/umesh)
+    set(UMESH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(UMESH_TARGET umesh)
+else()
+    set(UMESH_TARGET "")
+endif()
+#----------------------------------------------------
 
 
 add_executable(vistool_osp_offline
     main.cpp
+    renderer.cpp
+    rectMesh.cpp
     ../loader.cpp
     ../util.cpp)
 
-target_include_directories(vistool_osp_offline
-			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
-			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
 			
 target_link_libraries(vistool_osp_offline
 			${OPENGL_LIBRARIES}
-			/home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
+            ${UMESH_TARGET}
+            ospray)
 
 
 
