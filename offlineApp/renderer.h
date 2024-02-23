@@ -8,7 +8,7 @@
 
 #include "rkcommon/utility/SaveImage.h"
 
-#include "rectMesh.h"
+#include "../mesh/rectMesh.h"
 
 #include "../loader.h"
 

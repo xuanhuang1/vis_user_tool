@@ -35,7 +35,7 @@ endif()
 add_executable(vistool_osp_offline
     main.cpp
     renderer.cpp
-    rectMesh.cpp
+    ../mesh/rectMesh.cpp
     ../loader.cpp
     ../util.cpp)
 
