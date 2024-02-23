@@ -6,7 +6,18 @@ if (NOT WIN32)
 endif()
 
 find_package(OpenGL 3 REQUIRED)
-find_package(ospray 3.0.0 REQUIRED)
+find_package(ospray 3.0.0)
+add_library(ospray INTERFACE)
+if(ospray_FOUND)
+   target_link_libraries(ospray INTERFACE ospray::ospray)
+else()
+    target_include_directories(ospray
+        INTERFACE /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
+        INTERFACE /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
+
+    target_link_libraries(ospray
+        INTERFACE /home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
+endif()
 
 #-------------------- umesh -------------------------
 if (DEFINED OFFLINE_WITH_UMESH)
@@ -32,7 +43,7 @@ add_executable(vistool_osp_offline
 target_link_libraries(vistool_osp_offline
 			${OPENGL_LIBRARIES}
             ${UMESH_TARGET}
-            ospray::ospray)
+            ospray)
 
 
 
