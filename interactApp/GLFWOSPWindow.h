@@ -14,6 +14,7 @@
 #include "ArcballCamera.h"
 #include "TransferFunctionWidget.h"
 #include "KeyframeWidget.h"
+#include "../mesh/rectMesh.h"
 
 using namespace rkcommon::math;
 
@@ -46,7 +47,8 @@ public:
     ospray::cpp::TransferFunction tfn{"piecewiseLinear"};
     tfnw::TransferFunctionWidget tfn_widget;
     keyframe::KeyframeWidget kf_widget;
-  
+    visuser::RectMesh rectMesh; 
+    
     GLFWOSPWindow(){
 	activeWindow = this;
     

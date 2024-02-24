@@ -24,6 +24,8 @@ namespace visuser
         std::vector<float> scalars;
         std::vector<rkm::vec3f> vertices;
         std::vector<size_t> indices;
+	std::vector<size_t> cells;
+        std::vector<uint8_t> cellTypes;
     private:
     };
 };

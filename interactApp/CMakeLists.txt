@@ -21,7 +21,8 @@ add_executable(vistool_ospray_vol
     imgui/imgui_widgets.cpp
     imgui/imgui_impl_glfw_gl3.cpp
     ../loader.cpp
-    ../util.cpp)
+    ../util.cpp
+    ../mesh/rectMesh.cpp)
 
 target_include_directories(vistool_ospray_vol
 			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 

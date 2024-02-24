@@ -264,26 +264,45 @@ int main(int argc, const char **argv)
     		
 	//glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
     	glfwOspWindow.tfn = loadTransferFunction(widget, glfwOspWindow.tfn_widget);
-    	    
-	// volume
-	//ospray::cpp::Volume volume("structuredSpherical");
-	ospray::cpp::Volume volume("structuredRegular");
-	volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
-	volume.setParam("gridSpacing", vec3f(10.f / reduce_max(volumeDimensions)));
-	//volume.setParam("gridSpacing", vec3f(10.f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
-	volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), volumeDimensions));
-	volume.setParam("dimensions", volumeDimensions);
-	volume.commit();
-	// put the mesh into a model
-	ospray::cpp::VolumetricModel model(volume);
+
+	if (widget.type_name == "unstructured"){
+	    ospray::cpp::Volume volume("unstructured");
+	    glfwOspWindow.rectMesh.initMesh(volumeDimensions, widget.zMapping, rkm::vec2f(1.f));
+	    volume.setParam("vertex.position", ospray::cpp::SharedData(glfwOspWindow.rectMesh.vertices));
+	    volume.setParam("vertex.data", ospray::cpp::SharedData(*(glfwOspWindow.voxel_data)));
+	    volume.setParam("background", ospray::cpp::SharedData(rkm::vec3f(1.0f, 0.0f, 1.0f)));
+	    volume.setParam("index", ospray::cpp::SharedData(glfwOspWindow.rectMesh.indices));
+	    volume.setParam("cell.index", ospray::cpp::SharedData(glfwOspWindow.rectMesh.cells));
+	    volume.setParam("cell.type", ospray::cpp::SharedData(glfwOspWindow.rectMesh.cellTypes));
+	    volume.commit();
 	    
-	model.setParam("transferFunction", glfwOspWindow.tfn);
-	model.commit();
-	glfwOspWindow.model = model;
+	    // put the mesh into a model
+	    ospray::cpp::VolumetricModel model(volume);
+	    model.setParam("transferFunction", glfwOspWindow.tfn);
+	    model.commit();
 	    
-	group.setParam("volume", ospray::cpp::CopiedData(model));
-	
-	
+	    glfwOspWindow.volume = volume;
+	    glfwOspWindow.model = model;
+	    
+	}else{
+	    // volume
+	    //ospray::cpp::Volume volume("structuredSpherical");
+	    ospray::cpp::Volume volume("structuredRegular");
+	    volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
+	    volume.setParam("gridSpacing", vec3f(10.f / reduce_max(volumeDimensions)));
+	    //volume.setParam("gridSpacing", vec3f(10.f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
+	    volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), volumeDimensions));
+	    volume.setParam("dimensions", volumeDimensions);
+	    volume.commit();
+	    // put the mesh into a model
+	    ospray::cpp::VolumetricModel model(volume);
+	    model.setParam("transferFunction", glfwOspWindow.tfn);
+	    model.commit();
+	    
+	    glfwOspWindow.volume = volume;
+	    glfwOspWindow.model = model;
+	}	
+	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
 
 	// put the group into an instance (give the group a world transform)

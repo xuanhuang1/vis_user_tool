@@ -72,6 +72,11 @@ namespace visuser
 			    }
 		    }
 	    }
+	for (size_t i = 0; i < indices.size(); i += 8)
+	    {
+		cellTypes.push_back(OSP_HEXAHEDRON);
+		    cells.push_back(i);
+	    }
 	
     }
 

@@ -177,7 +177,7 @@ void GLFWOSPWindow::buildUI(){
     ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
         
     if (ImGui::TreeNode("Transfer Function")){
-	if (ImGui::SliderFloat("float", &f, 1.0f, 10.0f)){changeF = true;}
+	if (ImGui::SliderFloat("float", &f, 0.01f, 10.0f)){changeF = true;}
     
   	if (tfn_widget.changed() || changeF) {
 	    std::vector<float> tmpOpacities, tmpColors; 

@@ -4,7 +4,7 @@
 	"type": "unstructured",
 	"name": "/home/xuanhuang/projects/vis_interface/vis_user_tool/jupter_notebook_example/ocean_12_810_2160_float32.raw",
 	"dims": [2160, 810, 12],
-	"zMapping": [0, 1, 1.5, 3, 4, 5, 6, 7, 8, 9, 10, 15],
+	"zMapping": [0, 10, 15, 30, 40, 50, 60, 70, 80, 90, 100, 150],
 	"frameRange": [0, 10]
 	}
     ,
