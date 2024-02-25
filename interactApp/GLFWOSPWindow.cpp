@@ -1,5 +1,4 @@
 #include "GLFWOSPWindow.h"
-
 //
 // Lower level rendering contents
 //
@@ -41,6 +40,57 @@ void GLFWOSPWindow::display()
     glVertex2f(windowSize.x, 0.f);
 
     glEnd();
+}
+
+void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &widget){
+    if (widget.type_name == "unstructured"){
+	ospray::cpp::Volume vol("unstructured");
+	float world_scale_xy = 1;
+	for (size_t i=0; i<2; i++)
+	    world_scale_xy = std::min(world_scale_xy, float(widget.world_bbox[i]/volumeDimensions[i]));
+	for (size_t i=0; i<widget.zMapping.size(); i++)
+	    widget.zMapping[i] *= (widget.world_bbox[2]/widget.zMapping.back());
+	
+	rectMesh.initMesh(volumeDimensions, widget.zMapping, vec2f(world_scale_xy));
+	vol.setParam("vertex.position", ospray::cpp::SharedData(rectMesh.vertices));
+	vol.setParam("vertex.data", ospray::cpp::SharedData(*(voxel_data)));
+	vol.setParam("background", ospray::cpp::SharedData(vec3f(1.0f, 0.0f, 1.0f)));
+	vol.setParam("index", ospray::cpp::SharedData(rectMesh.indices));
+	vol.setParam("cell.index", ospray::cpp::SharedData(rectMesh.cells));
+	vol.setParam("cell.type", ospray::cpp::SharedData(rectMesh.cellTypes));
+	vol.commit();
+	    
+	// put the mesh into a model
+	ospray::cpp::VolumetricModel mdl(vol);
+	mdl.setParam("transferFunction", tfn);
+	mdl.commit();
+	    
+	volume = vol;
+	model = mdl;
+	    
+    }else{
+	// volume
+	//ospray::cpp::Volume volume("structuredSpherical");
+	ospray::cpp::Volume vol("structuredRegular");
+        float world_scale_xy = 1;
+	for (size_t i=0; i<2; i++)
+	    world_scale_xy = std::min(world_scale_xy, float(widget.world_bbox[i]/volumeDimensions[i]));
+	float world_scale_z = widget.world_bbox[0] / widget.world_bbox[2] * world_scale_xy;
+	vol.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
+	vol.setParam("gridSpacing", vec3f(world_scale_xy, world_scale_xy, world_scale_z));
+	//volume.setParam("gridSpacing", vec3f(10.f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
+	vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+	vol.setParam("dimensions", volumeDimensions);
+	vol.commit();
+	
+	// put the mesh into a model
+	ospray::cpp::VolumetricModel mdl(vol);
+	mdl.setParam("transferFunction", tfn);
+	mdl.commit();
+	    
+	volume = vol;
+	model = mdl;
+    }	
 }
 
 void GLFWOSPWindow::preRenderInit(){

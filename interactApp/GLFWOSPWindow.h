@@ -78,6 +78,7 @@ public:
     
     }
 
+    void initVolume(vec3i dim, visuser::AniObjWidget &widget);
     void preRenderInit();    
     void renderNewFrame(){
 	framebuffer.clear();

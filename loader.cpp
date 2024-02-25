@@ -46,15 +46,16 @@ visuser::AniObjWidget::AniObjWidget(const nlohmann::json in_file){
 }
 
 void visuser::AniObjWidget::load_info(){
-	file_name 	= config["data"]["name"];
-	type_name 	= config["data"]["type"];
-	dims 		= get_vec3i(config["data"]["dims"]);
-	frameRange 	= get_vec2i(config["data"]["frameRange"]);
-	currentF 	= frameRange[0];
+    file_name 	= config["data"]["name"];
+    type_name 	= config["data"]["type"];
+    world_bbox  = get_vec3f(config["data"]["world_bbox"]);
+    dims 	= get_vec3i(config["data"]["dims"]);
+    frameRange 	= get_vec2i(config["data"]["frameRange"]);
+    currentF 	= frameRange[0];
 	
-	// load z list, length must == dims.z
-	zMapping 	= config["data"]["zMapping"].get<std::vector<float>>();
-	if (zMapping.size() != dims.z) std::cerr << "unmatched z mapping size!\n";
+    // load z list, length must == dims.z
+    zMapping 	= config["data"]["zMapping"].get<std::vector<float>>();
+    if (zMapping.size() != dims.z) std::cerr << "unmatched z mapping size!\n";
 }
 
 void visuser::AniObjWidget::print_info(){
@@ -84,7 +85,7 @@ void visuser::AniObjWidget::load_tfs(){
     	const std::vector<json> &tf_set = config["transferFunc"].get<std::vector<json>>();
 	colors = tf_set[0]["colors"].get<std::vector<float>>();
 	opacities = tf_set[0]["opacities"].get<std::vector<float>>();
-	tfRange = get_vec2i(tf_set[0]["range"]);
+	tfRange = get_vec2f(tf_set[0]["range"]);
 }
 
 

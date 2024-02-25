@@ -34,6 +34,7 @@ namespace visuser{
     	std::string file_name;		// path to input raw file
     	std::string type_name;		// unstructured grid for now
     	glm::vec3 dims;			// x, y, z
+	glm::vec3 world_bbox;
     	std::vector<float> zMapping;	// physical depth mapping, size()==dim.z
     	
     	// animation widget settings
