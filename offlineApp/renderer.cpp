@@ -9,8 +9,8 @@ namespace visuser
     {
         stbi__flip_vertically_on_write = true;  
         // initialize OSPRay
-        const char *argv[] = {"vistool_osp_offline"};
-        InitializeOSPRay(1, argv);
+        //const char *argv[] = {"vistool_osp_offline"};
+        //InitializeOSPRay(1, argv);
 
         //renderer
         renderer = ospray::Renderer("scivis");
@@ -52,16 +52,21 @@ namespace visuser
         }
         else
         {
-            printf("using custom tf\n");
+            //printf("using custom tf\n");
             //printf("tf range: %f %f\n", umeshPtr->getValueRange().lower, umeshPtr->getValueRange().upper);
-            std::vector<float> colors, opacities;
+            std::vector<float> opacities, colors;
             config.getFrameTF(colors, opacities);
-            //print size of opacities and colors
+            
             transferFunction.setParam("opacity", ospray::CopiedData(opacities));
-            transferFunction.setParam("value", 
+            transferFunction.setParam("valueRange", 
                                 rkm::range1f(config.tfRange[0], config.tfRange[1]));
+            transferFunction.commit();
+            printf("using custom tf %i %i %f %f \n", opacities.size(), colors.size(),
+            		config.tfRange[0], config.tfRange[1]);
             SetTFColors(colors);
         }
+        
+       // return;
         //volume
         //InitializeVolumeModel(umeshPtr);
         InitializeVolumeModel(mesh);

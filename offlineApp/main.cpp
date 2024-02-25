@@ -75,6 +75,16 @@ int main(int argc, const char **argv)
     //
     // end of json load
     //
+    // initialize OSPRay; OSPRay parses (and removes) its commandline parameters,
+    // e.g. "--osp:debug"
+    OSPError initError = ospInit(&argc, argv);
+    //OSPDevice device;
+	
+    if (initError != OSP_NO_ERROR)
+            throw std::runtime_error("OSPRay not initialized correctly!");
+
+    //if(!ospGetCurrentDevice());
+    //        throw std::runtime_error("OSPRay device could not be fetched!");
 
 
     // create ospray renderer
