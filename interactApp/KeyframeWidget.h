@@ -18,6 +18,8 @@ namespace keyframe {
 	int timeFrame;
 	int data_i;
 	std::string filename;
+	float clippingBox[4] = {0,1,0,1};
+	
 	Keyframe(){};
 	Keyframe(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int timeFrame, int data_i);
     };
