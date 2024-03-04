@@ -93,6 +93,67 @@ void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &wi
     }	
 }
 
+
+void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bb_x){
+    ospray::cpp::Volume vol("unstructured");
+    float world_scale_xy = bb_x/reduce_max(volumeDimensions);
+    float world_scale_z = 0.00005;
+    const float zMap_full[] = {0.5,1.6,2.8,4.2,5.8,7.6,9.7,12,14.7,17.7,21.1,25,29.3,34.2,39.7,45.8,52.7,60.3,68.7,78,88.2,99.4,112,125,139,155,172,190,209,230,252,275,300,325,352,381,410,441,473,507,541,576,613,651,690,730,771,813,856,900,946,992,1040,1089,1140,1192,1246,1302,1359,1418,1480,1544,1611,1681,1754,1830,1911,1996,2086,2181,2281,2389,2503,2626,2757,2898,3050,3215,3392,3584,3792,4019,4266,4535,4828,5148,5499,5882,6301,6760};
+    std::vector<float> zMap;
+
+    if (volumeDimensions[2] == 45){
+	for (size_t i=0; i<45; i++)
+	    zMap.push_back(zMap_full[i*2] * world_scale_z);
+    }else if(volumeDimensions[2] == 23){
+	for (size_t i=0; i<23; i++)
+	    zMap.push_back(zMap_full[i*4] * world_scale_z);
+    }else if(volumeDimensions[2] == 12){
+	for (size_t i=0; i<12; i++)
+	    zMap.push_back(zMap_full[i*8] * world_scale_z);
+    }else std::cout << "z dim not matched!\n";
+
+    std::cout << "end zload\n";
+    
+    rectMesh.initMesh(volumeDimensions, zMap, vec2f(world_scale_xy));
+    vol.setParam("vertex.position", ospray::cpp::SharedData(rectMesh.vertices));
+    vol.setParam("vertex.data", ospray::cpp::SharedData(*(voxel_data)));
+    vol.setParam("background", ospray::cpp::SharedData(vec3f(1.0f, 0.0f, 1.0f)));
+    vol.setParam("index", ospray::cpp::SharedData(rectMesh.indices));
+    vol.setParam("cell.index", ospray::cpp::SharedData(rectMesh.cells));
+    vol.setParam("cell.type", ospray::cpp::SharedData(rectMesh.cellTypes));
+    vol.commit();
+	    
+    // put the mesh into a model
+    ospray::cpp::VolumetricModel mdl(vol);
+    mdl.setParam("transferFunction", tfn);
+    mdl.commit();
+	    
+    volume = vol;
+    model = mdl;
+}
+
+
+void GLFWOSPWindow::initClippingPlanes(){    
+    // clipping plane
+    clipping_params = std::array<ClippingPlaneParams, 4>{
+	ClippingPlaneParams(0, vec3f(-20, 0, 0)),
+	ClippingPlaneParams(0, vec3f(20, 0, 0)),
+	ClippingPlaneParams(1, vec3f(0, 20, 0)),
+	ClippingPlaneParams(1, vec3f(0, -20, 0))};
+    
+    clipping_params.changed = false;
+    clipping_planes = {
+	ClippingPlane(clipping_params.param[0]),
+	ClippingPlane(clipping_params.param[1]),
+	ClippingPlane(clipping_params.param[2]),
+	ClippingPlane(clipping_params.param[3])};
+    
+    for (int i=0; i<clipping_params.param.size()/2; i++){
+	clipping_params.param[i*2].flip_plane = true;
+    }
+
+}
+
 void GLFWOSPWindow::preRenderInit(){
     renderNewFrame();
 		
@@ -218,6 +279,8 @@ void GLFWOSPWindow::buildUI(){
     static bool changeF = false;
     static int curTime = 0;
     static int data_time = 0;
+    static float slider_tf_max = tf_range[1];
+    static float slider_tf_min = tf_range[0];
     ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
     bool camera_need_commit = false;
     bool tf_need_commit = false;
@@ -225,9 +288,62 @@ void GLFWOSPWindow::buildUI(){
     ImGui::Begin("Menu Window", nullptr, flags);
 
     ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        
+    if (ImGui::TreeNode("clipping planes")){
+	for (size_t i = 0; i < clipping_params.param.size(); ++i) {
+	    ImGui::PushID(i);
+	    ImGui::Separator();
+	    auto &plane = clipping_params.param[i];
+
+	    ImGui::Text("Clipping Plane on axis %d", plane.axis);
+	    clipping_params.changed |= ImGui::Checkbox("Enabled", &plane.enabled);
+	  
+	    if (ImGui::SliderFloat("Position",
+				   &clippingBox[i],
+				   -10, 10)) {
+		plane.position[plane.axis] = -clippingBox[i];
+		clipping_params.changed = true;
+	    }
+
+	    ImGui::PopID();
+	}
+	ImGui::TreePop();
+    }
+	
+    if (clipping_params.changed) {
+	clipping_params.changed = false;
+
+	for (size_t i = 0; i < clipping_params.param.size(); ++i) {
+	    clipping_planes[i].update(clipping_params.param[i]);
+	    clipping_planes[i].geom.commit();
+	    clipping_planes[i].model.commit();
+	    clipping_planes[i].group.commit();
+	    clipping_planes[i].instance.commit();
+	}
+
+	std::vector<cpp::Instance> active_instances = {instance};
+	for (auto &p : clipping_planes) {
+	    if (p.params.enabled) {
+		active_instances.push_back(p.instance);
+	    }
+	}
+	world.setParam("instance", cpp::CopiedData(active_instances));
+	world.commit();
+    }
+
     if (ImGui::TreeNode("Transfer Function")){
-	if (ImGui::SliderFloat("float", &f, 0.01f, 10.0f)){changeF = true;}
+	if (ImGui::SliderFloat("tf min", &slider_tf_min, tf_range[0], tf_range[1])){
+	    tfn.setParam("valueRange", vec2f(slider_tf_min, slider_tf_max));
+	    tfn.commit();
+	    model.commit();
+	}
+
+	if (ImGui::SliderFloat("tf max", &slider_tf_max, tf_range[0], tf_range[1])){
+	    tfn.setParam("valueRange", vec2f(slider_tf_min, slider_tf_max));
+	    tfn.commit();
+	    model.commit();
+	}
+    
+	if (ImGui::SliderFloat("float", &f, 0.01f, 30.0f)){changeF = true;}
     
   	if (tfn_widget.changed() || changeF) {
 	    std::vector<float> tmpOpacities, tmpColors; 
@@ -253,10 +369,12 @@ void GLFWOSPWindow::buildUI(){
     if (ImGui::TreeNode("Data time")){
   	if (ImGui::SliderInt("time", &data_time, 0, count-1)) {
 	    long long offset = data_time * volumeDimensions.long_product();
-	    //for (long long i =0 ; i < volumeDimensions.long_product(); i++){
-            //    (*voxel_data)[i] = all_data_ptr[i+offset];
-            //}
-	    
+	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
+                (*voxel_data)[i] = all_data_ptr[i+offset];
+            }
+	    volume.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+	    volume.commit();
+	    model.commit();
 	}
 	ImGui::TreePop();
     }
@@ -274,7 +392,14 @@ void GLFWOSPWindow::buildUI(){
 	ImGui::Text("active kf:");
 	ImGui::PopStyleColor();
 	ImGui::SameLine();
-	if (ImGui::Button("setF")) {}
+	if (ImGui::Button("setF")) {
+	    std::vector<float> tmpOpacities, tmpColors; 
+	    kf_widget.setKeyFrame(*arcballCamera, tmpColors, tmpOpacities, data_time);
+	    
+	    // update camera
+	    camera_need_commit = true;
+
+	}
 	ImGui::SameLine();
 	if (ImGui::Button("loadF")) {
 	  

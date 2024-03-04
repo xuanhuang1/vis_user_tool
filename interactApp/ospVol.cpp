@@ -245,16 +245,21 @@ int main(int argc, const char **argv)
 	    std::fstream file;
       	    file.open(widget.file_name, std::fstream::in | std::fstream::binary);
     	    std::cout <<"dim "<<widget.dims[0]<<" "<<widget.dims[1]<<" "<<widget.dims[2]<<"\nLoad "<< voxels.size()<< " :";
-	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
-	    	float buff;
-		file.read((char*)(&buff), sizeof(buff));
-		voxels[i] = float(buff);
-		if (float(buff) > max) max = float(buff);
-		if (float(buff) < min) min = float(buff);
-		
+	    for (size_t z=0; z<volumeDimensions[2]; z++){
+		long long offset = z * volumeDimensions[0] * volumeDimensions[1];
+		for (size_t y=0; y<volumeDimensions[1]; y++){
+		    for (size_t x =0 ; x < volumeDimensions[0]; x++){
+			size_t flipX = volumeDimensions[0] - 1 - x;
+			float buff;
+			file.read((char*)(&buff), sizeof(buff));
+			voxels[offset + y*volumeDimensions[0] + flipX] = float(buff);
+			if (float(buff) > max) max = float(buff);
+			if (float(buff) < min) min = float(buff);
+		    }
+		}
 		for (int k=0; k<10; k++)
-		    if (i == (volumeDimensions.long_product()/10)*k)
-			std::cout <<i<<" "<< k<<"0% \n";
+		    if (z == (volumeDimensions[2]/10)*k)
+			std::cout <<z*volumeDimensions[0] * volumeDimensions[1]<<" "<< k<<"0% \n";    
 	    }
 	    std::cout <<"End load \n";
 	    file.close();
@@ -265,10 +270,13 @@ int main(int argc, const char **argv)
 	//glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
     	glfwOspWindow.tfn = loadTransferFunction(widget, glfwOspWindow.tfn_widget);
 
-	// construct volume
-	glfwOspWindow.initVolume(volumeDimensions, widget);
+	// construct volume 
+	//glfwOspWindow.initVolume(volumeDimensions, widget);
+	glfwOspWindow.initVolumeOceanZMap(volumeDimensions, 10.f);
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
+
+	glfwOspWindow.initClippingPlanes();
 
 	// put the group into an instance (give the group a world transform)
    	glfwOspWindow.instance = ospray::cpp::Instance(group);

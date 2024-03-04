@@ -266,7 +266,28 @@ namespace keyframe {
 	
 	record_frame = -1;
     }
+    
+    void KeyframeWidget::setKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i){
+	if (selected_point > time_ctrl_points.size()-2) return;
+	if (selected_point < 0) return;
 
+	// find keyframe in list, both vector sorted by time
+	//Keyframe thisKF = kfs[selected_point];
+	kfs[selected_point].data_i = data_i;
+	kfs[selected_point].arcballCam.set(cam);
+
+	kfs[selected_point].tf_colors.resize(0);
+	kfs[selected_point].tf_opacities.resize(0);
+	for (uint32_t i=0; i<tf_colors.size(); i++)
+	    kfs[selected_point].tf_colors.push_back(tf_colors[i]);
+	for (uint32_t i=0; i<tf_opacities.size(); i++)
+	    kfs[selected_point].tf_opacities.push_back(tf_opacities[i]);
+
+	std::cout << "set frame["<<kfs[selected_point].timeFrame<<"]  with cam ";
+        cam.print();
+   
+    }
+    
     void KeyframeWidget::loadKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i){
 	if (selected_point > time_ctrl_points.size()-2) return;
 	if (selected_point < 0) return;
@@ -318,6 +339,22 @@ namespace keyframe {
 	for (uint32_t i=0; i<kfs[i_prev].tf_opacities.size(); i++)
 	    tf_opacities[i] = kfs[i_prev].tf_opacities[i];
 	data_i = kfs[i_prev].data_i;
+    }
+
+    
+    void KeyframeWidget::getDataFilterFromKF(float bbox[4], std::vector<uint32_t> &time_frames, uint32_t data_count){
+	// init return bbox
+	bbox[0] = 0.f; bbox[1] = 1.f;
+	bbox[2] = 0.f; bbox[2] = 1.f;
+
+	// union all camera view
+	for (uint32_t i=0; i<kfs.size(); i++){
+	    
+
+	}
+
+	// get all data index in use
+	// spread by keyframes in timeline
     }
 
 }

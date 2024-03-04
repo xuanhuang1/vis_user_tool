@@ -12,6 +12,7 @@ find_package(glfw3 REQUIRED)
 add_executable(vistool_ospray_vol
     ospVol.cpp
     ArcballCamera.cpp
+    clipping_plane.cpp
     TransferFunctionWidget.cpp
     KeyframeWidget.cpp
     GLFWOSPWindow.cpp

@@ -13,6 +13,9 @@
 #include "../loader.h"
 #include "ArcballCamera.h"
 #include "TransferFunctionWidget.h"
+#include "clipping_plane.h"
+#include "app_params.h"
+
 #include "KeyframeWidget.h"
 #include "../mesh/rectMesh.h"
 
@@ -43,11 +46,16 @@ public:
     ospray::cpp::FrameBuffer framebuffer;
     std::unique_ptr<ArcballCamera> arcballCamera;
     vec2f previousMouse{vec2f(-1)};
-  
+
+    vec2f tf_range;
     ospray::cpp::TransferFunction tfn{"piecewiseLinear"};
     tfnw::TransferFunctionWidget tfn_widget;
     keyframe::KeyframeWidget kf_widget;
-    visuser::RectMesh rectMesh; 
+    visuser::RectMesh rectMesh;
+    std::vector<float> clippingBox = {0,0,0,0,0,0};
+    std::array<ClippingPlane, 4> clipping_planes;
+    AppParam<std::array<ClippingPlaneParams, 4>> clipping_params;
+  
     
     GLFWOSPWindow(){
 	activeWindow = this;
@@ -79,6 +87,9 @@ public:
     }
 
     void initVolume(vec3i dim, visuser::AniObjWidget &widget);
+    void initVolumeOceanZMap(vec3i volumeDimensions, float bb_x);
+    void initClippingPlanes();
+    
     void preRenderInit();    
     void renderNewFrame(){
 	framebuffer.clear();
