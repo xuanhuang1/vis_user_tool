@@ -34,11 +34,12 @@ namespace keyframe {
 	}
     }
 
-    Keyframe::Keyframe(ArcballCamera &cam, std::vector<float> &c_in, std::vector<float> &o_in, int time_in, int data_i_in)
+    Keyframe::Keyframe(ArcballCamera &cam, std::vector<float> &c_in, std::vector<float> &o_in, int time_in, int data_i_in, std::vector<float> &cbox)
     {
         arcballCam.set(cam);
 	for (uint32_t i=0; i<c_in.size(); i++) tf_colors.push_back(c_in[i]);
 	for (uint32_t i=0; i<o_in.size(); i++) tf_opacities.push_back(o_in[i]);
+	for (uint32_t i=0; i<cbox.size(); i++) clippingBox.push_back(cbox[i]);
 	timeFrame = time_in;
 	data_i = data_i_in;
     }
@@ -253,10 +254,11 @@ namespace keyframe {
     void KeyframeWidget::recordKeyFrame(ArcballCamera &cam,
 					std::vector<float> &tf_colors,
 					std::vector<float> &tf_opacities,
-					int data_i)
+					int data_i,
+					std::vector<float> &cbox)
     {
         
-	kfs.push_back(Keyframe(cam, tf_colors, tf_opacities, record_frame, data_i));
+	kfs.push_back(Keyframe(cam, tf_colors, tf_opacities, record_frame, data_i, cbox));
 	std::cout << "adding frame[" << kfs.back().timeFrame<<"] with cam ";
         kfs.back().arcballCam.print();
 
@@ -303,6 +305,12 @@ namespace keyframe {
         cam.print();
     }
 
+    void KeyframeWidget::exportKFs(std::string filename){
+	// export all key frames to json file
+	// write a header of file names then a list of kf files
+	
+    }
+
     void KeyframeWidget::getFrameFromKF(float cam_params[9], std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i, int f){
 	if (f > kfs.back().timeFrame) return;
 
@@ -342,19 +350,23 @@ namespace keyframe {
     }
 
     
-    void KeyframeWidget::getDataFilterFromKF(float bbox[4], std::vector<uint32_t> &time_frames, uint32_t data_count){
+    void KeyframeWidget::getDataFilterFromKF(float bbox[4], std::vector<float> &data_indices){
 	// init return bbox
-	bbox[0] = 0.f; bbox[1] = 1.f;
-	bbox[2] = 0.f; bbox[2] = 1.f;
-
-	// union all camera view
+	bbox[0] = 1.f; bbox[1] = 0.f;
+	bbox[2] = 1.f; bbox[2] = 0.f;
+	
 	for (uint32_t i=0; i<kfs.size(); i++){
-	    
+	    // union all camera view
+	    bbox[0] = kfs[i].clippingBox[0];
+	    bbox[1] = kfs[i].clippingBox[1];
+	    bbox[2] = kfs[i].clippingBox[2];
+	    bbox[3] = kfs[i].clippingBox[3];
 
+	    // get all data index in use
+	    // spread by timeline
+	    data_indices.push_back(kfs[i].data_i);
 	}
-
-	// get all data index in use
-	// spread by keyframes in timeline
+	
     }
 
 }

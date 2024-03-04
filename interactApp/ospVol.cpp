@@ -272,7 +272,7 @@ int main(int argc, const char **argv)
 
 	// construct volume 
 	//glfwOspWindow.initVolume(volumeDimensions, widget);
-	glfwOspWindow.initVolumeOceanZMap(volumeDimensions, 10.f);
+	glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size);
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
 
@@ -367,7 +367,6 @@ int main(int argc, const char **argv)
     
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
-
 	
 	
     }
@@ -379,6 +378,8 @@ int main(int argc, const char **argv)
 	_getch();
     }
 #endif
+
+    
 
     return 0;
 }

@@ -31,6 +31,8 @@ public:
     unsigned int guiTextureSize = 0;
     GLFWwindow *glfwWindow = nullptr;
 
+    int world_size = 10;
+    
     ospray::cpp::Camera camera{"perspective"};
     ospray::cpp::Renderer renderer{"scivis"};
     ospray::cpp::World world;
@@ -52,7 +54,7 @@ public:
     tfnw::TransferFunctionWidget tfn_widget;
     keyframe::KeyframeWidget kf_widget;
     visuser::RectMesh rectMesh;
-    std::vector<float> clippingBox = {0,0,0,0,0,0};
+    std::vector<float> clippingBox = {-1,0,-1,0};
     std::array<ClippingPlane, 4> clipping_planes;
     AppParam<std::array<ClippingPlaneParams, 4>> clipping_params;
   
@@ -99,5 +101,6 @@ public:
 
     void buildUI();
     void playAnimationFrame();
+    void printSessionSummary();
 
 };

@@ -18,10 +18,10 @@ namespace keyframe {
 	int timeFrame;
 	int data_i;
 	std::string filename;
-	float clippingBox[4] = {0,1,0,1};
+	std::vector<float> clippingBox;
 	
 	Keyframe(){};
-	Keyframe(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int timeFrame, int data_i);
+	Keyframe(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int timeFrame, int data_i, std::vector<float> &cbox);
     };
     
     class KeyframeWidget {
@@ -62,13 +62,18 @@ namespace keyframe {
 	void draw_ui();
 	void setGuiText(std::string in) { guiText = in;}
 
-	void recordKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int i);
+	void recordKeyFrame(ArcballCamera &cam,
+			    std::vector<float> &tf_colors,
+			    std::vector<float> &tf_opacities,
+			    int i,
+			    std::vector<float> &cbox);
+	
 	void setKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i);
-
 	void loadKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i);
 	void getFrameFromKF(float cam[9], std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i, int f);
+	void exportKFs(std::string filename);
 
-	void getDataFilterFromKF(float bbox[4], std::vector<uint32_t> &time_frames, uint32_t data_count);
+	void getDataFilterFromKF(float bbox[4], std::vector<float> &data_indices);
 private:
 	void draw_attribute_line(ImDrawList *draw_list, const vec2f view_scale, const vec2f view_offset, std::vector<float>& pts, uint32_t index, std::string txt);
 	float display_offsets[4]  = {0.85f, 0.5f, 0.3f, 0.1f};

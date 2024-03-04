@@ -136,10 +136,10 @@ void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bb_x){
 void GLFWOSPWindow::initClippingPlanes(){    
     // clipping plane
     clipping_params = std::array<ClippingPlaneParams, 4>{
-	ClippingPlaneParams(0, vec3f(-20, 0, 0)),
-	ClippingPlaneParams(0, vec3f(20, 0, 0)),
-	ClippingPlaneParams(1, vec3f(0, 20, 0)),
-	ClippingPlaneParams(1, vec3f(0, -20, 0))};
+	ClippingPlaneParams(0, vec3f(world_size, 0, 0)),
+	ClippingPlaneParams(0, vec3f(-world_size, 0, 0)),
+	ClippingPlaneParams(1, vec3f(0, world_size, 0)),
+	ClippingPlaneParams(1, vec3f(0, -world_size, 0))};
     
     clipping_params.changed = false;
     clipping_planes = {
@@ -299,8 +299,8 @@ void GLFWOSPWindow::buildUI(){
 	  
 	    if (ImGui::SliderFloat("Position",
 				   &clippingBox[i],
-				   -10, 10)) {
-		plane.position[plane.axis] = -clippingBox[i];
+				   -1, 0)) {
+		plane.position[plane.axis] = -clippingBox[i]*world_size;
 		clipping_params.changed = true;
 	    }
 
@@ -425,7 +425,7 @@ void GLFWOSPWindow::buildUI(){
 	if (kf_widget.record_frame != -1){
 	    std::vector<float> tmpOpacities, tmpColors; 
 	    tfn_widget.get_osp_colormapf(tmpColors, tmpOpacities);
-	    kf_widget.recordKeyFrame(*arcballCamera, tmpColors, tmpOpacities, data_time);
+	    kf_widget.recordKeyFrame(*arcballCamera, tmpColors, tmpOpacities, data_time, clippingBox);
 
 	}
 
@@ -474,4 +474,25 @@ void GLFWOSPWindow::playAnimationFrame(){
     model.commit();
 
     kf_widget.playFrame++;
+}
+
+
+void GLFWOSPWindow::printSessionSummary(){
+    float bbox[4];
+    std::vector<float> data_indices;
+    kf_widget.getDataFilterFromKF(bbox, data_indices);
+
+    float y_scale = float(volumeDimensions[1])/volumeDimensions[0];
+
+    bbox[0] += 1;
+    bbox[1] += 1;
+    // flip y start end
+    float tmp = bbox[2];
+    bbox[2] = -bbox[3]/y_scale;
+    bbox[3] = -tmp/y_scale;
+
+    std::cerr << "bbox:" << bbox[0] <<" "<<bbox[1]<<" "<<bbox[2] <<" "<<bbox[3]<<"\nData: ";
+    for (auto &i : data_indices)
+	std::cerr << i <<" ";
+    std::cerr <<"\n";
 }

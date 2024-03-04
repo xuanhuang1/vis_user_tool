@@ -242,7 +242,7 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
     	    
 	// volume
 	//ospray::cpp::Volume volume("structuredSpherical");
-	if (1){
+	if (0){
 	    ospray::cpp::Volume volume("structuredRegular");
 	    volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
 	    volume.setParam("gridSpacing", vec3f(10.f / reduce_max(glfwOspWindow.volumeDimensions)));
@@ -259,7 +259,7 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
 	    model.commit();
 	    glfwOspWindow.model = model;
 	}else
-	    glfwOspWindow.initVolumeOceanZMap(glfwOspWindow.volumeDimensions, 10.f);
+	    glfwOspWindow.initVolumeOceanZMap(glfwOspWindow.volumeDimensions, glfwOspWindow.world_size);
 	
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
@@ -279,6 +279,7 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
 
 	// create and setup light for Ambient Occlusion
 	ospray::cpp::Light light("ambient");
+	light.setParam("visible", false);
 	light.commit();
 	
 	//world.setParam("light", ospray::cpp::CopiedData(light));
@@ -296,6 +297,12 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
 	ospray::cpp::Renderer *renderer = &glfwOspWindow.renderer;;
 
 	// complete setup of renderer
+	//renderer->setParam("lightSamples", -1);
+	//renderer->setParam("maxPathLength", 20);
+	//renderer->setParam("roulettePathLength", 1);
+	//renderer->setParam("minContribution", 0.001f);
+	//renderer->setParam("maxContribution", 2000.f);
+	
 	renderer->setParam("aoSamples", 1);
 	renderer->setParam("backgroundColor", 0.0f); // white, transparent
 	renderer->commit();
@@ -348,6 +355,9 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(glfwOspWindow.glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 	       glfwWindowShouldClose(glfwOspWindow.glfwWindow) == 0 );
+
+	
+	glfwOspWindow.printSessionSummary();
     
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
@@ -361,6 +371,7 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
 	_getch();
     }
 #endif
+
 
     return 0;
 }
