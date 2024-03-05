@@ -54,6 +54,7 @@ public:
     tfnw::TransferFunctionWidget tfn_widget;
     keyframe::KeyframeWidget kf_widget;
     visuser::RectMesh rectMesh;
+    std::vector<float> zMap;
     std::vector<float> clippingBox = {-1,0,-1,0};
     std::array<ClippingPlane, 4> clipping_planes;
     AppParam<std::array<ClippingPlaneParams, 4>> clipping_params;

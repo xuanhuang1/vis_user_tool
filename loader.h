@@ -44,7 +44,9 @@ namespace visuser{
     	
     	// init
     	AniObjWidget(const nlohmann::json in_file);
+	AniObjWidget(const nlohmann::json meta_file, uint32_t data_index);
 	AniObjWidget(std::string type_name, int x, int y, int z, std::vector<float> &z_m);
+	void loaf_from_meta_file();
     	void load_info();
     	void print_info();
     	void load_cameras();

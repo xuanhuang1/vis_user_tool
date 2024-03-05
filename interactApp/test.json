@@ -1,7 +1,7 @@
 {
     "data" : 
 	{
-	"type": "unstructured",
+	"type": "structured",
 	"name": "/home/xuanhuang/projects/vis_interface/vis_user_tool/jupter_notebook_example/ocean_12_810_2160_float32.raw",
 	"dims": [2160, 810, 12],
 	"world_bbox": [10, 10, 10],

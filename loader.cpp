@@ -45,6 +45,11 @@ visuser::AniObjWidget::AniObjWidget(const nlohmann::json in_file){
 	config = in_file;
 }
 
+visuser::AniObjWidget::AniObjWidget(const nlohmann::json meta_file, uint32_t data_index){
+    config = meta_file["file_list"][data_index];
+}
+
+
 void visuser::AniObjWidget::load_info(){
     file_name 	= config["data"]["name"];
     type_name 	= config["data"]["type"];
@@ -57,6 +62,7 @@ void visuser::AniObjWidget::load_info(){
     zMapping 	= config["data"]["zMapping"].get<std::vector<float>>();
     if (zMapping.size() != dims.z) std::cerr << "unmatched z mapping size!\n";
 }
+
 
 void visuser::AniObjWidget::print_info(){
 	std::cout << "data info...\n\n"

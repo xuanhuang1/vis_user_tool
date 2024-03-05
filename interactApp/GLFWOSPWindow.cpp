@@ -99,9 +99,11 @@ void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bb_x){
     float world_scale_xy = bb_x/reduce_max(volumeDimensions);
     float world_scale_z = 0.00005;
     const float zMap_full[] = {0.5,1.6,2.8,4.2,5.8,7.6,9.7,12,14.7,17.7,21.1,25,29.3,34.2,39.7,45.8,52.7,60.3,68.7,78,88.2,99.4,112,125,139,155,172,190,209,230,252,275,300,325,352,381,410,441,473,507,541,576,613,651,690,730,771,813,856,900,946,992,1040,1089,1140,1192,1246,1302,1359,1418,1480,1544,1611,1681,1754,1830,1911,1996,2086,2181,2281,2389,2503,2626,2757,2898,3050,3215,3392,3584,3792,4019,4266,4535,4828,5148,5499,5882,6301,6760};
-    std::vector<float> zMap;
 
-    if (volumeDimensions[2] == 45){
+    if (volumeDimensions[2] == 90){
+	for (size_t i=0; i<90; i++)
+	    zMap.push_back(zMap_full[i] * world_scale_z);
+    }else if(volumeDimensions[2] == 45){
 	for (size_t i=0; i<45; i++)
 	    zMap.push_back(zMap_full[i*2] * world_scale_z);
     }else if(volumeDimensions[2] == 23){
@@ -384,8 +386,10 @@ void GLFWOSPWindow::buildUI(){
 	//
 	//}
 	
-	//ImGui::SameLine();
-        //if (ImGui::Button("export")) {}
+	ImGui::SameLine();
+        if (ImGui::Button("export")) {
+	    kf_widget.exportKFs("expt", zMap);
+	}
 	
 	kf_widget.draw_ui();
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,0,255));

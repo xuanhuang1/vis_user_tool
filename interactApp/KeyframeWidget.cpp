@@ -305,10 +305,52 @@ namespace keyframe {
         cam.print();
     }
 
-    void KeyframeWidget::exportKFs(std::string filename){
-	// export all key frames to json file
-	// write a header of file names then a list of kf files
+
+    void KeyframeWidget::exportKFs(std::string meta_file_name, std::vector<float> &zmap){
+	// create an empty structure (null)
+	nlohmann::ordered_json j;
+	std::string base_file_name = meta_file_name+"_kf";
 	
+	// export all key frames to json file
+	// write a header of file names 
+	for (size_t i=0; i<kfs.size()-1;i++){
+	    std::string file_name = base_file_name + std::to_string(i) + ".json";
+	    j["file_list"][i] = file_name;
+
+	    // write json for each keyframe interval
+	    nlohmann::ordered_json tmp_j;
+	    tmp_j["data"]["type"] = "structured";
+	    tmp_j["data"]["name"] = "";
+	    tmp_j["data"]["world_bbox"] = {10, 10, 10};
+	    for (auto &z : zmap) tmp_j["data"]["zMapping"].push_back(z);
+	    tmp_j["data"]["frameRange"] = {kfs[i].timeFrame, kfs[i+1].timeFrame};
+
+	    // cameras
+	    for (size_t j=0; j<2; j++)
+	    {
+		nlohmann::ordered_json tmp_cam;
+		tmp_cam["frame"] = kfs[i+j].timeFrame;
+		for (size_t c=0; c<3; c++){
+		    tmp_cam["pos"].push_back(kfs[i+j].arcballCam.eyePos()[c]);
+		    tmp_cam["dir"].push_back(kfs[i+j].arcballCam.lookDir()[c]);
+		    tmp_cam["up"].push_back(kfs[i+j].arcballCam.upDir()[c]);
+		}
+		tmp_j["camera"].push_back(tmp_cam);
+	    }
+
+	    // tf
+	    tmp_j["transferFunc"]["frame"] = kfs[i].timeFrame;
+	    tmp_j["transferFunc"]["range"] = {-1, 1};
+	    for (auto &z : kfs[i].tf_colors) tmp_j["transferFunc"]["colors"].push_back(z);
+	    for (auto &z : kfs[i].tf_opacities) tmp_j["transferFunc"]["opacities"].push_back(z);
+	    
+	    std::ofstream o(file_name);
+	    o << std::setw(4)<< tmp_j <<std::endl;
+	    o.close();
+	}
+	std::ofstream o_meta(meta_file_name+".json");
+	o_meta << std::setw(4) << j <<std::endl;
+	o_meta.close();
     }
 
     void KeyframeWidget::getFrameFromKF(float cam_params[9], std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i, int f){

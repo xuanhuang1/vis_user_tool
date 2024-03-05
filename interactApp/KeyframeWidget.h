@@ -71,7 +71,7 @@ namespace keyframe {
 	void setKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i);
 	void loadKeyFrame(ArcballCamera &cam, std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i);
 	void getFrameFromKF(float cam[9], std::vector<float> &tf_colors, std::vector<float> &tf_opacities, int &data_i, int f);
-	void exportKFs(std::string filename);
+	void exportKFs(std::string filename, std::vector<float> &zmap);
 
 	void getDataFilterFromKF(float bbox[4], std::vector<float> &data_indices);
 private:
