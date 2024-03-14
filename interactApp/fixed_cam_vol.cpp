@@ -207,6 +207,7 @@ int main(int argc, const char **argv)
     
 	json config;
 	std::string prefix;
+	std::string overwrite_inputf = "";
 	for (int i = 1; i < argc; ++i) {
 	    if (args[i] == "-h") {
 		std::cout << "./mini_vistool <config.json> [options]\n";
@@ -219,6 +220,10 @@ int main(int argc, const char **argv)
 			throw std::runtime_error("Failed to open input config file");
 		    }
 		    cfg_file >> config;
+		}else if (i == 2){
+		    if (args[i] == "-f"){
+			overwrite_inputf = args[3];
+		    }
 		}
 	    }
 	}
@@ -233,6 +238,10 @@ int main(int argc, const char **argv)
     	widget.load_cameras();
     	widget.load_tfs();
     	std::cout << "\nEnd json loading ... \n\n";
+
+	if (overwrite_inputf != ""){
+	    widget.file_name = overwrite_inputf;
+	}
     
 	
 	vec3i volumeDimensions(widget.dims[0], widget.dims[1], widget.dims[2]);
@@ -263,8 +272,6 @@ int main(int argc, const char **argv)
 	    std::cout <<"End load \n";
 	    file.close();
 	    glfwOspWindow.voxel_data = &voxels;
-	    glfwOspWindow.tf_range[0] = min;
-	    glfwOspWindow.tf_range[1] = max;
 	    std::cout <<"range: "<< max <<" "<<min<<"\n";
 	}
     		
@@ -273,10 +280,8 @@ int main(int argc, const char **argv)
 
 	// construct volume 
 	//glfwOspWindow.initVolume(volumeDimensions, widget);
-	glfwOspWindow.initVolumeSphere(volumeDimensions, widget);
-	//glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size);
-	//group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
-	group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
+	glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size);
+	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
 
 	glfwOspWindow.initClippingPlanes();
@@ -337,7 +342,8 @@ int main(int argc, const char **argv)
 	auto t2 = std::chrono::high_resolution_clock::now();
 	
 	std::cout << "Begin render loop\n";
-	do{
+	//do
+	{
 	    glfwPollEvents();
     
 	    t1 = std::chrono::high_resolution_clock::now();
@@ -346,27 +352,25 @@ int main(int argc, const char **argv)
 	    glEnable(GL_TEXTURE_2D);      
 	    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
 	    glfwOspWindow.display();
+	    // Access and save rendered image
+	    glfwOspWindow.renderNewFrame();
+	    
 	    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
 	    glDisable(GL_TEXTURE_2D);
-      
-	    // Start the Dear ImGui frame
-	    ImGui_ImplGlfwGL3_NewFrame();
-	    glfwOspWindow.buildUI();
-	    ImGui::Render();
-	    ImGui_ImplGlfwGL3_Render();
       
 	    // Swap buffers
 	    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
 	    glfwSwapBuffers(glfwOspWindow.glfwWindow);
-      
+
+	    glfwOspWindow.saveFrame("text.png");
 
 	    t2 = std::chrono::high_resolution_clock::now();
 	    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 	    glfwSetWindowTitle(glfwOspWindow.glfwWindow, (std::string("Render FPS:")+std::to_string(int(1.f / time_span.count()))).c_str());
-
-	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey(glfwOspWindow.glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-	       glfwWindowShouldClose(glfwOspWindow.glfwWindow) == 0 );
+	}
+	//    } // Check if the ESC key was pressed or the window was closed
+	//while( glfwGetKey(glfwOspWindow.glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+	//   glfwWindowShouldClose(glfwOspWindow.glfwWindow) == 0 );
     
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();

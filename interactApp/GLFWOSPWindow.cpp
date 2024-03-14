@@ -1,4 +1,8 @@
 #include "GLFWOSPWindow.h"
+
+//#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../stb_image_write.h"
+
 //
 // Lower level rendering contents
 //
@@ -41,6 +45,22 @@ void GLFWOSPWindow::display()
 
     glEnd();
 }
+
+void GLFWOSPWindow::saveFrame(std::string filename){
+    int width, height;
+    glfwGetFramebufferSize(glfwWindow, &width, &height);
+    GLsizei nrChannels = 3;
+    GLsizei stride = nrChannels * width;
+    stride += (stride % 4) ? (4 - stride % 4) : 0;
+    GLsizei bufferSize = stride * height;
+    std::vector<char> buffer(bufferSize);
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
+    glReadBuffer(GL_FRONT);
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+    stbi_flip_vertically_on_write(true);
+    stbi_write_png(filename.c_str(), width, height, nrChannels, buffer.data(), stride);
+}
+
 
 void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &widget){
     if (widget.type_name == "unstructured"){
@@ -94,10 +114,68 @@ void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &wi
 }
 
 
+void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, visuser::AniObjWidget &widget){
+    // volume
+    ospray::cpp::Volume vol("structuredSpherical");
+    //ospray::cpp::Volume vol("structuredRegular");
+    float world_scale_xy = 1;
+    vol.setParam("gridOrigin", vec3f(world_size-0.1,0.f,0.f));
+    //vol.setParam("gridSpacing", vec3f(world_scale_xy, world_scale_xy, world_scale_z));
+    vol.setParam("gridSpacing", vec3f(0.1f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
+    vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+    vol.setParam("dimensions", volumeDimensions);
+    vol.commit();
+	
+    // put the mesh into a model
+    ospray::cpp::VolumetricModel mdl(vol);
+    mdl.setParam("transferFunction", tfn);
+    mdl.commit();
+	    
+    volume = vol;
+    model = mdl;
+
+    // sphere
+    // triangle mesh data
+    std::vector<vec3f> vertex;
+    std::vector<vec4f> color;
+    std::vector<vec4ui> index;
+
+    int mapx = 864;
+    int mapy = 648;
+    float scale = 0.01;
+    for (size_t j=0; j<mapy; j++){
+	for (size_t i=0; i<mapx; i++){
+	    vertex.push_back(vec3f(i*scale, j*scale, 0));
+	    color.push_back(vec4f(float(i)/mapx, float(j)/mapy, 0, 1,f));
+	}
+    }
+
+    for (size_t i=0; i<mapx-1; i++){
+	for (size_t j=0; j<mapy-1; j++){
+	    index.push_back(vec4ui());
+	}
+    }
+    
+    // create and setup model and mesh
+    ospray::cpp::Geometry mesh("mesh");
+    mesh.setParam("vertex.position", ospray::cpp::CopiedData(vertex));
+    mesh.setParam("vertex.color", ospray::cpp::CopiedData(color));
+    mesh.setParam("index", ospray::cpp::CopiedData(index));
+    mesh.commit();
+    
+    
+    // put the mesh into a model
+    ospray::cpp::GeometricModel model_(mesh);
+    model_.commit();
+    gmodel = model_;
+
+}
+
+
 void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bb_x){
     ospray::cpp::Volume vol("unstructured");
     float world_scale_xy = bb_x/reduce_max(volumeDimensions);
-    float world_scale_z = 0.00005;
+    float world_scale_z = 0.0005;
     const float zMap_full[] = {0.5,1.6,2.8,4.2,5.8,7.6,9.7,12,14.7,17.7,21.1,25,29.3,34.2,39.7,45.8,52.7,60.3,68.7,78,88.2,99.4,112,125,139,155,172,190,209,230,252,275,300,325,352,381,410,441,473,507,541,576,613,651,690,730,771,813,856,900,946,992,1040,1089,1140,1192,1246,1302,1359,1418,1480,1544,1611,1681,1754,1830,1911,1996,2086,2181,2281,2389,2503,2626,2757,2898,3050,3215,3392,3584,3792,4019,4266,4535,4828,5148,5499,5882,6301,6760};
 
     if (volumeDimensions[2] == 90){
@@ -115,8 +193,11 @@ void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bb_x){
     }else std::cout << "z dim not matched!\n";
 
     std::cout << "end zload\n";
-    
+
+    //if (!isSphere)
     rectMesh.initMesh(volumeDimensions, zMap, vec2f(world_scale_xy));
+    //else
+    //	rectMesh.initSphereMesh(volumeDimensions, zMap, vec2f(world_scale_xy));
     vol.setParam("vertex.position", ospray::cpp::SharedData(rectMesh.vertices));
     vol.setParam("vertex.data", ospray::cpp::SharedData(*(voxel_data)));
     vol.setParam("background", ospray::cpp::SharedData(vec3f(1.0f, 0.0f, 1.0f)));
@@ -397,7 +478,12 @@ void GLFWOSPWindow::buildUI(){
 	ImGui::PopStyleColor();
 	ImGui::SameLine();
 	if (ImGui::Button("setF")) {
-	    std::vector<float> tmpOpacities, tmpColors; 
+	    std::vector<float> tmpOpacities, tmpColors;
+	    tfn_widget.get_osp_colormapf(tmpColors, tmpOpacities);
+	    for (uint32_t i=0;i<tmpOpacities.size();i++){
+	    	tmpOpacities[i] = tmpOpacities[i]*f;
+	    }
+	    
 	    kf_widget.setKeyFrame(*arcballCamera, tmpColors, tmpOpacities, data_time);
 	    
 	    // update camera

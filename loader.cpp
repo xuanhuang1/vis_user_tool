@@ -42,7 +42,7 @@ visuser::Camera visuser::interpolate(visuser::Camera &a, visuser::Camera &b, glm
     
     
 visuser::AniObjWidget::AniObjWidget(const nlohmann::json in_file){
-	config = in_file;
+    config = in_file;
 }
 
 visuser::AniObjWidget::AniObjWidget(const nlohmann::json meta_file, uint32_t data_index){

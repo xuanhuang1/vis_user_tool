@@ -38,6 +38,7 @@ public:
     ospray::cpp::World world;
     ospray::cpp::Instance instance;
     ospray::cpp::VolumetricModel model;
+    ospray::cpp::GeometricModel gmodel;
     ospray::cpp::Volume volume;
     std::vector<float> * voxel_data; // pointer to voxels data
     vec3i volumeDimensions;
@@ -71,6 +72,7 @@ public:
     }
   
     void display();
+    void saveFrame(std::string filename);
     void motion(double, double);
     void mouse(int, int, int, int);
     void reshape(int, int);
@@ -90,6 +92,7 @@ public:
     }
 
     void initVolume(vec3i dim, visuser::AniObjWidget &widget);
+    void initVolumeSphere(vec3i dim, visuser::AniObjWidget &widget);
     void initVolumeOceanZMap(vec3i volumeDimensions, float bb_x);
     void initClippingPlanes();
     

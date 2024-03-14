@@ -36,6 +36,33 @@ target_link_libraries(vistool_ospray_vol
 
 
 
+add_executable(fixed_cam_vol
+    fixed_cam_vol.cpp
+    ArcballCamera.cpp
+    clipping_plane.cpp
+    TransferFunctionWidget.cpp
+    KeyframeWidget.cpp
+    GLFWOSPWindow.cpp
+    imgui/imgui.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_tables.cpp
+    imgui/imgui_widgets.cpp
+    imgui/imgui_impl_glfw_gl3.cpp
+    ../loader.cpp
+    ../util.cpp
+    ../mesh/rectMesh.cpp)
+
+target_include_directories(fixed_cam_vol
+			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
+			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
+			
+target_link_libraries(fixed_cam_vol 
+			glfw
+			${OPENGL_LIBRARIES}
+			/home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
+
+
+
 
 
     

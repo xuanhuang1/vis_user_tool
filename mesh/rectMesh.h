@@ -19,6 +19,10 @@ namespace visuser
 	void initMesh(rkm::vec3ui dimensions, 
 		      std::vector<float> &z_mapping,
 		      rkm::vec2f xy_scaling);
+	void initSphereMesh(rkm::vec3ui dimensions, 
+			    std::vector<float> &z_mapping,
+			    rkm::vec2f xy_scaling);
+
 	void setValue(std::vector<float> &v);
 	
         std::vector<float> scalars;

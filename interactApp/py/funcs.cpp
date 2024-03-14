@@ -165,7 +165,7 @@ init_app(const std::vector<std::string>& args)
     return newargs;
 }
 
-int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
+int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, bool use_zmap)
 {
  
 #ifdef _WIN32
@@ -242,7 +242,7 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count)
     	    
 	// volume
 	//ospray::cpp::Volume volume("structuredSpherical");
-	if (0){
+	if (!use_zmap){
 	    ospray::cpp::Volume volume("structuredRegular");
 	    volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
 	    volume.setParam("gridSpacing", vec3f(10.f / reduce_max(glfwOspWindow.volumeDimensions)));
