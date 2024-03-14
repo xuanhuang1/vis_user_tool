@@ -3,6 +3,8 @@
 //#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../stb_image_write.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 //
 // Lower level rendering contents
 //
@@ -121,7 +123,7 @@ void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, visuser::AniObjWidg
     float world_scale_xy = 1;
     vol.setParam("gridOrigin", vec3f(world_size-0.1,0.f,0.f));
     //vol.setParam("gridSpacing", vec3f(world_scale_xy, world_scale_xy, world_scale_z));
-    vol.setParam("gridSpacing", vec3f(0.1f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
+    vol.setParam("gridSpacing", vec3f(-0.2f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
     vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
     vol.setParam("dimensions", volumeDimensions);
     vol.commit();
@@ -143,16 +145,35 @@ void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, visuser::AniObjWidg
     int mapx = 864;
     int mapy = 648;
     float scale = 0.01;
+    const char mapfile[] = "/home/xuanhuang/projects/vis_interface/vis_user_tool/mesh/land.png";
+
+    int comp;
+    stbi_set_flip_vertically_on_load(1);
+    float* image = stbi_loadf(mapfile, &mapx, &mapy, &comp, 0);
+
+    if(image == nullptr)
+	throw(std::string("Failed to load texture"));
+    else std::cout << "load earth image: " << mapx <<" "<<mapy <<" "<<comp <<"\n";
+    
     for (size_t j=0; j<mapy; j++){
 	for (size_t i=0; i<mapx; i++){
-	    vertex.push_back(vec3f(i*scale, j*scale, 0));
-	    color.push_back(vec4f(float(i)/mapx, float(j)/mapy, 0, 1,f));
+	    float angle_h = i/float(mapx)*M_PI*2; // radius h, 0-PI
+	    float angle_v = j/float(mapy)*M_PI; // radius v, 0-PI/2;
+	    float r = 10; // radius r, 0-1
+	    float p_x = r*sin(angle_v)*cos(angle_h);
+	    float p_y = r*sin(angle_v)*sin(angle_h);
+	    float p_z = r*cos(angle_v);
+
+	    vertex.push_back(vec3f(p_x, p_y, p_z));
+	    size_t c_i = (j*mapx+i)*comp;
+	    color.push_back(vec4f(image[c_i], image[c_i+1], image[c_i+2], image[c_i+3]));
+	    //color.push_back(vec4f(float(i)/mapx, float(j)/mapy, 0, 1.f));
 	}
     }
 
     for (size_t i=0; i<mapx-1; i++){
 	for (size_t j=0; j<mapy-1; j++){
-	    index.push_back(vec4ui());
+	    index.push_back(vec4ui(i + j*mapx, i+1+j*mapx, i+1+(j+1)*mapx, i+(j+1)*mapx));
 	}
     }
     
