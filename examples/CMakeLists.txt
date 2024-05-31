@@ -34,6 +34,13 @@ target_include_directories(vistool_opengl
 			
 target_link_libraries(vistool_opengl glfw ${OPENGL_LIBRARIES})
 
+add_executable(vistool_jsonio
+    jsonIOExample.cpp
+    ../loader.cpp
+    ../util.cpp)
+
+
+
 
     
 
