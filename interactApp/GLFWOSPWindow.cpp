@@ -63,80 +63,7 @@ void GLFWOSPWindow::saveFrame(std::string filename){
     stbi_write_png(filename.c_str(), width, height, nrChannels, buffer.data(), stride);
 }
 
-
-void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &widget){
-    if (widget.type_name == "unstructured"){
-	ospray::cpp::Volume vol("unstructured");
-	float world_scale_xy = 1;
-	for (size_t i=0; i<2; i++)
-	    world_scale_xy = std::min(world_scale_xy, float(widget.world_bbox[i]/volumeDimensions[i]));
-	for (size_t i=0; i<widget.zMapping.size(); i++)
-	    widget.zMapping[i] *= (widget.world_bbox[2]/widget.zMapping.back());
-	
-	rectMesh.initMesh(volumeDimensions, widget.zMapping, vec2f(world_scale_xy));
-	vol.setParam("vertex.position", ospray::cpp::SharedData(rectMesh.vertices));
-	vol.setParam("vertex.data", ospray::cpp::SharedData(*(voxel_data)));
-	vol.setParam("background", ospray::cpp::SharedData(vec3f(1.0f, 0.0f, 1.0f)));
-	vol.setParam("index", ospray::cpp::SharedData(rectMesh.indices));
-	vol.setParam("cell.index", ospray::cpp::SharedData(rectMesh.cells));
-	vol.setParam("cell.type", ospray::cpp::SharedData(rectMesh.cellTypes));
-	vol.commit();
-	    
-	// put the mesh into a model
-	ospray::cpp::VolumetricModel mdl(vol);
-	mdl.setParam("transferFunction", tfn);
-	mdl.commit();
-	    
-	volume = vol;
-	model = mdl;
-	    
-    }else{
-	// volume
-	//ospray::cpp::Volume volume("structuredSpherical");
-	ospray::cpp::Volume vol("structuredRegular");
-        float world_scale_xy = 1;
-	for (size_t i=0; i<2; i++)
-	    world_scale_xy = std::min(world_scale_xy, float(widget.world_bbox[i]/volumeDimensions[i]));
-	float world_scale_z = widget.world_bbox[0] / widget.world_bbox[2] * world_scale_xy;
-	vol.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
-	vol.setParam("gridSpacing", vec3f(world_scale_xy, world_scale_xy, world_scale_z));
-	//volume.setParam("gridSpacing", vec3f(10.f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
-	vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
-	vol.setParam("dimensions", volumeDimensions);
-	vol.commit();
-	
-	// put the mesh into a model
-	ospray::cpp::VolumetricModel mdl(vol);
-	mdl.setParam("transferFunction", tfn);
-	mdl.commit();
-	    
-	volume = vol;
-	model = mdl;
-    }	
-}
-
-
-void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, visuser::AniObjWidget &widget){
-    // volume
-    ospray::cpp::Volume vol("structuredSpherical");
-    //ospray::cpp::Volume vol("structuredRegular");
-    float world_scale_xy = 1;
-    vol.setParam("gridOrigin", vec3f(world_size-0.1,0.f,0.f));
-    //vol.setParam("gridSpacing", vec3f(world_scale_xy, world_scale_xy, world_scale_z));
-    vol.setParam("gridSpacing", vec3f(-0.2f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
-    vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
-    vol.setParam("dimensions", volumeDimensions);
-    vol.commit();
-	
-    // put the mesh into a model
-    ospray::cpp::VolumetricModel mdl(vol);
-    mdl.setParam("transferFunction", tfn);
-    mdl.commit();
-	    
-    volume = vol;
-    model = mdl;
-
-    // sphere
+void GLFWOSPWindow::initBGMap(){
     // triangle mesh data
     std::vector<vec3f> vertex;
     std::vector<vec4f> color;
@@ -144,7 +71,6 @@ void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, visuser::AniObjWidg
 
     int mapx = 864;
     int mapy = 648;
-    float scale = 0.01;
     const char mapfile[] = "/home/xuanhuang/projects/vis_interface/vis_user_tool/mesh/land.png";
 
     int comp;
@@ -159,7 +85,7 @@ void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, visuser::AniObjWidg
 	for (size_t i=0; i<mapx; i++){
 	    float angle_h = i/float(mapx)*M_PI*2; // radius h, 0-PI
 	    float angle_v = j/float(mapy)*M_PI; // radius v, 0-PI/2;
-	    float r = 10; // radius r, 0-1
+	    float r = 10.1; // radius r, 0-1
 	    float p_x = r*sin(angle_v)*cos(angle_h);
 	    float p_y = r*sin(angle_v)*sin(angle_h);
 	    float p_z = r*cos(angle_v);
@@ -189,13 +115,79 @@ void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, visuser::AniObjWidg
     ospray::cpp::GeometricModel model_(mesh);
     model_.commit();
     gmodel = model_;
+}
 
+void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &widget){
+ 
+	// volume
+	//ospray::cpp::Volume volume("structuredSpherical");
+	ospray::cpp::Volume vol("structuredRegular");
+        float world_scale_xy = 1;
+	for (size_t i=0; i<2; i++)
+	    world_scale_xy = std::min(world_scale_xy, float(widget.world_bbox[i]/volumeDimensions[i]));
+	float world_scale_z = widget.world_bbox[0] / widget.world_bbox[2] * world_scale_xy;
+	vol.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
+	vol.setParam("gridSpacing", vec3f(world_scale_xy, world_scale_xy, world_scale_z));
+	//volume.setParam("gridSpacing", vec3f(10.f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
+	vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+	vol.setParam("dimensions", volumeDimensions);
+	vol.commit();
+	
+	// put the mesh into a model
+	ospray::cpp::VolumetricModel mdl(vol);
+	mdl.setParam("transferFunction", tfn);
+	mdl.commit();
+	    
+	volume = vol;
+	model = mdl;
+   
+}
+
+void GLFWOSPWindow::initVolume(vec3i volumeDimensions, float bb_x){
+	ospray::cpp::Volume vol("structuredRegular");
+	vol.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
+	vol.setParam("gridSpacing", vec3f(bb_x / volumeDimensions.x));
+	vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+	vol.setParam("dimensions", volumeDimensions);
+	vol.commit();
+	
+	// put the mesh into a model
+	ospray::cpp::VolumetricModel mdl(vol);
+	mdl.setParam("transferFunction", tfn);
+	mdl.commit();
+	    
+	volume = vol;
+	model = mdl;
 }
 
 
-void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bb_x){
+void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions){
+    // volume
+    ospray::cpp::Volume vol("structuredSpherical");
+    //ospray::cpp::Volume vol("structuredRegular");
+    float world_scale_xy = 1;
+    vol.setParam("gridOrigin", vec3f(world_size_x-0.1,0.f,0.f));
+    //vol.setParam("gridSpacing", vec3f(world_scale_xy, world_scale_xy, world_scale_z));
+    vol.setParam("gridSpacing", vec3f(-0.1f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
+    vol.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+    vol.setParam("dimensions", volumeDimensions);
+    vol.commit();
+	
+    // put the mesh into a model
+    ospray::cpp::VolumetricModel mdl(vol);
+    mdl.setParam("transferFunction", tfn);
+    mdl.commit();
+	    
+    volume = vol;
+    model = mdl;
+    
+    initBGMap();
+}
+
+
+void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bbx){
     ospray::cpp::Volume vol("unstructured");
-    float world_scale_xy = bb_x/reduce_max(volumeDimensions);
+    float world_scale_xy = bbx/volumeDimensions.x;
     float world_scale_z = 0.0005;
     const float zMap_full[] = {0.5,1.6,2.8,4.2,5.8,7.6,9.7,12,14.7,17.7,21.1,25,29.3,34.2,39.7,45.8,52.7,60.3,68.7,78,88.2,99.4,112,125,139,155,172,190,209,230,252,275,300,325,352,381,410,441,473,507,541,576,613,651,690,730,771,813,856,900,946,992,1040,1089,1140,1192,1246,1302,1359,1418,1480,1544,1611,1681,1754,1830,1911,1996,2086,2181,2281,2389,2503,2626,2757,2898,3050,3215,3392,3584,3792,4019,4266,4535,4828,5148,5499,5882,6301,6760};
 
@@ -236,14 +228,13 @@ void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bb_x){
     model = mdl;
 }
 
-
 void GLFWOSPWindow::initClippingPlanes(){    
     // clipping plane
     clipping_params = std::array<ClippingPlaneParams, 4>{
-	ClippingPlaneParams(0, vec3f(world_size, 0, 0)),
-	ClippingPlaneParams(0, vec3f(-world_size, 0, 0)),
-	ClippingPlaneParams(1, vec3f(0, world_size, 0)),
-	ClippingPlaneParams(1, vec3f(0, -world_size, 0))};
+	ClippingPlaneParams(0, vec3f(world_size_x, 0, 0)),
+	ClippingPlaneParams(0, vec3f(-world_size_x, 0, 0)),
+	ClippingPlaneParams(1, vec3f(0, world_size_x, 0)),
+	ClippingPlaneParams(1, vec3f(0, -world_size_x, 0))};
     
     clipping_params.changed = false;
     clipping_planes = {
@@ -404,7 +395,7 @@ void GLFWOSPWindow::buildUI(){
 	    if (ImGui::SliderFloat("Position",
 				   &clippingBox[i],
 				   -1, 0)) {
-		plane.position[plane.axis] = -clippingBox[i]*world_size;
+		plane.position[plane.axis] = -clippingBox[i]*world_size_x;
 		clipping_params.changed = true;
 	    }
 

@@ -31,7 +31,7 @@ public:
     unsigned int guiTextureSize = 0;
     GLFWwindow *glfwWindow = nullptr;
 
-    int world_size = 10;
+    int world_size_x = 10;
     
     ospray::cpp::Camera camera{"perspective"};
     ospray::cpp::Renderer renderer{"scivis"};
@@ -90,10 +90,12 @@ public:
 
     
     }
-
+    
     void initVolume(vec3i dim, visuser::AniObjWidget &widget);
-    void initVolumeSphere(vec3i dim, visuser::AniObjWidget &widget);
+    void initVolume(vec3i dim, float bb_x);
     void initVolumeOceanZMap(vec3i volumeDimensions, float bb_x);
+    void initVolumeSphere(vec3i dim);
+    void initBGMap();
     void initClippingPlanes();
     
     void preRenderInit();    

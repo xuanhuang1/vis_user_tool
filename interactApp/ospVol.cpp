@@ -273,7 +273,7 @@ int main(int argc, const char **argv)
 
 	// construct volume 
 	//glfwOspWindow.initVolume(volumeDimensions, widget);
-	glfwOspWindow.initVolumeSphere(volumeDimensions, widget);
+	glfwOspWindow.initVolumeSphere(volumeDimensions);
 	//glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size);
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));

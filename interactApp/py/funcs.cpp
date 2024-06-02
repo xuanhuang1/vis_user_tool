@@ -165,7 +165,7 @@ init_app(const std::vector<std::string>& args)
     return newargs;
 }
 
-int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, bool use_zmap)
+int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, int mode)
 {
  
 #ifdef _WIN32
@@ -217,21 +217,6 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, boo
 	    	min = std::min(min, voxels[i]);
 	    	max = std::max(max, voxels[i]);        
             }
-	    //for (size_t z_i=0; z_i<z; z_i++){
-	    //	for (size_t y_i=0; y_i<y; y_i++){
-	    //	    long long offset = z_i * x * y + y_i * x;
-	    //	    for (size_t x_i=0; x_i<x; x_i++){
-	    //		size_t flipX = x - 1 - x_i;
-	    //		voxels[offset + flipX] = glfwOspWindow.all_data_ptr[offset + x_i];
-	    //		min = std::min(min, voxels[offset + flipX]);
-	    //		max = std::max(max, voxels[offset + flipX]);
-	    //	    }
-	    //	}
-	     //	for (int k=0; k<10; k++)
-	     //	    if (z_i == float(z)/10*k)
-	     //		std::cout <<z_i*x*y<<" "<< k<<"0% \n";    
-	     //}
-
 	    
 	    std::cout <<"End load max: "<< max <<" min: "<<min<< "\n";
 	    glfwOspWindow.voxel_data = &voxels;
@@ -242,24 +227,14 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, boo
     	    
 	// volume
 	//ospray::cpp::Volume volume("structuredSpherical");
-	if (!use_zmap){
-	    ospray::cpp::Volume volume("structuredRegular");
-	    volume.setParam("gridOrigin", vec3f(0.f,0.f,0.f));
-	    volume.setParam("gridSpacing", vec3f(10.f / reduce_max(glfwOspWindow.volumeDimensions)));
-	    //volume.setParam("gridSpacing", vec3f(10.f, 180.f / volumeDimensions.y, 360.f/volumeDimensions.z));
-	    volume.setParam("data", ospray::cpp::SharedData(glfwOspWindow.voxel_data->data(), glfwOspWindow.volumeDimensions));
-	    volume.setParam("dimensions", glfwOspWindow.volumeDimensions);
-	    volume.commit();
-	    glfwOspWindow.volume = volume;
-	
-	    // put the mesh into a model
-	    ospray::cpp::VolumetricModel model(volume);
-	     
-	    model.setParam("transferFunction", glfwOspWindow.tfn);
-	    model.commit();
-	    glfwOspWindow.model = model;
-	}else
-	    glfwOspWindow.initVolumeOceanZMap(glfwOspWindow.volumeDimensions, glfwOspWindow.world_size);
+	if (mode == 0){
+	    glfwOspWindow.initVolume(glfwOspWindow.volumeDimensions, glfwOspWindow.world_size_x);
+	}else if (mode == 1)
+	    glfwOspWindow.initVolumeOceanZMap(glfwOspWindow.volumeDimensions, glfwOspWindow.world_size_x);
+	else if (mode == 2){
+	    glfwOspWindow.initVolumeSphere(glfwOspWindow.volumeDimensions);
+	    group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));	
+	}
 	
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();

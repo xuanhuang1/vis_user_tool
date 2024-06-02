@@ -235,15 +235,17 @@ int main(int argc, const char **argv)
 	std::cout << "\n\nStart json loading ... \n";
     	AniObjWidget widget(config);
     	widget.load_info();
+	std::cout << "load info";
     	widget.load_cameras();
+	std::cout << ", cam";
     	widget.load_tfs();
+	std::cout << ", tf\n";
     	std::cout << "\nEnd json loading ... \n\n";
 
 	if (overwrite_inputf != ""){
 	    widget.file_name = overwrite_inputf;
 	}
-    
-	
+
 	vec3i volumeDimensions(widget.dims[0], widget.dims[1], widget.dims[2]);
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
@@ -280,11 +282,19 @@ int main(int argc, const char **argv)
 
 	// construct volume 
 	//glfwOspWindow.initVolume(volumeDimensions, widget);
-	glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size);
+	if (widget.type_name == "structured"){
+		glfwOspWindow.initVolume(volumeDimensions, glfwOspWindow.world_size_x);
+	}else if (widget.type_name == "unstructured"){
+		glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
+	}else if (widget.type_name == "structuredSpherical"){
+		glfwOspWindow.initVolumeSphere(volumeDimensions);
+		group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
+	}
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
 
 	glfwOspWindow.initClippingPlanes();
+	std::cout << "volume loaded\n";
 
 	// put the group into an instance (give the group a world transform)
    	glfwOspWindow.instance = ospray::cpp::Instance(group);
@@ -362,7 +372,11 @@ int main(int argc, const char **argv)
 	    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
 	    glfwSwapBuffers(glfwOspWindow.glfwWindow);
 
-	    glfwOspWindow.saveFrame("text.png");
+	    std::string base_filename = widget.file_name.substr(widget.file_name.find_last_of("/\\") + 1);
+	    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+	    outname = "img_" + outname + ".png";
+	    std::cout <<"write :"<< outname << "\n";
+	    glfwOspWindow.saveFrame(outname);
 
 	    t2 = std::chrono::high_resolution_clock::now();
 	    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
