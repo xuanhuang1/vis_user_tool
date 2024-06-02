@@ -27,6 +27,7 @@ namespace visuser{
 
     Camera interpolate(Camera &a, Camera &b, glm::vec2 range, uint32_t f);
     
+    void jsonFromFile(const char* name, nlohmann::json &j);
     
     struct AniObjWidget{
     	// input data
@@ -43,10 +44,11 @@ namespace visuser{
     	glm::vec2 tfRange;				// TF range 
     	
     	// init
+    	AniObjWidget(){};
     	AniObjWidget(const nlohmann::json in_file);
-	AniObjWidget(const nlohmann::json meta_file, uint32_t data_index);
 	AniObjWidget(std::string type_name, int x, int y, int z, std::vector<float> &z_m);
-	void load_from_meta_file();
+	void init();
+	void init_from_json(const nlohmann::json in_file);
     	void load_info();
     	void print_info();
     	void load_cameras();
@@ -63,6 +65,18 @@ namespace visuser{
     	std::vector<float> colors;
     	std::vector<float> opacities;
     	
+    };
+    
+       
+    struct AniObjHandler{
+    	// input data
+    	bool is_header = false;
+    	nlohmann::json header_config;
+    	std::vector<AniObjWidget> widgets;
+    	
+    	// init
+    	AniObjHandler(){};
+    	AniObjHandler(const char* filename);
     };
 }
 

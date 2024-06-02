@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 #include "json.hpp"
 
 //#include "stb_image.h"
@@ -39,16 +40,35 @@ visuser::Camera visuser::interpolate(visuser::Camera &a, visuser::Camera &b, glm
 	return visuser::Camera(pos, dir, up);
 }
     
+void visuser::jsonFromFile(const char* name, nlohmann::json &j){
+    std::ifstream cfg_file(name);
+    if (!cfg_file) {
+        std::cerr << "[error]: Failed to open config file " << name << "\n";
+        throw std::runtime_error("Failed to open input config file");
+    }
+    cfg_file >> j;
+    std::cout << "Reading " << name <<"\n";
+}
     
     
 visuser::AniObjWidget::AniObjWidget(const nlohmann::json in_file){
     config = in_file;
 }
 
-visuser::AniObjWidget::AniObjWidget(const nlohmann::json meta_file, uint32_t data_index){
-    config = meta_file["file_list"][data_index];
+
+void visuser::AniObjWidget::init(){
+    load_info(); 
+    load_cameras(); 
+    load_tfs();
 }
 
+
+void visuser::AniObjWidget::init_from_json(const nlohmann::json in_file){
+    config = in_file;
+    load_info();
+    load_cameras();
+    load_tfs();
+}
 
 void visuser::AniObjWidget::load_info(){
     file_name 	= config["data"]["name"];
@@ -61,8 +81,8 @@ void visuser::AniObjWidget::load_info(){
     // load z list, length must == dims.z
     zMapping 	= config["data"]["zMapping"].get<std::vector<float>>();
     if (zMapping.size() != dims.z) std::cerr << "unmatched z mapping size!\n";
+    std::cout << "end load info\n";
 }
-
 
 void visuser::AniObjWidget::print_info(){
 	std::cout << "data info...\n\n"
@@ -85,6 +105,7 @@ void visuser::AniObjWidget::load_cameras(){
 					 c["frame"].get<uint32_t>()));
 	}
 	currentCam = cameras[0];
+	std::cout << "end load cames\n";
 }
 
 void visuser::AniObjWidget::load_tfs(){
@@ -92,6 +113,7 @@ void visuser::AniObjWidget::load_tfs(){
 	colors = tf_set[0]["colors"].get<std::vector<float>>();
 	opacities = tf_set[0]["opacities"].get<std::vector<float>>();
 	tfRange = get_vec2f(tf_set[0]["range"]);
+	std::cout << "end load tfs\n";
 }
 
 
@@ -101,6 +123,28 @@ void visuser::AniObjWidget::advanceFrame(){
 	// do nothing for transfer function now
 	
 	currentF++;
+}
+
+
+
+visuser::AniObjHandler::AniObjHandler(const char* filename){
+    jsonFromFile(filename, header_config);
+    is_header = header_config["isheader"];
+    
+    if (!is_header){
+    	// not a header, read again as plain kf file
+    	widgets.resize(1);
+    	widgets[0].init_from_json(header_config);
+    }else{
+    	// is a header, read all kf files
+    	std::vector<std::string> filenames = header_config["file_list"].get<std::vector<std::string>>();
+    	widgets.resize(filenames.size());
+    	for (size_t i=0; i<filenames.size(); i++){
+    		nlohmann::json config;
+    		jsonFromFile(filenames[i].c_str(), config);
+    		widgets[i].init_from_json(config);
+    	}
+    }
 }
 
 
