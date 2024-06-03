@@ -9,8 +9,8 @@ find_package(OpenGL 3 REQUIRED)
 find_package(glfw3 REQUIRED)
 
 
-add_executable(vistool_ospray_vol
-    ospVol.cpp
+add_executable(interactiveRender
+    interactiveRender.cpp
     ArcballCamera.cpp
     clipping_plane.cpp
     TransferFunctionWidget.cpp
@@ -25,19 +25,19 @@ add_executable(vistool_ospray_vol
     ../util.cpp
     ../mesh/rectMesh.cpp)
 
-target_include_directories(vistool_ospray_vol
+target_include_directories(interactiveRender
 			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
 			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
 			
-target_link_libraries(vistool_ospray_vol 
+target_link_libraries(interactiveRender 
 			glfw
 			${OPENGL_LIBRARIES}
 			/home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
 
 
 
-add_executable(fixed_cam_vol
-    fixed_cam_vol.cpp
+add_executable(offlineRender
+    offlineRender.cpp
     ArcballCamera.cpp
     clipping_plane.cpp
     TransferFunctionWidget.cpp
@@ -52,11 +52,11 @@ add_executable(fixed_cam_vol
     ../util.cpp
     ../mesh/rectMesh.cpp)
 
-target_include_directories(fixed_cam_vol
+target_include_directories(offlineRender
 			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
 			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
 			
-target_link_libraries(fixed_cam_vol 
+target_link_libraries(offlineRender 
 			glfw
 			${OPENGL_LIBRARIES}
 			/home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)

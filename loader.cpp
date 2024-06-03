@@ -149,7 +149,7 @@ visuser::AniObjHandler::AniObjHandler(const char* filename){
 	    widgets[i].init_from_json(config);
 	    if (!filenames[i]["data_i"].is_null()){
 		uint32_t data_i = filenames[i]["data_i"];
-		if (datanames.size() > (data_i+1)){ 
+		if (datanames.size() > data_i){ 
 		    widgets[i].overwrite_data_info(datanames[data_i]["name"], 
 						   get_vec3i(datanames[data_i]["dims"]));
 		    std::cout << "overwriting " << kf_name 
@@ -163,17 +163,28 @@ visuser::AniObjHandler::AniObjHandler(const char* filename){
 }
 
 void visuser::writeSampleJsonFile(std::string meta_file_name){
+    std::vector<uint32_t> data_i_list_kf = {0, 0, 1};
+    std::map<uint32_t, uint32_t > data_i_list;
     nlohmann::ordered_json j;
     std::string base_file_name = meta_file_name+"_kf";
+    
     j["isheader"] = true;
-    j["data_list"][0] = {};
+    
+    for (auto i: data_i_list_kf){
+	if (data_i_list.find(i) == data_i_list.end()){
+	    uint32_t idx = data_i_list.size();
+	    j["data_list"][idx]["name"] = "<file "+std::to_string(idx)+">";
+	    j["data_list"][idx]["dims"] = {(idx+1)*100, (idx+1)*100, (idx+1)*100};
+	    data_i_list[i] = idx;
+	}
+    }
 	
     // export all key frames to json file
     // write a header of file names 
-    for (size_t i=0; i<2;i++){
+    for (size_t i=0; i<data_i_list_kf.size();i++){
 	std::string file_name = base_file_name + std::to_string(i) + ".json";
 	j["file_list"][i]["keyframe"] = file_name;
-	j["file_list"][i]["data_i"] = NULL;
+	j["file_list"][i]["data_i"] = data_i_list[data_i_list_kf[i]];
 
 	// write json for each keyframe interval
 	nlohmann::ordered_json tmp_j;

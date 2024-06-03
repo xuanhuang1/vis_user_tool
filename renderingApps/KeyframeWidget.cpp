@@ -306,7 +306,7 @@ namespace keyframe {
     }
 
 
-    void KeyframeWidget::exportKFs(std::string meta_file_name, std::vector<float> &zmap){
+    void KeyframeWidget::exportKFs(std::string meta_file_name, int dims[3], int world_bbox[3]){
 	// create an empty structure (null)
 	nlohmann::ordered_json j;
 	std::string base_file_name = meta_file_name+"_kf";
@@ -325,8 +325,8 @@ namespace keyframe {
 	    tmp_j["isheader"] = false;
 	    tmp_j["data"]["type"] = "structured";
 	    tmp_j["data"]["name"] = "";
-	    tmp_j["data"]["dims"] = {100, 100, 100};
-	    tmp_j["data"]["world_bbox"] = {10, 10, 10};
+	    tmp_j["data"]["dims"] = {dims[0], dims[1], dims[2]};
+	    tmp_j["data"]["world_bbox"] = {world_bbox[0], world_bbox[1], world_bbox[2]};
 	    tmp_j["data"]["frameRange"] = {kfs[i].timeFrame, kfs[i+1].timeFrame};
 
 	    // cameras

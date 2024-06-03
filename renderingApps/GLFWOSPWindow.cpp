@@ -481,7 +481,10 @@ void GLFWOSPWindow::buildUI(){
 	
 	ImGui::SameLine();
         if (ImGui::Button("export")) {
-	    kf_widget.exportKFs("expt", zMap);
+	    int dims[3] = {volumeDimensions.x, volumeDimensions.y, volumeDimensions.z};
+	    int world_bbox[3] = {world_size_x, world_size_x, world_size_x};
+	    kf_widget.exportKFs("expt", dims, world_bbox);
+	    std::cout << "keyframes exported\n";
 	}
 	
 	kf_widget.draw_ui();
