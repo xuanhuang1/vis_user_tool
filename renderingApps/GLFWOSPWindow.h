@@ -17,7 +17,7 @@
 #include "app_params.h"
 
 #include "KeyframeWidget.h"
-#include "../mesh/rectMesh.h"
+#include "mesh/rectMesh.h"
 
 using namespace rkcommon::math;
 

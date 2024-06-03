@@ -14,7 +14,7 @@ file (GLOB SOURCE_FILES
   "../KeyframeWidget.cpp"
   "../clipping_plane.cpp"
   "../GLFWOSPWindow.cpp"
-  "../../mesh/rectMesh.cpp"
+  "../mesh/rectMesh.cpp"
   "../imgui/*.cpp" "../../loader.cpp" "../../util.cpp")
 
 file (GLOB PYTHON_FILES "funcs.cpp" "")

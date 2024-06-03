@@ -23,7 +23,7 @@ add_executable(interactiveRender
     imgui/imgui_impl_glfw_gl3.cpp
     ../loader.cpp
     ../util.cpp
-    ../mesh/rectMesh.cpp)
+    mesh/rectMesh.cpp)
 
 target_include_directories(interactiveRender
 			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
@@ -50,7 +50,7 @@ add_executable(offlineRender
     imgui/imgui_impl_glfw_gl3.cpp
     ../loader.cpp
     ../util.cpp
-    ../mesh/rectMesh.cpp)
+    mesh/rectMesh.cpp)
 
 target_include_directories(offlineRender
 			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
