@@ -71,7 +71,7 @@ void GLFWOSPWindow::initBGMap(){
 
     int mapx = 864;
     int mapy = 648;
-    const char mapfile[] = "/home/xuanhuang/projects/vis_interface/vis_user_tool/mesh/land.png";
+    const char mapfile[] = "/home/xuanhuang/projects/vis_interface/vis_user_tool/renderingApps/mesh/land.png";
 
     int comp;
     stbi_set_flip_vertically_on_load(1);
