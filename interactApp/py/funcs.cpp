@@ -281,7 +281,6 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, int
 	renderer->setParam("aoSamples", 1);
 	renderer->setParam("backgroundColor", 0.0f); // white, transparent
 	renderer->commit();
-
 	
 	ospray::cpp::Camera* camera = &glfwOspWindow.camera;
 	    
@@ -305,7 +304,6 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, int
       
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	    glEnable(GL_TEXTURE_2D);
-  
       
 	    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
 	    glfwOspWindow.display();

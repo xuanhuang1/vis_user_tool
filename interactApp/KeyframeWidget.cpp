@@ -310,19 +310,23 @@ namespace keyframe {
 	// create an empty structure (null)
 	nlohmann::ordered_json j;
 	std::string base_file_name = meta_file_name+"_kf";
+	j["isheader"] = true;
+	j["data_list"][0] = {};
 	
 	// export all key frames to json file
 	// write a header of file names 
 	for (size_t i=0; i<kfs.size()-1;i++){
 	    std::string file_name = base_file_name + std::to_string(i) + ".json";
-	    j["file_list"][i] = file_name;
+	    j["file_list"][i]["keyframe"] = file_name;
+	    j["file_list"][i]["data_i"] = NULL;
 
 	    // write json for each keyframe interval
 	    nlohmann::ordered_json tmp_j;
+	    tmp_j["isheader"] = false;
 	    tmp_j["data"]["type"] = "structured";
 	    tmp_j["data"]["name"] = "";
+	    tmp_j["data"]["dims"] = {100, 100, 100};
 	    tmp_j["data"]["world_bbox"] = {10, 10, 10};
-	    for (auto &z : zmap) tmp_j["data"]["zMapping"].push_back(z);
 	    tmp_j["data"]["frameRange"] = {kfs[i].timeFrame, kfs[i+1].timeFrame};
 
 	    // cameras
@@ -339,10 +343,10 @@ namespace keyframe {
 	    }
 
 	    // tf
-	    tmp_j["transferFunc"]["frame"] = kfs[i].timeFrame;
-	    tmp_j["transferFunc"]["range"] = {-1, 1};
-	    for (auto &z : kfs[i].tf_colors) tmp_j["transferFunc"]["colors"].push_back(z);
-	    for (auto &z : kfs[i].tf_opacities) tmp_j["transferFunc"]["opacities"].push_back(z);
+	    tmp_j["transferFunc"][0]["frame"] = kfs[i].timeFrame;
+	    tmp_j["transferFunc"][0]["range"] = {-1, 1};
+	    for (auto &z : kfs[i].tf_colors) tmp_j["transferFunc"][0]["colors"].push_back(z);
+	    for (auto &z : kfs[i].tf_opacities) tmp_j["transferFunc"][0]["opacities"].push_back(z);
 	    
 	    std::ofstream o(file_name);
 	    o << std::setw(4)<< tmp_j <<std::endl;

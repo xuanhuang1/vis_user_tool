@@ -1,0 +1,23 @@
+{
+    "isheader" : true,
+    "data_list" : [
+    	{"name" : "<new file path 0>",
+    	 "dims" : [100, 100, 100]
+    	},
+    	{"name" : "<new file path 1>",
+    	 "dims" : [200, 200, 200]
+    	}
+    ],
+    
+    "file_list": [
+        {
+        "keyframe" : "example_kf_0.json",
+        "data_i" : 0
+        },
+        {
+        "keyframe" : "example_kf_1.json",
+        "data_i" : 1
+        }
+    ]
+    
+}

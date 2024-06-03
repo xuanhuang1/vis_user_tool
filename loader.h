@@ -28,6 +28,7 @@ namespace visuser{
     Camera interpolate(Camera &a, Camera &b, glm::vec2 range, uint32_t f);
     
     void jsonFromFile(const char* name, nlohmann::json &j);
+    void writeSampleJsonFile(std::string meta_file_name);
     
     struct AniObjWidget{
     	// input data
@@ -36,7 +37,6 @@ namespace visuser{
     	std::string type_name;		// unstructured grid for now
     	glm::vec3 dims;			// x, y, z
 	glm::vec3 world_bbox;
-    	std::vector<float> zMapping;	// physical depth mapping, size()==dim.z
     	
     	// animation widget settings
     	glm::vec2 frameRange;				// the range of animating this object
@@ -53,6 +53,7 @@ namespace visuser{
     	void print_info();
     	void load_cameras();
     	void load_tfs();
+    	void overwrite_data_info(std::string file_name, glm::vec3 dims);
     	
     	// animation
     	void getFrameCam(Camera &cam) const {cam = currentCam;}

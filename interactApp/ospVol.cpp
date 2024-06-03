@@ -270,13 +270,24 @@ int main(int argc, const char **argv)
     		
 	//glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
     	glfwOspWindow.tfn = loadTransferFunction(widget, glfwOspWindow.tfn_widget);
-
+	
 	// construct volume 
 	//glfwOspWindow.initVolume(volumeDimensions, widget);
-	glfwOspWindow.initVolumeSphere(volumeDimensions);
-	//glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size);
+	//glfwOspWindow.initVolumeSphere(volumeDimensions);
+	//glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size);    
+	//group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
+	//group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
+	//group.commit();
+	
+	if (widget.type_name == "structured"){
+		glfwOspWindow.initVolume(volumeDimensions, glfwOspWindow.world_size_x);
+	}else if (widget.type_name == "unstructured"){
+		glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
+	}else if (widget.type_name == "structuredSpherical"){
+		glfwOspWindow.initVolumeSphere(volumeDimensions);
+		group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
+	}
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
-	group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
 	group.commit();
 
 	glfwOspWindow.initClippingPlanes();

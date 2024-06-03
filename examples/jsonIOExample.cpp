@@ -29,7 +29,9 @@ int main(int argc, char **argv)
         if (args[i] == "-h") {
             std::cout << USAGE << "\n";
             return 0;
-        } else {
+        } else if (args[i] == "-w"){
+	    writeSampleJsonFile("iotest");
+	}else {
             AniObjHandler handler(argv[1]);
             h = &handler;
         }

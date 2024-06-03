@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include "json.hpp"
 
 //#include "stb_image.h"
@@ -78,53 +79,51 @@ void visuser::AniObjWidget::load_info(){
     frameRange 	= get_vec2i(config["data"]["frameRange"]);
     currentF 	= frameRange[0];
 	
-    // load z list, length must == dims.z
-    zMapping 	= config["data"]["zMapping"].get<std::vector<float>>();
-    if (zMapping.size() != dims.z) std::cerr << "unmatched z mapping size!\n";
     std::cout << "end load info\n";
 }
 
 void visuser::AniObjWidget::print_info(){
-	std::cout << "data info...\n\n"
-		  << "input file: " << file_name << "\n"
-		  << "type: " << type_name <<"\n"
-		  << "dims: " << dims[0] <<" "<< dims[1] <<" "<<dims[2]<<"\n"
-		  << "output frame range: " << frameRange[0] <<" "<<frameRange[1]<<"\n";
-	std::cout << "z mapping: [";
-	for (auto z : zMapping) std::cout << z <<" ";
-	std::cout << "]\n\nEnd data log...\n\n";
+    std::cout << "data info...\n\n"
+	      << "input file: " << file_name << "\n"
+	      << "type: " << type_name <<"\n"
+	      << "dims: " << dims[0] <<" "<< dims[1] <<" "<<dims[2]<<"\n"
+	      << "output frame range: " << frameRange[0] <<" "<<frameRange[1]<<"\n";
+    std::cout << "]\n\nEnd data log...\n\n";
 }
 
 void visuser::AniObjWidget::load_cameras(){
-    	const std::vector<json> &camera_set = config["camera"].get<std::vector<json>>();
-	for (size_t i = 0; i < camera_set.size(); ++i) {
-	    const auto &c = camera_set[i];
-	    cameras.push_back(Camera(get_vec3f(c["pos"]),
-					 get_vec3f(c["dir"]),
-					 get_vec3f(c["up"]),
-					 c["frame"].get<uint32_t>()));
-	}
-	currentCam = cameras[0];
-	std::cout << "end load cames\n";
+    const std::vector<json> &camera_set = config["camera"].get<std::vector<json>>();
+    for (size_t i = 0; i < camera_set.size(); ++i) {
+	const auto &c = camera_set[i];
+	cameras.push_back(Camera(get_vec3f(c["pos"]),
+				 get_vec3f(c["dir"]),
+				 get_vec3f(c["up"]),
+				 c["frame"].get<uint32_t>()));
+    }
+    currentCam = cameras[0];
+    std::cout << "end load cames\n";
 }
 
 void visuser::AniObjWidget::load_tfs(){
-    	const std::vector<json> &tf_set = config["transferFunc"].get<std::vector<json>>();
-	colors = tf_set[0]["colors"].get<std::vector<float>>();
-	opacities = tf_set[0]["opacities"].get<std::vector<float>>();
-	tfRange = get_vec2f(tf_set[0]["range"]);
-	std::cout << "end load tfs\n";
+    const std::vector<json> &tf_set = config["transferFunc"].get<std::vector<json>>();
+    colors = tf_set[0]["colors"].get<std::vector<float>>();
+    opacities = tf_set[0]["opacities"].get<std::vector<float>>();
+    tfRange = get_vec2f(tf_set[0]["range"]);
+    std::cout << "end load tfs\n";
 }
 
+void visuser::AniObjWidget::overwrite_data_info(std::string f_name, glm::vec3 d){
+    file_name = f_name;
+    dims = d;
+}
 
 void visuser::AniObjWidget::advanceFrame(){
-	currentCam = interpolate(cameras[0], cameras[1], frameRange, currentF);
+    currentCam = interpolate(cameras[0], cameras[1], frameRange, currentF);
 	
-	// do nothing for transfer function now
+    // do nothing for transfer function now
 	
-	currentF++;
+    currentF++;
 }
-
 
 
 visuser::AniObjHandler::AniObjHandler(const char* filename){
@@ -137,14 +136,83 @@ visuser::AniObjHandler::AniObjHandler(const char* filename){
     	widgets[0].init_from_json(header_config);
     }else{
     	// is a header, read all kf files
-    	std::vector<std::string> filenames = header_config["file_list"].get<std::vector<std::string>>();
+    	auto filenames = header_config["file_list"].get<std::vector<json>>();
+    	auto datanames = header_config["data_list"].get<std::vector<json>>();
+	std::filesystem::path p = std::filesystem::absolute(filename).parent_path();
+	std::string p_str = p.generic_string() + "/";
+	std::cout << "path: "<< p_str <<"\n";
     	widgets.resize(filenames.size());
     	for (size_t i=0; i<filenames.size(); i++){
-    		nlohmann::json config;
-    		jsonFromFile(filenames[i].c_str(), config);
-    		widgets[i].init_from_json(config);
+	    nlohmann::json config;
+	    std::string kf_name = filenames[i]["keyframe"];
+	    jsonFromFile((p_str+kf_name).c_str(), config);
+	    widgets[i].init_from_json(config);
+	    if (!filenames[i]["data_i"].is_null()){
+		uint32_t data_i = filenames[i]["data_i"];
+		if (datanames.size() > (data_i+1)){ 
+		    widgets[i].overwrite_data_info(datanames[data_i]["name"], 
+						   get_vec3i(datanames[data_i]["dims"]));
+		    std::cout << "overwriting " << kf_name 
+			      << " to \n  data: " << widgets[i].file_name
+			      << " \n  dims: " << glm::to_string(widgets[i].dims)
+			      << "\n";
+		}	
+	    }
     	}
     }
+}
+
+void visuser::writeSampleJsonFile(std::string meta_file_name){
+    nlohmann::ordered_json j;
+    std::string base_file_name = meta_file_name+"_kf";
+    j["isheader"] = true;
+    j["data_list"][0] = {};
+	
+    // export all key frames to json file
+    // write a header of file names 
+    for (size_t i=0; i<2;i++){
+	std::string file_name = base_file_name + std::to_string(i) + ".json";
+	j["file_list"][i]["keyframe"] = file_name;
+	j["file_list"][i]["data_i"] = NULL;
+
+	// write json for each keyframe interval
+	nlohmann::ordered_json tmp_j;
+	tmp_j["isheader"] = false;
+	tmp_j["data"]["type"] = "structured";
+	tmp_j["data"]["name"] = "";
+	tmp_j["data"]["dims"] = {100, 100, 100};
+	tmp_j["data"]["world_bbox"] = {10, 10, 10};
+	tmp_j["data"]["frameRange"] = {i*5, (i+1)*5};
+
+	// cameras
+	for (size_t j=0; j<2; j++)
+	    {
+		nlohmann::ordered_json tmp_cam;
+		tmp_cam["frame"] = (i+j)*5;
+		for (size_t c=0; c<3; c++){
+		    tmp_cam["pos"].push_back(c);
+		    tmp_cam["dir"].push_back(c);
+		    tmp_cam["up"].push_back(c);
+		}
+		tmp_j["camera"].push_back(tmp_cam);
+	    }
+
+	// tf
+	tmp_j["transferFunc"][0]["frame"] = i*5;
+	tmp_j["transferFunc"][0]["range"] = {-1, 1};
+        tmp_j["transferFunc"][0]["colors"].push_back(0);
+	tmp_j["transferFunc"][0]["colors"].push_back(0);
+	tmp_j["transferFunc"][0]["colors"].push_back(255);
+        tmp_j["transferFunc"][0]["opacities"].push_back(0);
+	tmp_j["transferFunc"][0]["opacities"].push_back(1);
+	    
+	std::ofstream o(file_name);
+	o << std::setw(4)<< tmp_j <<std::endl;
+	o.close();
+    }
+    std::ofstream o_meta(meta_file_name+".json");
+    o_meta << std::setw(4) << j <<std::endl;
+    o_meta.close();
 }
 
 

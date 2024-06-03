@@ -517,6 +517,8 @@ void GLFWOSPWindow::buildUI(){
 	    //update tf
 	    //tfn_widget.set_osp_colormapf(tmpColors, tmpOpacities);
 	    //tfn_widget.changed();
+	    
+	    // TODO update scene
         }
 	ImGui::SameLine();
         if (ImGui::Button("play")) {kf_widget.play = true;}
