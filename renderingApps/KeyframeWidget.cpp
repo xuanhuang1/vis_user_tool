@@ -303,6 +303,7 @@ namespace keyframe {
 
 	std::cout << "load frame["<<thisKF.timeFrame<<"]  with cam ";
         cam.print();
+	std::cout << "  data_i=" <<data_i<<"\n";
     }
 
 

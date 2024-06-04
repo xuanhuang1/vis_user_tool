@@ -513,8 +513,7 @@ void GLFWOSPWindow::buildUI(){
 	  
 	    ArcballCamera cam;
 	    std::vector<float> tmpOpacities, tmpColors;
-	    int data_index;
-	    kf_widget.loadKeyFrame(cam, tmpColors, tmpOpacities, data_index);
+	    kf_widget.loadKeyFrame(cam, tmpColors, tmpOpacities, data_time);
 	    
 	    // update camera
 	    arcballCamera->set(cam);
@@ -525,6 +524,13 @@ void GLFWOSPWindow::buildUI(){
 	    //tfn_widget.changed();
 	    
 	    // TODO update scene
+	    long long offset = data_time * volumeDimensions.long_product();
+	    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
+                (*voxel_data)[i] = all_data_ptr[i+offset];
+            }
+	    volume.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+	    volume.commit();
+	    model.commit();
         }
 	ImGui::SameLine();
         if (ImGui::Button("play")) {kf_widget.play = true;}
