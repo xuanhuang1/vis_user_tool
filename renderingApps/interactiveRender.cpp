@@ -202,7 +202,6 @@ int main(int argc, const char **argv)
 	    throw std::runtime_error("Failed to create GLFW window!");
 	}
 
-
 	std::vector<std::string> args(argv, argv + argc);
     
 	json config;

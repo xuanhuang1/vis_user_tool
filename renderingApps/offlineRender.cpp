@@ -202,12 +202,15 @@ int main(int argc, const char **argv)
 	    throw std::runtime_error("Failed to create GLFW window!");
 	}
 
-
 	std::vector<std::string> args(argv, argv + argc);
     
 	json config;
 	std::string prefix;
 	std::string overwrite_inputf = "";
+
+	// which kf file to render
+	// -2 = input is single kf, -1 = render all kfs, >0 = render selected kf
+	int header_sel = -2; 
 	for (int i = 1; i < argc; ++i) {
 	    if (args[i] == "-h") {
 		std::cout << "./mini_vistool <config.json> [options]\n";
@@ -220,10 +223,13 @@ int main(int argc, const char **argv)
 			throw std::runtime_error("Failed to open input config file");
 		    }
 		    cfg_file >> config;
-		}else if (i == 2){
+		}else{
 		    if (args[i] == "-f"){
-			overwrite_inputf = args[3];
-		    }
+			overwrite_inputf = args[++i];
+		    }else if (args[i] == "-header-sel"){
+			header_sel = std::stoi(args[++i]);
+		    }else if (args[i] == "-header")
+			header_sel = -1;
 		}
 	    }
 	}
@@ -233,17 +239,23 @@ int main(int argc, const char **argv)
 	//std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
 	//std::string dataType = config["data"]["type"];
 	std::cout << "\n\nStart json loading ... \n";
-    	AniObjWidget widget(config);
-    	widget.load_info();
-    	widget.load_cameras();
-    	widget.load_tfs();
+      
+	AniObjWidget *widget;
+	AniObjHandler h(argv[1]);
+	if (header_sel < 0)
+	    widget = &h.widgets[0];
+	else widget = &h.widgets[header_sel];
+	
+    	//widget.load_info();
+    	//widget.load_cameras();
+    	//widget.load_tfs();
     	std::cout << "\nEnd json loading ... \n\n";
 
 	if (overwrite_inputf != ""){
-	    widget.file_name = overwrite_inputf;
+	    widget->file_name = overwrite_inputf;
 	}
 
-	vec3i volumeDimensions(widget.dims[0], widget.dims[1], widget.dims[2]);
+	vec3i volumeDimensions(widget->dims[0], widget->dims[1], widget->dims[2]);
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
 	
@@ -251,8 +263,8 @@ int main(int argc, const char **argv)
 	ospray::cpp::Group group;
 	{
 	    std::fstream file;
-      	    file.open(widget.file_name, std::fstream::in | std::fstream::binary);
-    	    std::cout <<"dim "<<widget.dims[0]<<" "<<widget.dims[1]<<" "<<widget.dims[2]<<"\nLoad "<< voxels.size()<< " :";
+      	    file.open(widget->file_name, std::fstream::in | std::fstream::binary);
+    	    std::cout <<"dim "<<widget->dims[0]<<" "<<widget->dims[1]<<" "<<widget->dims[2]<<"\nLoad "<< voxels.size()<< " :";
 	    for (size_t z=0; z<volumeDimensions[2]; z++){
 		long long offset = z * volumeDimensions[0] * volumeDimensions[1];
 		for (size_t y=0; y<volumeDimensions[1]; y++){
@@ -275,15 +287,15 @@ int main(int argc, const char **argv)
 	}
     		
 	//glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
-    	glfwOspWindow.tfn = loadTransferFunction(widget, glfwOspWindow.tfn_widget);
+    	glfwOspWindow.tfn = loadTransferFunction(*widget, glfwOspWindow.tfn_widget);
 
 	// construct volume 
 	//glfwOspWindow.initVolume(volumeDimensions, widget);
-	if (widget.type_name == "structured"){
+	if (widget->type_name == "structured"){
 		glfwOspWindow.initVolume(volumeDimensions, glfwOspWindow.world_size_x);
-	}else if (widget.type_name == "unstructured"){
+	}else if (widget->type_name == "unstructured"){
 		glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
-	}else if (widget.type_name == "structuredSpherical"){
+	}else if (widget->type_name == "structuredSpherical"){
 		glfwOspWindow.initVolumeSphere(volumeDimensions);
 		group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
 	}
@@ -315,7 +327,7 @@ int main(int argc, const char **argv)
     	std::cout << glfwOspWindow.arcballCamera->lookDir() <<"\n";
     	std::cout << glfwOspWindow.arcballCamera->upDir() <<"\n";
     	
-    	auto c = widget.cameras[0];
+    	auto c = widget->cameras[0];
     	vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
     	vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
     	vec3f up(c.up[0], c.up[1], c.up[2]);
@@ -349,7 +361,7 @@ int main(int argc, const char **argv)
 	auto t2 = std::chrono::high_resolution_clock::now();
 	
 	std::cout << "Begin render loop\n";
-	//do
+	
 	{
 	    glfwPollEvents();
     
@@ -369,10 +381,11 @@ int main(int argc, const char **argv)
 	    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
 	    glfwSwapBuffers(glfwOspWindow.glfwWindow);
 
-	    std::string base_filename = widget.file_name.substr(widget.file_name.find_last_of("/\\") + 1);
+	    std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
 	    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
-	    outname = "img_" + outname + ".png";
-	    std::cout <<"write :"<< outname << "\n";
+	    std::string kf_num = std::to_string(std::max(header_sel, 0));
+	    outname = "img_"+outname+"_kf"+kf_num+".png";
+	    std::cout <<"write: "<< outname << "\n";
 	    glfwOspWindow.saveFrame(outname);
 
 	    t2 = std::chrono::high_resolution_clock::now();
@@ -385,7 +398,6 @@ int main(int argc, const char **argv)
     
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
-	
 	
     }
     ospShutdown();
