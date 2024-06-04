@@ -233,8 +233,8 @@ int main(int argc, const char **argv)
     	widget.load_cameras();
     	widget.load_tfs();
     	std::cout << "\nEnd json loading ... \n\n";
-    
 	
+	glfwOspWindow.setFileNames({"sample.raw"});
 	vec3i volumeDimensions(widget.dims[0], widget.dims[1], widget.dims[2]);
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
@@ -270,6 +270,7 @@ int main(int argc, const char **argv)
     		
 	//glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
     	glfwOspWindow.tfn = loadTransferFunction(widget, glfwOspWindow.tfn_widget);
+	glfwOspWindow.volumeDimensions = volumeDimensions;
 	
 	// construct volume 
 	//glfwOspWindow.initVolume(volumeDimensions, widget);

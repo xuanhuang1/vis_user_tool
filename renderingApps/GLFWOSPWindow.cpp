@@ -249,6 +249,11 @@ void GLFWOSPWindow::initClippingPlanes(){
 
 }
 
+void GLFWOSPWindow::setFileNames(std::vector<std::string> names){
+    file_names.resize(0);
+    for (auto i : names) file_names.push_back(i);
+}
+
 void GLFWOSPWindow::preRenderInit(){
     renderNewFrame();
 		
@@ -475,16 +480,14 @@ void GLFWOSPWindow::buildUI(){
     }
     
     if (ImGui::TreeNode("Animation keyframe")){
-  	//if (ImGui::SliderInt("time", &curTime, 0, kf_widget.timeFrameMax)) {
-	//
-	//}
-	
 	ImGui::SameLine();
         if (ImGui::Button("export")) {
 	    int dims[3] = {volumeDimensions.x, volumeDimensions.y, volumeDimensions.z};
 	    int world_bbox[3] = {world_size_x, world_size_x, world_size_x};
-	    kf_widget.exportKFs("expt", dims, world_bbox);
-	    std::cout << "keyframes exported\n";
+	    kf_widget.exportKFs("expt", dims, world_bbox, file_names, slider_tf_min, slider_tf_max);
+	    std::cout << "keyframes exported, data dims: "
+		      << dims[0] <<" "<<dims[1] <<" "<< dims[2]
+		      << " tf ranges" << slider_tf_min <<" "<<slider_tf_max <<"\n";
 	}
 	
 	kf_widget.draw_ui();

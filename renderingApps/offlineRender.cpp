@@ -235,11 +235,8 @@ int main(int argc, const char **argv)
 	std::cout << "\n\nStart json loading ... \n";
     	AniObjWidget widget(config);
     	widget.load_info();
-	std::cout << "load info";
     	widget.load_cameras();
-	std::cout << ", cam";
     	widget.load_tfs();
-	std::cout << ", tf\n";
     	std::cout << "\nEnd json loading ... \n\n";
 
 	if (overwrite_inputf != ""){

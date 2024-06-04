@@ -306,25 +306,38 @@ namespace keyframe {
     }
 
 
-    void KeyframeWidget::exportKFs(std::string meta_file_name, int dims[3], int world_bbox[3]){
-	// create an empty structure (null)
+    void KeyframeWidget::exportKFs(std::string meta_file_name, int dims[3], int world_bbox[3], std::vector<std::string> &data_fnames, float tf_range_x, float tf_range_y){
+	// create a header file
 	nlohmann::ordered_json j;
 	std::string base_file_name = meta_file_name+"_kf";
 	j["isheader"] = true;
 	j["data_list"][0] = {};
+	std::filesystem::path p = std::filesystem::current_path();
+	std::string p_str = p.generic_string() + "/";
+
+	// construct data list with pair<data_i, list_index>
+	std::map<uint32_t, uint32_t > data_i_list;
+	for (auto kf: kfs){
+	    uint32_t i = kf.data_i;
+	    if (data_i_list.find(i) == data_i_list.end()){
+		uint32_t idx = data_i_list.size();
+		j["data_list"][idx]["name"] = p_str+data_fnames[kf.data_i];
+		j["data_list"][idx]["dims"] = {dims[0], dims[1], dims[2]};
+		data_i_list[i] = idx;
+	    }
+	}
 	
-	// export all key frames to json file
-	// write a header of file names 
+	// export all key frames to json file 
 	for (size_t i=0; i<kfs.size()-1;i++){
 	    std::string file_name = base_file_name + std::to_string(i) + ".json";
 	    j["file_list"][i]["keyframe"] = file_name;
-	    j["file_list"][i]["data_i"] = NULL;
+	    j["file_list"][i]["data_i"] = data_i_list[kfs[i].data_i];
 
 	    // write json for each keyframe interval
 	    nlohmann::ordered_json tmp_j;
 	    tmp_j["isheader"] = false;
 	    tmp_j["data"]["type"] = "structured";
-	    tmp_j["data"]["name"] = "";
+	    tmp_j["data"]["name"] = p_str+data_fnames[kfs[i].data_i];
 	    tmp_j["data"]["dims"] = {dims[0], dims[1], dims[2]};
 	    tmp_j["data"]["world_bbox"] = {world_bbox[0], world_bbox[1], world_bbox[2]};
 	    tmp_j["data"]["frameRange"] = {kfs[i].timeFrame, kfs[i+1].timeFrame};
@@ -344,7 +357,7 @@ namespace keyframe {
 
 	    // tf
 	    tmp_j["transferFunc"][0]["frame"] = kfs[i].timeFrame;
-	    tmp_j["transferFunc"][0]["range"] = {-1, 1};
+	    tmp_j["transferFunc"][0]["range"] = {tf_range_x, tf_range_y};
 	    for (auto &z : kfs[i].tf_colors) tmp_j["transferFunc"][0]["colors"].push_back(z);
 	    for (auto &z : kfs[i].tf_opacities) tmp_j["transferFunc"][0]["opacities"].push_back(z);
 	    

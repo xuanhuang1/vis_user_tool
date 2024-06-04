@@ -62,6 +62,7 @@ ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw
     std::string tfOpacityMap{"linear"};
   
     std::vector<vec3f> colors;
+    std::vector<float> colors_f;
     std::vector<float> opacities;
 
     if (tfColorMap == "jet") {
@@ -104,6 +105,16 @@ ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw
 	widget.alpha_control_pts[1].y = 1.f;
     }
 
+    for (auto c : colors) {
+	colors_f.push_back(c.x);
+	colors_f.push_back(c.y);
+	colors_f.push_back(c.z);
+    }
+    
+    widget.set_osp_colormapf(colors_f, opacities);
+    std::cout << "init tf col sz="<< widget.osp_colors.size()<<" "
+	      <<widget.alpha_control_pts.size() <<" \n";
+    
     transferFunction.setParam("color", ospray::cpp::CopiedData(colors));
     transferFunction.setParam("opacity", ospray::cpp::CopiedData(opacities));
     transferFunction.setParam("valueRange", valueRange);
@@ -165,7 +176,7 @@ init_app(const std::vector<std::string>& args)
     return newargs;
 }
 
-int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, int mode)
+int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y, int z, int count, int mode)
 {
  
 #ifdef _WIN32
@@ -197,15 +208,22 @@ int run_app(py::array_t<float> &input_array, int x, int y, int z, int count, int
 	    throw std::runtime_error("Failed to create GLFW window!");
 	}
 
+	// process py inputs
 	py::buffer_info buf_info = input_array.request();
+        auto fnames = input_names.cast<std::vector<std::string>>();
 	glfwOspWindow.all_data_ptr = static_cast<float *>(buf_info.ptr);
 	glfwOspWindow.count = count;
-	std::cout << "shape:" <<count <<" of "<< x <<" "<<y<<" "<<z <<std::endl;
-
-	
+	glfwOspWindow.setFileNames(fnames);
 	glfwOspWindow.volumeDimensions[0] = x; 
 	glfwOspWindow.volumeDimensions[1] = y; 
-	glfwOspWindow.volumeDimensions[2] = z; 
+	glfwOspWindow.volumeDimensions[2] = z;
+	std::cout << "shape:" <<count <<" of "<< x <<" "<<y<<" "<<z <<std::endl;
+	std::cout << "file names: ";
+	for (auto f : glfwOspWindow.file_names)
+	    std::cout << f <<" ";
+	std::cout <<"\n";
+
+	// init vol containers
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(glfwOspWindow.volumeDimensions.long_product());
 	

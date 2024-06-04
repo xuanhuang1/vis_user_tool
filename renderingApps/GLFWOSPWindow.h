@@ -40,7 +40,8 @@ public:
     ospray::cpp::VolumetricModel model;
     ospray::cpp::GeometricModel gmodel;
     ospray::cpp::Volume volume;
-    std::vector<float> * voxel_data; // pointer to voxels data
+    std::vector<float> *voxel_data; // pointer to voxels data
+    std::vector<std::string> file_names; // file names of all data 
     vec3i volumeDimensions;
     float* all_data_ptr; // pointer to all data
     int count = 1;
@@ -60,7 +61,6 @@ public:
     std::array<ClippingPlane, 4> clipping_planes;
     AppParam<std::array<ClippingPlaneParams, 4>> clipping_params;
   
-    
     GLFWOSPWindow(){
 	activeWindow = this;
     
@@ -97,6 +97,7 @@ public:
     void initVolumeSphere(vec3i dim);
     void initBGMap();
     void initClippingPlanes();
+    void setFileNames(std::vector<std::string> names);
     
     void preRenderInit();    
     void renderNewFrame(){
