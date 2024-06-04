@@ -213,7 +213,11 @@ int main(int argc, const char **argv)
 	int header_sel = -2; 
 	for (int i = 1; i < argc; ++i) {
 	    if (args[i] == "-h") {
-		std::cout << "./mini_vistool <config.json> [options]\n";
+		std::cout << "./mini_vistool <config.json> [options] \n"
+			  << "  [options]: \n"
+			  << "  -f img_output_name"
+			  << "  -header-sel # (select a keyframe under the header file, i.e. config.json must be a header)"
+			  << "\n";
 		return 0;
 	    } else {
 	    	if (i == 1){
