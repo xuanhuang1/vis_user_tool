@@ -6,6 +6,7 @@ if (NOT WIN32)
 endif()
 
 option(BUILD_EXAMPLES "Build mini example programs" OFF)
+option(BUILD_GL_RENDERING_APPS "Build opengl rendering programs" OFF)
 option(BUILD_RENDERING_APPS "Build ospray rendering programs" OFF)
 option(BUILD_RENDERING_APPS_PY "Build ospray rendering python program" OFF)
 
@@ -23,4 +24,8 @@ if (BUILD_RENDERING_APPS)
 	if (BUILD_RENDERING_APPS_PY)
 		add_subdirectory(renderingApps/py)
 	endif()
+endif()
+
+if (BUILD_GL_RENDERING_APPS)
+	add_subdirectory(GLRenderingApps)
 endif()
