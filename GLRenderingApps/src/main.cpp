@@ -86,7 +86,9 @@ bool showOrgans = false;
 bool showNerves = false;
 bool showEyes = false;
 
-bool isVolumeViewPicked = false;
+bool isVolumeViewPicked = true;
+static bool showMenu = true;
+static bool saveFirstFrame = true;
 
 int windowX = 0;
 int windowY = 0;
@@ -228,14 +230,44 @@ static void reorientCamera(float thetaChange, float phiChange, float rChange)
 	
 	phi += phiChange;
 	if (phi > 3.1415)
-		phi= 3.1415;
-	if (phi < 0)
-		phi = 0;
+		phi -= 3.1415*2;
+	if (phi < -3.1415)
+		phi += 3.1415*2;
 	
 	r += rChange / 10.0;
 	cameraPos = glm::vec3(r * sin(theta) * sin(phi), r * cos(theta) * sin(phi), r * cos(phi));
 	up = glm::vec3(sin(theta) * cos(-phi), cos(theta) * cos(-phi), sin(-phi));
 	
+}
+
+static void rotateLeft(double xVariance)
+{
+    reorientCamera(-xVariance, 0.0f, 0.0f);
+}
+
+static void rotateRight(double xVariance)
+{
+    reorientCamera(xVariance, 0.0f, 0.0f);
+}
+
+static void rotateUp(double yVariance)
+{
+    reorientCamera(0.0f, yVariance, 0.0f);
+}
+
+static void rotateDown(double yVariance)
+{
+    reorientCamera(0.0f, -yVariance, 0.0f);
+}
+
+static void zoomIn(double zVariance)
+{
+    reorientCamera(0.0f, 0.0f, zVariance);
+}
+
+static void zoomOut(double zVariance)
+{
+    reorientCamera(0.0f, 0.0f, -zVariance);
 }
 
 
@@ -245,6 +277,21 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         render_mode = SURFACE;
     if (key == GLFW_KEY_V && action == GLFW_PRESS)
         render_mode = VOLUME;
+    if (key == GLFW_KEY_M && action == GLFW_PRESS)
+       showMenu = !showMenu;
+
+    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+	rotateLeft(0.5f);
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+	rotateRight(0.5f);
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	rotateUp(0.5f);
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	rotateDown(0.5f);
+    if (key == GLFW_KEY_I && action == GLFW_PRESS)
+	zoomIn(0.1f);
+    if (key == GLFW_KEY_O && action == GLFW_PRESS)
+	zoomOut(0.1f);
 }
 
 static void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -381,7 +428,7 @@ int main( void )
 	int dim[3] = {500, 470, 136};
 	int isovalue = preset_isovals[item_selected_index];
 	int prev_isovalue = isovalue;
-	int vol_range = 20;
+	int vol_range = 256;
 	int prev_vol_range = vol_range;
 	std::vector<char> inputData(dim[0]*dim[1]*dim[2]);
 	std::vector<float> tfnc_rgba;
@@ -506,9 +553,10 @@ int main( void )
 	
 	
 	// init cameras
-	cameraPos = glm::vec3(1.0f, 1.0f, -2.0f);  
-	cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-	up = glm::vec3(0.0f, 1.0f, 0.0f); 
+	//cameraPos = glm::vec3(1.0f, 1.0f, -2.0f);  
+	//cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	//up = glm::vec3(0.0f, 1.0f, 0.0f);
+	reorientCamera(0,0,0);
 
 	glm::vec3 cameraDirection = glm::normalize(cameraTarget - cameraPos);
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
@@ -656,54 +704,55 @@ int main( void )
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, drawArraySize);
 
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::Begin("Controls"); 
-		ImGui::SliderFloat("Zoom", &r, -0.0000000000000000000001f, -3);
-		ImGui::Checkbox("Volume View", &isVolumeViewPicked);
-		ImGui::Text("Isosurfaces");               // Display some text (you can use a format strings too)
+		if (showMenu){
+		    ImGui_ImplOpenGL3_NewFrame();
+		    ImGui_ImplGlfw_NewFrame();
+		    ImGui::NewFrame();
+		    ImGui::Begin("Controls"); 
+		    ImGui::SliderFloat("Zoom", &r, -0.0000000000000000000001f, -3);
+		    ImGui::Checkbox("Volume View", &isVolumeViewPicked);
+		    ImGui::Text("Isosurfaces");               // Display some text (you can use a format strings too)
       	        
 
-		if (ImGui::BeginCombo("##combo", items[item_selected_index])) // The second parameter is the label previewed before opening the combo.
-		{
-			for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+		    if (ImGui::BeginCombo("##combo", items[item_selected_index])) // The second parameter is the label previewed before opening the combo.
 			{
-				bool is_selected = (item_selected_index == n); // You can store your selection however you want, outside or inside your objects
-				if (ImGui::Selectable(items[n], is_selected)){
+			    for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+				{
+				    bool is_selected = (item_selected_index == n); // You can store your selection however you want, outside or inside your objects
+				    if (ImGui::Selectable(items[n], is_selected)){
 				        item_selected_index = n;
 					isovalue = preset_isovals[n];
+				    }
+				    if (is_selected)
+					ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
 				}
-				if (is_selected)
-				  ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+			    ImGui::EndCombo();
 			}
-			ImGui::EndCombo();
-		}
-		ImGui::SliderInt("Isovalue", &isovalue, 0, 256);
-	        ImGui::SliderInt("Volume range", &vol_range, 0, 256);
-		ImGui::Text("Transfer Function");
+		    ImGui::SliderInt("Isovalue", &isovalue, 0, 256);
+		    ImGui::SliderInt("Volume range", &vol_range, 0, 256);
+		    ImGui::Text("Transfer Function");
 		
-	        ImDrawList* draw_list = ImGui::GetWindowDrawList();
-		const ImVec2 p = ImGui::GetCursorScreenPos();
-		const float length = 120;
-		const float line_width = length/float(colormap_length);
-		for (uint32_t i=0; i<colormap_length; i++){
-		  draw_list->AddLine(ImVec2(p.x + line_width*i, p.y),
-				     ImVec2(p.x + line_width*i, p.y+20),
-				     ImColor(ImVec4(tfnc_rgba[i*4], tfnc_rgba[i*4+1], tfnc_rgba[i*4+2],tfnc_rgba[i*4+3])),
-				     line_width+5);
+		    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		    const ImVec2 p = ImGui::GetCursorScreenPos();
+		    const float length = 120;
+		    const float line_width = length/float(colormap_length);
+		    for (uint32_t i=0; i<colormap_length; i++){
+			draw_list->AddLine(ImVec2(p.x + line_width*i, p.y),
+					   ImVec2(p.x + line_width*i, p.y+20),
+					   ImColor(ImVec4(tfnc_rgba[i*4], tfnc_rgba[i*4+1], tfnc_rgba[i*4+2],tfnc_rgba[i*4+3])),
+					   line_width+5);
+		    }
+		    windowX = ImGui::GetWindowPos().x;
+		    windowY = ImGui::GetWindowPos().y;
+		    windowWidth = ImGui::GetWindowWidth();
+		    windowHeight = ImGui::GetWindowHeight();
+
+		    ImGui::End();
+
+		    ImGui::Render();
+		    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
-		windowX = ImGui::GetWindowPos().x;
-		windowY = ImGui::GetWindowPos().y;
-		windowWidth = ImGui::GetWindowWidth();
-		windowHeight = ImGui::GetWindowHeight();
-
-		ImGui::End();
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+		
 		// poll events
 		glfwPollEvents();
 		// Swap buffers
