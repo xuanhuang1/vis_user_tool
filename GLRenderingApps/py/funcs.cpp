@@ -33,12 +33,24 @@ GLFWwindow* window;
 // include MC 
 #include "../src/isosurface/MarchingCube.h"
 
-
-
 // change to 1 for windows vs proj
 #define USE_WIN_VSPROJ 0
 
+struct CameraHandler{
+    CameraHandler(){
+	rotX = 0;
+	rotY = 0;
+	scale = -2;
+    }
+    void rotateLeft (float x) { rotX = -x;}
+    void rotateRight(float x) { rotX =  x;}
+    void rotateUp   (float y) { rotY =  y;}
+    void rotateDown (float y) { rotY = -y;}
 
+    float rotX;
+    float rotY;
+    float scale;
+};
 
 
 const char* vertex_shader =
@@ -360,7 +372,7 @@ void generate_colormap(std::vector<float> &tfnc_rgba, std::vector<glm::vec4> &co
 
 
 
-int run_app(const std::string root_dir_path)
+int run_app(const std::string root_dir_path, const CameraHandler& c)
 {
 	// Initialise GLFW
 	if( !glfwInit() )
@@ -550,7 +562,7 @@ int run_app(const std::string root_dir_path)
 	//cameraPos = glm::vec3(1.0f, 1.0f, -2.0f);  
 	//cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 	//up = glm::vec3(0.0f, 1.0f, 0.0f);
-	reorientCamera(0,0,0);
+	reorientCamera(c.rotX, c.rotY, c.scale);
 
 	glm::vec3 cameraDirection = glm::normalize(cameraTarget - cameraPos);
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
@@ -786,7 +798,14 @@ void echo(int i) {
 PYBIND11_MODULE(vistool_gl_py, m) {
     // Optional docstring
     m.doc() = "the renderer's py library";
-        
+
+    py::class_<CameraHandler>(m, "CameraHandler")
+        .def(py::init<>())
+        .def("rotateLeft", &CameraHandler::rotateLeft)
+        .def("rotateRight", &CameraHandler::rotateRight)
+	.def("rotateUp", &CameraHandler::rotateUp)
+        .def("rotateDown", &CameraHandler::rotateDown);
+    
     m.def("echo", &echo, "echo test func");
     m.def("run_app", &run_app, "run rendering");
 }
