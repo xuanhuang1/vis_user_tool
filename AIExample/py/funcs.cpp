@@ -28,29 +28,13 @@ GLFWwindow* window;
 #include "../imgui/examples/imgui_impl_glfw.h"
 #include "../imgui/examples/imgui_impl_opengl3.h"
 
-
 // include MC 
 #include "../src/isosurface/MarchingCube.h"
 
-// change to 1 for windows vs proj
-#define USE_WIN_VSPROJ 0
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../../stb_image_write.h"
 
-struct RendererHandler{
-    RendererHandler(){
-	rotX = 0;
-	rotY = 0;
-	scale = -2;
-    }
-    void rotateLeft (float x) { rotX = -x;}
-    void rotateRight(float x) { rotX =  x;}
-    void rotateUp   (float y) { rotY =  y;}
-    void rotateDown (float y) { rotY = -y;}
-
-    float rotX;
-    float rotY;
-    float scale;
-};
-
+#include "RendererHandler.h"
 
 const char* vertex_shader =
 "#version 330\n"
@@ -103,8 +87,7 @@ bool showNerves = false;
 bool showEyes = false;
 
 bool isVolumeViewPicked = true;
-static bool showMenu = true;
-static bool saveFirstFrame = true;
+static bool showMenu = false;
 
 int windowX = 0;
 int windowY = 0;
@@ -154,14 +137,10 @@ static  float box_points[] = {
     0.5f,-0.5f, 0.5f
 };
 
-enum RENDER_TYPE{
-	SURFACE, VOLUME
-};
-
 float width = 800, height = 600;
 glm::mat4 view, MVP, model, projection;
 
-RENDER_TYPE render_mode = SURFACE; // CHANGE HERE FOR A DIFFERENT MODE
+static RENDER_TYPE render_mode = SURFACE; // CHANGE HERE FOR A DIFFERENT MODE
 
 
 GLuint getShader(const char* v, const char* f){
@@ -286,6 +265,38 @@ static void zoomOut(double zVariance)
 }
 
 
+void saveImage()
+{
+    int w, h;
+    glfwGetFramebufferSize(window, &w, &h);
+    GLsizei nrChannels = 3;
+    GLsizei stride = nrChannels * w;
+    stride += (stride % 4) ? (4 - stride % 4) : 0;
+    GLsizei bufferSize = stride * h;
+    std::vector<char> buffer(bufferSize);
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
+    glReadBuffer(GL_FRONT);
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+    glFinish();
+    stbi_flip_vertically_on_write(true);
+    stbi_write_png("output.png", w, h, nrChannels, buffer.data(), stride);
+}
+
+void printHelperText()
+{
+    std::cout << "use rndr = vistool_ai_py.RendererHandler() to modify rendering settings \n"
+    		<< "  see RendererHandler.h for available calls\n"
+    		<< "call vistool_ai_py.run_frog(path_to_AIExample, rndr) to run the frog example\n"
+    		<< "  window is interactive, an output.png will record first frame upon launch \n"
+    		<< " S: surfacae mode \n"
+    		<< " V: volume mode \n"
+    		<< " M: toggle menu \n"
+    		<< " I: save current view\n";
+}
+
+
+
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_S && action == GLFW_PRESS)
@@ -307,6 +318,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	zoomIn(0.1f);
     if (key == GLFW_KEY_O && action == GLFW_PRESS)
 	zoomOut(0.1f);
+    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	saveImage();
 }
 
 static void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -343,7 +356,6 @@ void  scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	//reorientCamera(0.0f, 0.0f, r);
 }
 
-
 void generate_colormap(std::vector<float> &tfnc_rgba, std::vector<glm::vec4> &col_pts, int isovalue, int range, int colormap_length){
   
   tfnc_rgba.clear();
@@ -371,7 +383,7 @@ void generate_colormap(std::vector<float> &tfnc_rgba, std::vector<glm::vec4> &co
 
 
 
-int run_app(const std::string root_dir_path, const RendererHandler& c)
+int run_frog(const std::string root_dir_path, const RendererHandler& h)
 {
 	// Initialise GLFW
 	if( !glfwInit() )
@@ -434,12 +446,16 @@ int run_app(const std::string root_dir_path, const RendererHandler& c)
 	uint32_t item_selected_index = 5-1;
 
 	int dim[3] = {500, 470, 136};
-	int isovalue = preset_isovals[item_selected_index];
+	//int isovalue = preset_isovals[item_selected_index];
+	int isovalue = h.isovalue;
 	int prev_isovalue = isovalue;
-	int vol_range = 256;
+	//int vol_range = 256;
+	int vol_range = h.isovalueVolRange;
 	int prev_vol_range = vol_range;
 	std::vector<char> inputData(dim[0]*dim[1]*dim[2]);
 	std::vector<float> tfnc_rgba;
+	render_mode = h.mode;
+	isVolumeViewPicked = render_mode == SURFACE? false : true;
 	
 
 	// Read data
@@ -561,7 +577,7 @@ int run_app(const std::string root_dir_path, const RendererHandler& c)
 	//cameraPos = glm::vec3(1.0f, 1.0f, -2.0f);  
 	//cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 	//up = glm::vec3(0.0f, 1.0f, 0.0f);
-	reorientCamera(c.rotX, c.rotY, c.scale);
+	reorientCamera(h.rotX, h.rotY, h.scale);
 
 	glm::vec3 cameraDirection = glm::normalize(cameraTarget - cameraPos);
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
@@ -588,21 +604,18 @@ int run_app(const std::string root_dir_path, const RendererHandler& c)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	//bool show_demo_window = true;
-
 	GLenum err = glGetError();
 	if(err != GL_NO_ERROR) // error
 	  std::cout <<"err\n";
 
-       
-
+        int waitTilSave = 1; // wait 1 frame, somehow the first frame doesn't show full 3D tex 
 	do{
 		// Clear the screen
 		glEnable(GL_DEPTH_TEST);
 		
 		// Enable blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		glClear( GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT );
 
@@ -762,6 +775,9 @@ int run_app(const std::string root_dir_path, const RendererHandler& c)
 		glfwPollEvents();
 		// Swap buffers
 		glfwSwapBuffers(window);
+		
+		if (waitTilSave == 0){ saveImage(); waitTilSave = -1;}
+		else if (waitTilSave > 0) waitTilSave --;
 
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
@@ -803,8 +819,14 @@ PYBIND11_MODULE(vistool_ai_py, m) {
         .def("rotateLeft", &RendererHandler::rotateLeft)
         .def("rotateRight", &RendererHandler::rotateRight)
 	.def("rotateUp", &RendererHandler::rotateUp)
-        .def("rotateDown", &RendererHandler::rotateDown);
+	.def("rotateDown", &RendererHandler::rotateDown)
+        .def("zoom", &RendererHandler::zoom) 
+        .def("setRenderMode", &RendererHandler::setRenderMode)
+        .def("setIsoValue", &RendererHandler::setIsoValue)
+        .def("setIsoValueVolumeRange", &RendererHandler::setIsoValueVolumeRange)
+        ;
     
     m.def("echo", &echo, "echo test func");
-    m.def("run_app", &run_app, "run rendering");
+    m.def("run_frog", &run_frog, "run rendering");
+    m.def("frog_helper", &printHelperText, "prt helper");
 }
