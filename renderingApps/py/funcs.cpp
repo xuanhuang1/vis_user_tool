@@ -1,6 +1,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include "../../ext/pybind11_json/pybind11_json.hpp"
 #include <iostream>
 
 namespace py = pybind11;
@@ -122,6 +123,34 @@ ospray::cpp::TransferFunction makeTransferFunction(const vec2f &valueRange, tfnw
     //    widget.update_colormap();
 
     return transferFunction;
+}
+
+
+ospray::cpp::TransferFunction loadTransferFunction(AniObjWidget &widget, tfnw::TransferFunctionWidget& tfWidget)
+{
+    ospray::cpp::TransferFunction transferFunction("piecewiseLinear");
+    
+    std::vector<float> colors;
+    std::vector<vec3f> colors3f;
+    std::vector<float> opacities;
+    const vec2f valueRange(widget.tfRange[0], widget.tfRange[1]);
+    widget.getFrameTF(colors, opacities);
+
+    for (uint32_t i=0; i<colors.size()/3; i++){
+    	colors3f.emplace_back(colors[i*3], colors[i*3+1], colors[i*3+2]);
+    }
+    
+    tfWidget.set_osp_colormapf(colors, opacities);
+    std::cout << "load tf col sz="<< tfWidget.osp_colors.size()<<" "
+	      <<tfWidget.alpha_control_pts.size() <<" \n";
+    
+    transferFunction.setParam("color", ospray::cpp::CopiedData(colors3f));
+    transferFunction.setParam("opacity", ospray::cpp::CopiedData(opacities));
+    transferFunction.setParam("valueRange", valueRange);
+    transferFunction.commit();
+
+    return transferFunction;
+    
 }
 
 void init (void* fb, GLFWOSPWindow &glfwOspWindow){
@@ -369,10 +398,244 @@ int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y
 
 
 
+void loadWidget(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, std::vector<float> &voxels, float &max, float &min)
+{
+    std::fstream file;
+    file.open(widget->file_name, std::fstream::in | std::fstream::binary);
+    std::cout <<"dim "<<widget->dims[0]<<" "<<widget->dims[1]<<" "<<widget->dims[2]<<"\nLoad "<< voxels.size()<< " :";
+
+    // load value field
+    for (size_t z=0; z<widget->dims[2]; z++){
+	long long offset = z * widget->dims[0] * widget->dims[1];
+	for (size_t y=0; y<widget->dims[1]; y++){
+	    for (size_t x =0 ; x < widget->dims[0]; x++){
+		float buff;
+		file.read((char*)(&buff), sizeof(buff));
+		voxels[offset + y*widget->dims[0] + x] = float(buff);
+		if (float(buff) > max) max = float(buff);
+		if (float(buff) < min) min = float(buff);
+	    }
+	}
+	for (int k=0; k<10; k++)
+	    if (z == (widget->dims[2]/10)*k)
+		std::cout <<z*widget->dims[0] * widget->dims[1]<<" "<< k<<"0% \n";    
+    }
+    std::cout <<"End load \n";
+    file.close();
+    glfwOspWindow.voxel_data = &voxels;
+    std::cout <<"range: "<< max <<" "<<min<<"\n";
+
+    // load tf
+    glfwOspWindow.tfn = loadTransferFunction(*widget, glfwOspWindow.tfn_widget);
+
+    // load camera
+    auto c = widget->cameras[0];
+    vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+    vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+    vec3f up(c.up[0], c.up[1], c.up[2]);
+    ospray::cpp::Camera* camera = &glfwOspWindow.camera;
+    camera->setParam("aspect", glfwOspWindow.imgSize.x / (float)glfwOspWindow.imgSize.y);
+    camera->setParam("position", pos);
+    camera->setParam("direction", dir);
+    camera->setParam("up", up);
+    camera->commit(); // commit each object to indicate modifications are done	
+}
+
+
+void renderKeyFrame(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, int kf_idx)
+{
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+    // render
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_2D);      
+    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+    glfwOspWindow.display();
+    glfwOspWindow.renderNewFrame();
+    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+    glDisable(GL_TEXTURE_2D);
+    // Swap buffers
+    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+    glfwSwapBuffers(glfwOspWindow.glfwWindow);
+
+    // save file
+    std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
+    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+    outname = "img_"+outname+"_kf"+std::to_string(kf_idx)+".png";
+    glfwOspWindow.saveFrame(outname);
+
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+    std::cout <<"write: "<< outname <<" "<< time_span.count() <<"sec \n\n";
+}
+
+void renderAllFrames(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, int kf_idx)
+{
+    std::cout <<"\nrender frame "
+	      << widget->frameRange[0] <<" - "
+	      << widget->frameRange[1] <<" sec \n";
+    
+    for (int f = widget->frameRange[0]; f <= widget->frameRange[1]; f++){
+	auto t1 = std::chrono::high_resolution_clock::now();
+
+	// render
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_TEXTURE_2D);      
+	glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+	glfwOspWindow.display();
+	glfwOspWindow.renderNewFrame();	    
+	glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+	glDisable(GL_TEXTURE_2D);
+	// Swap buffers
+	glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+	glfwSwapBuffers(glfwOspWindow.glfwWindow);
+
+	std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
+	std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+	outname = "img_"+outname+"_f"+std::to_string(f)+".png";
+	glfwOspWindow.saveFrame(outname);
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+	std::cout <<"write: f"<< f  <<" "<< time_span.count() <<"sec \n";
+
+	if (f < widget->frameRange[1]){
+	    // advance frame 
+	    widget->advanceFrame();
+	    auto c = Camera();
+	    widget->getFrameCam(c);
+	    vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+	    vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+	    vec3f up(c.up[0], c.up[1], c.up[2]);
+	    glfwOspWindow.camera.setParam("position", pos);
+	    glfwOspWindow.camera.setParam("direction", dir);
+	    glfwOspWindow.camera.setParam("up", up);
+	    glfwOspWindow.camera.commit();
+	}
+    }
+    
+    std::cout <<"\n";
+}
+
+
+
+int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_sel) 
+{
+    // use scoped lifetimes of wrappers to release everything before ospShutdown()
+    {
+    
+	// initialize GLFW
+	if (!glfwInit()) {
+	    throw std::runtime_error("Failed to initialize GLFW!");
+	}
+
+	glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
+
+	GLFWOSPWindow glfwOspWindow;
+
+	// create GLFW window
+	glfwOspWindow.glfwWindow = glfwCreateWindow(glfwOspWindow.windowSize.x, glfwOspWindow.windowSize.y, "Viewer", nullptr, nullptr);
+
+	if (!glfwOspWindow.glfwWindow) {
+	    glfwTerminate();
+	    throw std::runtime_error("Failed to create GLFW window!");
+	}
+
+	// load json
+	std::cout << "\n\nStart json loading ... \n";
+      
+	AniObjWidget *widget;
+	AniObjHandler h(jsonStr.c_str());
+	if (header_sel < 0)
+	    widget = &h.widgets[0];
+	else widget = &h.widgets[header_sel];
+        
+    	std::cout << "\nEnd json loading ... \n\n";
+
+	if (overwrite_inputf != ""){
+	    widget->file_name = overwrite_inputf;
+	}
+
+	vec3i volumeDimensions(widget->dims[0], widget->dims[1], widget->dims[2]);
+	float min=std::numeric_limits<float>::infinity(), max=0;
+	std::vector<float> voxels(volumeDimensions.long_product());
+	
+	// load new value field, camera and tf from the key frame script
+        loadWidget(glfwOspWindow, widget, voxels, max, min);
+        
+	// construct one time objects
+        // init volume mesh
+	ospray::cpp::Group group;
+	if (widget->type_name == "structured"){
+	    glfwOspWindow.initVolume(volumeDimensions, glfwOspWindow.world_size_x);
+	}else if (widget->type_name == "unstructured"){
+	    glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
+	}else if (widget->type_name == "structuredSpherical"){
+	    glfwOspWindow.initVolumeSphere(volumeDimensions);
+	    group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
+	}
+	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
+	group.commit();
+
+	glfwOspWindow.initClippingPlanes();
+	std::cout << "volume loaded\n";
+
+	// ospray objects init
+   	glfwOspWindow.instance = ospray::cpp::Instance(group);
+    	glfwOspWindow.instance.commit();
+	ospray::cpp::World world;
+	glfwOspWindow.world.setParam("instance", ospray::cpp::CopiedData(glfwOspWindow.instance));
+	ospray::cpp::Light light("ambient");
+	light.commit();
+	glfwOspWindow.world.setParam("light", ospray::cpp::CopiedData(light));
+    	glfwOspWindow.world.commit();
+	ospray::cpp::Renderer *renderer = &glfwOspWindow.renderer;;
+	renderer->setParam("aoSamples", 1);
+	renderer->setParam("backgroundColor", 0.0f); // black, transparent
+	renderer->commit();
+	    
+	std::cout << "All osp objects committed\n";
+
+	glfwOspWindow.preRenderInit();
+
+	if (header_sel >= 0){
+	    renderKeyFrame(glfwOspWindow, widget, header_sel);
+	}else{
+	    for (int kf_idx=0; kf_idx<h.widgets.size(); kf_idx++){
+		widget = &h.widgets[kf_idx];
+		loadWidget(glfwOspWindow, widget, voxels, max, min);
+		if      (header_sel == -1) renderKeyFrame(glfwOspWindow, widget, kf_idx);
+		else if (header_sel == -2) renderAllFrames(glfwOspWindow, widget, kf_idx);
+	    }
+        }
+	
+	ImGui_ImplGlfwGL3_Shutdown();
+	glfwTerminate();
+	
+    }
+    ospShutdown();
+
+    return 0;
+}
+
+
+nlohmann::json generateScript(){
+    nlohmann::json j = {{"value", 1}};
+
+    std::cout << "This function returns an nlohmann::json instance: "  << j << std::endl;
+
+    return j;
+}
+
+
+
 PYBIND11_MODULE(vistool_py, m) {
     // Optional docstring
     m.doc() = "the renderer's py library";
         
     m.def("init_app", &init_app, "init render app");
     m.def("run_app", &run_app, "run render app");
+    m.def("run_offline_app", &run_offline, "run render app");
+
+    m.def("generateScript", &generateScript, "generate preset script");
 }

@@ -4,3 +4,5 @@ build
 *.jpg
 *.png
 *.zip
+__pycache__
+imgui.ini

@@ -1,10 +1,10 @@
 {
     "isheader" : true,
     "data_list" : [
-    	{"name" : "/home/xuanhuang/Desktop/ocean_data/salinity/ocean_90_777_665_t0_float32.raw",
+    	{"name" : "/home/xuanhuang/Desktop/ocean_data/salinity/ocean_90_777_665_t48_float32.raw",
     	 "dims" : [665, 777, 90]
     	},
-    	{"name" : "/home/xuanhuang/Desktop/ocean_data/salinity/ocean_90_777_665_t432_float32.raw",
+    	{"name" : "/home/xuanhuang/Desktop/ocean_data/salinity/ocean_90_777_665_t48_float32.raw",
     	 "dims" : [665, 777, 90]
     	}
     ],

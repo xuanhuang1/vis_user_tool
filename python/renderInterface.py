@@ -41,10 +41,15 @@ class AnimationHandler:
         print("set data dims [0, {}] [0, {}] [0, {}] t=[0, {}]".format(x_max, y_max, z_max, t_max))
 
     # get data from source
+    # TODO local data src
     def readData(self, t=0,x_range=[0,0],y_range=[0,0],z_range=[0,0],q=-6):
         if (self.srcType == "visus"): # use visus to read
             return self.dataSrc.read(time=t,x=x_range,y=y_range,z=z_range,quality=q)
-            
+
+    # generate scripts by templates
+    def generateScript(self, template="fixedCam"):
+        return vistool_py.generateScript();
+        
     # launch rendering
     def renderTask(self, x_range=[0,0], y_range=[0,0], z_range=[0,0], q=-6, t_list=[0], mode=0):
         dims = [100, 100, 100]
@@ -82,4 +87,11 @@ class AnimationHandler:
         vistool_py.init_app(sys.argv)
         vistool_py.run_app(total_data, t_names, dims[2], dims[1], dims[0], counter, mode)
         #return dims
+
+
+    # launch rendering
+    def renderTaskOffline(self, jsonStr):
+        vistool_py.init_app(sys.argv)
+        vistool_py.run_offline_app(jsonStr, "", -2)
+
     

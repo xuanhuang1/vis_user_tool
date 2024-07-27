@@ -163,6 +163,125 @@ void init (void* fb, GLFWOSPWindow &glfwOspWindow){
 		 fb);
 }
 
+void loadWidget(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, std::vector<float> &voxels, float &max, float &min)
+{
+    std::fstream file;
+    file.open(widget->file_name, std::fstream::in | std::fstream::binary);
+    std::cout <<"dim "<<widget->dims[0]<<" "<<widget->dims[1]<<" "<<widget->dims[2]<<"\nLoad "<< voxels.size()<< " :";
+
+    // load value field
+    for (size_t z=0; z<widget->dims[2]; z++){
+	long long offset = z * widget->dims[0] * widget->dims[1];
+	for (size_t y=0; y<widget->dims[1]; y++){
+	    for (size_t x =0 ; x < widget->dims[0]; x++){
+		float buff;
+		file.read((char*)(&buff), sizeof(buff));
+		voxels[offset + y*widget->dims[0] + x] = float(buff);
+		if (float(buff) > max) max = float(buff);
+		if (float(buff) < min) min = float(buff);
+	    }
+	}
+	for (int k=0; k<10; k++)
+	    if (z == (widget->dims[2]/10)*k)
+		std::cout <<z*widget->dims[0] * widget->dims[1]<<" "<< k<<"0% \n";    
+    }
+    std::cout <<"End load \n";
+    file.close();
+    glfwOspWindow.voxel_data = &voxels;
+    std::cout <<"range: "<< max <<" "<<min<<"\n";
+
+    // load tf
+    glfwOspWindow.tfn = loadTransferFunction(*widget, glfwOspWindow.tfn_widget);
+
+    // load camera
+    auto c = widget->cameras[0];
+    vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+    vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+    vec3f up(c.up[0], c.up[1], c.up[2]);
+    ospray::cpp::Camera* camera = &glfwOspWindow.camera;
+    camera->setParam("aspect", glfwOspWindow.imgSize.x / (float)glfwOspWindow.imgSize.y);
+    camera->setParam("position", pos);
+    camera->setParam("direction", dir);
+    camera->setParam("up", up);
+    camera->commit(); // commit each object to indicate modifications are done	
+}
+
+
+void renderKeyFrame(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, int kf_idx)
+{
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+    // render
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_2D);      
+    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+    glfwOspWindow.display();
+    glfwOspWindow.renderNewFrame();
+    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+    glDisable(GL_TEXTURE_2D);
+    // Swap buffers
+    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+    glfwSwapBuffers(glfwOspWindow.glfwWindow);
+
+    // save file
+    std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
+    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+    outname = "img_"+outname+"_kf"+std::to_string(kf_idx)+".png";
+    glfwOspWindow.saveFrame(outname);
+
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+    std::cout <<"write: "<< outname <<" "<< time_span.count() <<"sec \n\n";
+}
+
+void renderAllFrames(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, int kf_idx)
+{
+    std::cout <<"\nrender frame "
+	      << widget->frameRange[0] <<" - "
+	      << widget->frameRange[1] <<" sec \n";
+    
+    for (int f = widget->frameRange[0]; f <= widget->frameRange[1]; f++){
+	auto t1 = std::chrono::high_resolution_clock::now();
+
+	// render
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_TEXTURE_2D);      
+	glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+	glfwOspWindow.display();
+	glfwOspWindow.renderNewFrame();	    
+	glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+	glDisable(GL_TEXTURE_2D);
+	// Swap buffers
+	glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+	glfwSwapBuffers(glfwOspWindow.glfwWindow);
+
+	std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
+	std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+	outname = "img_"+outname+"_f"+std::to_string(f)+".png";
+	glfwOspWindow.saveFrame(outname);
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+	std::cout <<"write: f"<< f  <<" "<< time_span.count() <<"sec \n";
+
+	if (f < widget->frameRange[1]){
+	    // advance frame 
+	    widget->advanceFrame();
+	    auto c = Camera();
+	    widget->getFrameCam(c);
+	    vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+	    vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+	    vec3f up(c.up[0], c.up[1], c.up[2]);
+	    glfwOspWindow.camera.setParam("position", pos);
+	    glfwOspWindow.camera.setParam("direction", dir);
+	    glfwOspWindow.camera.setParam("up", up);
+	    glfwOspWindow.camera.commit();
+	}
+    }
+    
+    std::cout <<"\n";
+}
+
 int main(int argc, const char **argv)
 {
 
@@ -209,8 +328,8 @@ int main(int argc, const char **argv)
 	std::string overwrite_inputf = "";
 
 	// which kf file to render
-	// -2 = input is single kf, -1 = render all kfs, >0 = render selected kf
-	int header_sel = -2; 
+	// -2 = render all frames, -1 = render all kfs, >0 = render selected kf
+	int header_sel = -1; 
 	for (int i = 1; i < argc; ++i) {
 	    if (args[i] == "-h") {
 		std::cout << "./mini_vistool <config.json> [options] \n"
@@ -237,11 +356,8 @@ int main(int argc, const char **argv)
 		}
 	    }
 	}
-	
     
 	// load json
-	//std::vector<Camera> cams = load_cameras(config["camera"].get<std::vector<json>>(), 10);
-	//std::string dataType = config["data"]["type"];
 	std::cout << "\n\nStart json loading ... \n";
       
 	AniObjWidget *widget;
@@ -249,10 +365,7 @@ int main(int argc, const char **argv)
 	if (header_sel < 0)
 	    widget = &h.widgets[0];
 	else widget = &h.widgets[header_sel];
-	
-    	//widget.load_info();
-    	//widget.load_cameras();
-    	//widget.load_tfs();
+        
     	std::cout << "\nEnd json loading ... \n\n";
 
 	if (overwrite_inputf != ""){
@@ -263,45 +376,19 @@ int main(int argc, const char **argv)
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
 	
-	// construct ospray variables
+	// load new value field, camera and tf from the key frame script
+        loadWidget(glfwOspWindow, widget, voxels, max, min);
+        
+	// construct one time objects
+        // init volume mesh
 	ospray::cpp::Group group;
-	{
-	    std::fstream file;
-      	    file.open(widget->file_name, std::fstream::in | std::fstream::binary);
-    	    std::cout <<"dim "<<widget->dims[0]<<" "<<widget->dims[1]<<" "<<widget->dims[2]<<"\nLoad "<< voxels.size()<< " :";
-	    for (size_t z=0; z<volumeDimensions[2]; z++){
-		long long offset = z * volumeDimensions[0] * volumeDimensions[1];
-		for (size_t y=0; y<volumeDimensions[1]; y++){
-		    for (size_t x =0 ; x < volumeDimensions[0]; x++){
-			float buff;
-			file.read((char*)(&buff), sizeof(buff));
-			voxels[offset + y*volumeDimensions[0] + x] = float(buff);
-			if (float(buff) > max) max = float(buff);
-			if (float(buff) < min) min = float(buff);
-		    }
-		}
-		for (int k=0; k<10; k++)
-		    if (z == (volumeDimensions[2]/10)*k)
-			std::cout <<z*volumeDimensions[0] * volumeDimensions[1]<<" "<< k<<"0% \n";    
-	    }
-	    std::cout <<"End load \n";
-	    file.close();
-	    glfwOspWindow.voxel_data = &voxels;
-	    std::cout <<"range: "<< max <<" "<<min<<"\n";
-	}
-    		
-	//glfwOspWindow.tfn = makeTransferFunction(vec2f(-1.f, 1.f), glfwOspWindow. tfn_widget);
-    	glfwOspWindow.tfn = loadTransferFunction(*widget, glfwOspWindow.tfn_widget);
-
-	// construct volume 
-	//glfwOspWindow.initVolume(volumeDimensions, widget);
 	if (widget->type_name == "structured"){
-		glfwOspWindow.initVolume(volumeDimensions, glfwOspWindow.world_size_x);
+	    glfwOspWindow.initVolume(volumeDimensions, glfwOspWindow.world_size_x);
 	}else if (widget->type_name == "unstructured"){
-		glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
+	    glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
 	}else if (widget->type_name == "structuredSpherical"){
-		glfwOspWindow.initVolumeSphere(volumeDimensions);
-		group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
+	    glfwOspWindow.initVolumeSphere(volumeDimensions);
+	    group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
 	}
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
@@ -309,97 +396,35 @@ int main(int argc, const char **argv)
 	glfwOspWindow.initClippingPlanes();
 	std::cout << "volume loaded\n";
 
-	// put the group into an instance (give the group a world transform)
+	// ospray objects init
    	glfwOspWindow.instance = ospray::cpp::Instance(group);
     	glfwOspWindow.instance.commit();
-
-	// put the instance in the world
 	ospray::cpp::World world;
 	glfwOspWindow.world.setParam("instance", ospray::cpp::CopiedData(glfwOspWindow.instance));
-
-	// create and setup light for Ambient Occlusion
 	ospray::cpp::Light light("ambient");
 	light.commit();
-	
 	glfwOspWindow.world.setParam("light", ospray::cpp::CopiedData(light));
     	glfwOspWindow.world.commit();
-    	
-    	// set up arcball camera for ospray
-    	glfwOspWindow.arcballCamera.reset(new ArcballCamera(glfwOspWindow.world.getBounds<box3f>(), glfwOspWindow.windowSize));
-    	glfwOspWindow.arcballCamera->updateWindowSize(glfwOspWindow.windowSize);
-    	std::cout << glfwOspWindow.arcballCamera->eyePos() <<"\n";
-    	std::cout << glfwOspWindow.arcballCamera->lookDir() <<"\n";
-    	std::cout << glfwOspWindow.arcballCamera->upDir() <<"\n";
-    	
-    	auto c = widget->cameras[0];
-    	vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
-    	vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
-    	vec3f up(c.up[0], c.up[1], c.up[2]);
-	
-	// create renderer, choose Scientific Visualization renderer
 	ospray::cpp::Renderer *renderer = &glfwOspWindow.renderer;;
-
-	// complete setup of renderer
 	renderer->setParam("aoSamples", 1);
-	renderer->setParam("backgroundColor", 0.0f); // white, transparent
+	renderer->setParam("backgroundColor", 0.0f); // black, transparent
 	renderer->commit();
-
-	
-	ospray::cpp::Camera* camera = &glfwOspWindow.camera;
-	    
-	camera->setParam("aspect", glfwOspWindow.imgSize.x / (float)glfwOspWindow.imgSize.y);
-	//camera->setParam("position", glfwOspWindow.arcballCamera->eyePos());
-	//camera->setParam("direction", glfwOspWindow.arcballCamera->lookDir());
-	//camera->setParam("up", glfwOspWindow.arcballCamera->upDir());
-	camera->setParam("position", pos);
-	camera->setParam("direction", dir);
-	camera->setParam("up", up);
-	camera->commit(); // commit each object to indicate modifications are done
-	
 	    
 	std::cout << "All osp objects committed\n";
 
 	glfwOspWindow.preRenderInit();
-	
-	auto t1 = std::chrono::high_resolution_clock::now();
-	auto t2 = std::chrono::high_resolution_clock::now();
-	
-	std::cout << "Begin render loop\n";
-	
-	{
-	    glfwPollEvents();
-    
-	    t1 = std::chrono::high_resolution_clock::now();
-      
-	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	    glEnable(GL_TEXTURE_2D);      
-	    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
-	    glfwOspWindow.display();
-	    // Access and save rendered image
-	    glfwOspWindow.renderNewFrame();
-	    
-	    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
-	    glDisable(GL_TEXTURE_2D);
-      
-	    // Swap buffers
-	    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
-	    glfwSwapBuffers(glfwOspWindow.glfwWindow);
 
-	    std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
-	    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
-	    std::string kf_num = std::to_string(std::max(header_sel, 0));
-	    outname = "img_"+outname+"_kf"+kf_num+".png";
-	    std::cout <<"write: "<< outname << "\n";
-	    glfwOspWindow.saveFrame(outname);
-
-	    t2 = std::chrono::high_resolution_clock::now();
-	    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-	    glfwSetWindowTitle(glfwOspWindow.glfwWindow, (std::string("Render FPS:")+std::to_string(int(1.f / time_span.count()))).c_str());
-	}
-	//    } // Check if the ESC key was pressed or the window was closed
-	//while( glfwGetKey(glfwOspWindow.glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-	//   glfwWindowShouldClose(glfwOspWindow.glfwWindow) == 0 );
-    
+	if (header_sel >= 0){
+	    renderKeyFrame(glfwOspWindow, widget, header_sel);
+	}else{
+	    for (int kf_idx=0; kf_idx<h.widgets.size(); kf_idx++){
+		widget = &h.widgets[kf_idx];
+		loadWidget(glfwOspWindow, widget, voxels, max, min);
+		if      (header_sel == -1) renderKeyFrame(glfwOspWindow, widget, kf_idx);
+		else if (header_sel == -2) renderAllFrames(glfwOspWindow, widget, kf_idx);
+	    }
+        }
+	
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
 	
