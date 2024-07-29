@@ -211,7 +211,7 @@ init_app(const std::vector<std::string>& args)
     return newargs;
 }
 
-int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y, int z, int count, int mode)
+int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y, int z, int count, int mode, std::string path_to_bgmap)
 {
  
 #ifdef _WIN32
@@ -285,8 +285,8 @@ int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y
 	}else if (mode == 1)
 	    glfwOspWindow.initVolumeOceanZMap(glfwOspWindow.volumeDimensions, glfwOspWindow.world_size_x);
 	else if (mode == 2){
-	    glfwOspWindow.initVolumeSphere(glfwOspWindow.volumeDimensions);
-	    group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));	
+	    glfwOspWindow.initVolumeSphere(glfwOspWindow.volumeDimensions, path_to_bgmap);
+	    if (path_to_bgmap!="") group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
 	}
 	
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
@@ -560,8 +560,10 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
 	camera->setParam("position", pos);
 	camera->setParam("direction", dir);
 	camera->setParam("up", up);
-	camera->commit(); // commit each object to indicate modifications are done	
-
+	camera->commit(); // commit each object to indicate modifications are done
+	
+	// load background map	
+	glfwOspWindow.bgImg = h.widgets[0].bgmap_name;
 
 	// construct one time objects
         // init volume mesh
@@ -571,8 +573,8 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
 	}else if (h.widgets[0].type_name == "unstructured"){
 	    glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
 	}else if (h.widgets[0].type_name == "structuredSpherical"){
-	    glfwOspWindow.initVolumeSphere(volumeDimensions);
-	    group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
+	    glfwOspWindow.initVolumeSphere(volumeDimensions, glfwOspWindow.bgImg);
+	    if (glfwOspWindow.bgImg!="") group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
 	}
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));
 	group.commit();
@@ -771,7 +773,8 @@ nlohmann::json fixedCamHelper(std::string meta_file_name,
 			      std::string meshType,
 			      int world_bbx_len,
 			      std::vector<float> &cam,
-			      std::vector<float> &tf_range)
+			      std::vector<float> &tf_range,
+			      std::string bgImg)
 
 {
     nlohmann::ordered_json j;
@@ -802,6 +805,7 @@ nlohmann::json fixedCamHelper(std::string meta_file_name,
 	tmp_j["data"]["dims"] = {dims[0], dims[1], dims[2]};
 	tmp_j["data"]["world_bbox"] = {world_bbx_len, world_bbx_len, world_bbx_len};
 	tmp_j["data"]["frameRange"] = {i*kf_interval, (i+1)*kf_interval};
+	if (bgImg != "") tmp_j["data"]["backgroundMap"] = bgImg;
 
 	// cameras
 	for (size_t j=0; j<2; j++)
@@ -844,7 +848,8 @@ nlohmann::json generateScriptFixedCam(std::string meta_file_name,
 				      std::string meshType,
 				      int world_bbx_len,
 				      py::array_t<float> cam_in,
-				      py::array_t<float> tf_range_in
+				      py::array_t<float> tf_range_in,
+				      std::string bgImg
 				      )
 {
     std::vector<std::string> filenames = input_names.cast<std::vector<std::string>>();
@@ -861,9 +866,10 @@ nlohmann::json generateScriptFixedCam(std::string meta_file_name,
 	std::cout << "key frame interval = " << kf_interval << "\n";
 	std::cout << "mesh type = "          << meshType << "\n";
 	std::cout << "world bbox size = "    << world_bbx_len << "\n";
+	std::cout << "bg img file name = "   << bgImg << "\n";
     }
 
-    return fixedCamHelper(meta_file_name, filenames, kf_interval, dims, meshType, world_bbx_len, cam, tf_range);
+    return fixedCamHelper(meta_file_name, filenames, kf_interval, dims, meshType, world_bbx_len, cam, tf_range, bgImg);
 }
 
 

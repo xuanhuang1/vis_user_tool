@@ -215,7 +215,7 @@ void GLFWOSPWindow::initVolume(vec3i volumeDimensions, float bb_x){
 }
 
 
-void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions){
+void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions, const std::string path_to_bgmap){
     // volume
     ospray::cpp::Volume vol("structuredSpherical");
     //ospray::cpp::Volume vol("structuredRegular");
@@ -236,7 +236,8 @@ void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions){
     model = mdl;
     volume_type = "structuredSpherical";
     
-    initBGMap();
+    if (path_to_bgmap != "")
+    	initBGMap(path_to_bgmap);
 }
 
 
@@ -471,7 +472,8 @@ void GLFWOSPWindow::buildUI(){
         if(fileDialog.HasSelected())
         {
             std::cout << "Selected filename" << fileDialog.GetSelected().string() << std::endl;
-            initBGMap(fileDialog.GetSelected().string());
+            bgImg = fileDialog.GetSelected().string();
+            initBGMap(bgImg);
             ospray::cpp::Group tmp_group;
     	    if (map_on) tmp_group.setParam("geometry", ospray::cpp::SharedData(gmodel));
     	    tmp_group.setParam("volume", ospray::cpp::SharedData(model));
@@ -581,7 +583,7 @@ void GLFWOSPWindow::buildUI(){
         if (ImGui::Button("export")) {
 	    int dims[3] = {volumeDimensions.x, volumeDimensions.y, volumeDimensions.z};
 	    int world_bbox[3] = {world_size_x, world_size_x, world_size_x};
-	    kf_widget.exportKFs("viewer_script", dims, world_bbox, file_names, slider_tf_min, slider_tf_max);
+	    kf_widget.exportKFs("viewer_script", dims, volume_type, world_bbox, file_names, slider_tf_min, slider_tf_max, bgImg);
 	    std::cout << "keyframes exported, data dims: "
 		      << dims[0] <<" "<<dims[1] <<" "<< dims[2]
 		      << " tf ranges" << slider_tf_min <<" "<<slider_tf_max <<"\n";

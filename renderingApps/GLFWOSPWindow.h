@@ -47,6 +47,7 @@ public:
     float* all_data_ptr; // pointer to all data
     int count = 1;
     std::string volume_type="structured";
+    std::string bgImg="";
   
     static GLFWOSPWindow *activeWindow;
     ospray::cpp::FrameBuffer framebuffer;
@@ -96,7 +97,7 @@ public:
     void initVolume(vec3i dim, visuser::AniObjWidget &widget);
     void initVolume(vec3i dim, float bb_x);
     void initVolumeOceanZMap(vec3i volumeDimensions, float bb_x);
-    void initVolumeSphere(vec3i dim);
+    void initVolumeSphere(vec3i dim, const std::string s);
     void initBGMap();
     void initBGMap(const std::string s);
     void initClippingPlanes();

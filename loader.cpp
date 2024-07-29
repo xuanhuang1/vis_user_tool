@@ -78,6 +78,10 @@ void visuser::AniObjWidget::load_info(){
     dims 	= get_vec3i(config["data"]["dims"]);
     frameRange 	= get_vec2i(config["data"]["frameRange"]);
     currentF 	= frameRange[0];
+    
+    if (config["data"].contains("backgroundMap")) {
+    	bgmap_name = config["data"]["backgroundMap"];
+    }else bgmap_name = "";
 	
     std::cout << "end load info\n";
 }

@@ -42,8 +42,8 @@ quality=-6
 # scripting
 #
 
-scriptingType = "viewer"
-#scriptingType = "text"
+#scriptingType = "viewer"
+scriptingType = "text"
 #scriptingType = ""
 
 outputName_text = "text_script"
@@ -53,23 +53,27 @@ outputName_viewer = "viewer_script"
 # if the data need to be flipped or transposed 
 flip_axis=2
 transpose=False
+bgImg = ''
 
 #testing_scene="flat"
 testing_scene="sphere"
+
 if(testing_scene=="flat"):
     flip_axis=2
     transpose=False
     render_mode=0
+    bgImg = ''
 elif(testing_scene=="sphere"):
     flip_axis=2
     transpose=True
     render_mode=2
+    bgImg = '/home/xuanhuang/projects/vis_interface/vis_user_tool/renderingApps/mesh/land.png'
     
 # produce scripts from one of
 if (scriptingType == "viewer"):
     # 1. interactive app
     print ("launch interactive viewer")
-    Thread(target = a.renderTask(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, q=quality, mode=render_mode, flip_axis=flip_axis, transpose=transpose)).start()
+    Thread(target = a.renderTask(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, q=quality, mode=render_mode, flip_axis=flip_axis, transpose=transpose, bgImg=bgImg)).start()
 
 elif (scriptingType == "text"):
     # 2. text scripting
@@ -101,7 +105,7 @@ elif (scriptingType == "text"):
         cam = [-30, 0, 0, 1, 0, 0, 0, 0, -1]
 
     # generate script
-    a.generateScript(input_names, kf_interval, dims, meshType, world_bbx_len, cam, tf_range, template=script_template, outfile=outputName_text);
+    a.generateScript(input_names, kf_interval, dims, meshType, world_bbx_len, cam, tf_range, template=script_template, outfile=outputName_text, bgImg=bgImg);
 #
 # download data for offline render
 #

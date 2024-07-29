@@ -307,7 +307,7 @@ namespace keyframe {
     }
 
 
-    void KeyframeWidget::exportKFs(std::string meta_file_name, int dims[3], int world_bbox[3], std::vector<std::string> &data_fnames, float tf_range_x, float tf_range_y){
+    void KeyframeWidget::exportKFs(std::string meta_file_name, int dims[3], std::string meshType, int world_bbox[3], std::vector<std::string> &data_fnames, float tf_range_x, float tf_range_y, std::string bgImg){
 	// create a header file
 	nlohmann::ordered_json j;
 	std::string base_file_name = meta_file_name+"_kf";
@@ -337,11 +337,12 @@ namespace keyframe {
 	    // write json for each keyframe interval
 	    nlohmann::ordered_json tmp_j;
 	    tmp_j["isheader"] = false;
-	    tmp_j["data"]["type"] = "structured";
+	    tmp_j["data"]["type"] = meshType;
 	    tmp_j["data"]["name"] = p_str+data_fnames[kfs[i].data_i];
 	    tmp_j["data"]["dims"] = {dims[0], dims[1], dims[2]};
 	    tmp_j["data"]["world_bbox"] = {world_bbox[0], world_bbox[1], world_bbox[2]};
 	    tmp_j["data"]["frameRange"] = {kfs[i].timeFrame, kfs[i+1].timeFrame};
+	    if (bgImg != "") tmp_j["data"]["backgroundMap"] = bgImg;
 
 	    // cameras
 	    for (size_t j=0; j<2; j++)

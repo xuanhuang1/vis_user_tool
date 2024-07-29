@@ -86,10 +86,12 @@ namespace keyframe {
 	
 	void exportKFs(     std::string filename,
 			    int dim[3],
+			    std::string meshType,
 			    int world_bbox[3],
 			    std::vector<std::string> &data_fnames,
 			    float tf_range_x,
-			    float tf_range_y);
+			    float tf_range_y,
+			    std::string bgImg);
 	
 	void getDataFilterFromKF(float bbox[4],
 				 std::vector<float>

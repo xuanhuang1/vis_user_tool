@@ -284,7 +284,8 @@ int main(int argc, const char **argv)
 	}else if (widget.type_name == "unstructured"){
 		glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
 	}else if (widget.type_name == "structuredSpherical"){
-		glfwOspWindow.initVolumeSphere(volumeDimensions);
+		std::string path_to_bgmap = "/home/xuanhuang/projects/vis_interface/vis_user_tool/renderingApps/mesh/land.png";
+		glfwOspWindow.initVolumeSphere(volumeDimensions, path_to_bgmap);
 		group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
 	}
 	group.setParam("volume", ospray::cpp::CopiedData(glfwOspWindow.model));

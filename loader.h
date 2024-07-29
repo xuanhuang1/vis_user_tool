@@ -37,6 +37,7 @@ namespace visuser{
     	std::string type_name;		// unstructured grid for now
     	glm::vec3 dims;			// x, y, z
 	glm::vec3 world_bbox;
+	std::string bgmap_name;		// path to background map
     	
     	// animation widget settings
     	glm::vec2 frameRange;				// the range of animating this object
