@@ -8,11 +8,11 @@ import vistool_py
 
 # common utility functions
 
-def getFileName(dimsx, dimsy, dimsz, t):
-    return "ocean_{}_{}_{}_t{}_Transpose_float32.raw".format(dimsx, dimsy, dimsz, t)
+def getRawFileName(dimsx, dimsy, dimsz, t):
+    return "ocean_{}_{}_{}_t{}_float32.raw".format(dimsx, dimsy, dimsz, t)
 
-def getFileNameWithPrefix(name, dimsx, dimsy, dimsz, t):
-    return "{}_{}_{}_{}_t{}_Transpose_float32.raw".format(name, dimsx, dimsy, dimsz, t)
+def getRawFileNameWithPrefix(name, dimsx, dimsy, dimsz, t):
+    return "{}_{}_{}_{}_t{}_float32.raw".format(name, dimsx, dimsy, dimsz, t)    
 
 def saveFile(raw_fpath, data):
     start_time = time.monotonic()
@@ -25,13 +25,14 @@ def saveFile(raw_fpath, data):
 # animation handler
 
 class AnimationHandler:
-    def __init__(self, path, pathType="visus"):
-        self.srcType = pathType
-        if (self.srcType == "visus"): # use visus to load
-            self.dataSrc = LoadDataset(path)
-            print(self.dataSrc.getDatasetBody().toString())
-        elif (pathType == "local"): # set local file path
-            self.dataSrc = path
+    def __init__(self, path="", pathType="visus"):
+        if (path != ""):
+            self.srcType = pathType
+            if (self.srcType == "visus"): # use visus to load
+                self.dataSrc = LoadDataset(path)
+                #print(self.dataSrc.getDatasetBody().toString())
+            elif (pathType == "local"): # set local file path
+                self.dataSrc = path
 
     def setDataDim(self, x_max=0, y_max=0, z_max=0, t_max=0):
         self.x_max = x_max
@@ -42,16 +43,60 @@ class AnimationHandler:
 
     # get data from source
     # TODO local data src
-    def readData(self, t=0,x_range=[0,0],y_range=[0,0],z_range=[0,0],q=-6):
+    def readData(self, t=0,x_range=[0,0],y_range=[0,0],z_range=[0,0],q=-6, flip_axis=2, transpose=False):
         if (self.srcType == "visus"): # use visus to read
-            return self.dataSrc.read(time=t,x=x_range,y=y_range,z=z_range,quality=q)
+            d = self.dataSrc.read(time=t,x=x_range,y=y_range,z=z_range,quality=q)
+            if (flip_axis >= 0): # flip data on demand
+                d = np.flip(d, flip_axis)
+            if (transpose): # transpose data on demend
+                d = np.transpose(d, (2, 1, 0))
+            return d
 
+    # get file names to save or script
+    def getRawFileNames(self, dimsx, dimsy, dimsz, t_list):
+        t_names = []
+        counter = 0;
+        for t in t_list:
+            print(t)    
+            # concat all timesteps
+            t_names.append(getRawFileName(dimsx, dimsy, dimsz, t))
+            counter += 1
+        return t_names
+
+    def saveRawFilesByVisusRead(self, x_range=[0,0], y_range=[0,0], z_range=[0,0], q=-6, t_list=[0], flip_axis=2, transpose=False):
+        dims = [100, 100, 100]
+        counter = 0;
+        for t in t_list:
+            print(t)
+            start_time = time.monotonic()
+            data = self.readData(t=t, x_range=x_range, y_range=y_range, z_range=z_range, q=q, flip_axis=flip_axis, transpose=transpose)
+            end_time = time.monotonic()
+            print('Read Duration: {}'.format(timedelta(seconds=end_time - start_time)))
+    
+            # concate all timesteps
+            dims = data.shape
+            counter += 1
+
+            # save 
+            saveFile(getRawFileName(data.shape[2], data.shape[1], data.shape[0], t), data)    
+        print("count ", counter)
+        
     # generate scripts by templates
-    def generateScript(self, template="fixedCam"):
-        return vistool_py.generateScript();
+    def generateScript(self, input_names, kf_interval, dims, meshType, world_bbx_len, cam, tf_range, template="fixedCam", outfile="script"):
+        if (template == "fixedCam"):
+            print("generating fixed camera script to: ", outfile, "\n")
+            # convert to strict data types
+            dims = np.array(dims)
+            cam = np.float32(cam)
+            tf_range = np.float32(tf_range)
+            vistool_py.generateScriptFixedCam(outfile, input_names, kf_interval, dims, meshType, world_bbx_len, cam, tf_range);
+
+    # read scripts by file path
+    def readScript(self, p):
+        return vistool_py.readScript(p);
         
     # launch rendering
-    def renderTask(self, x_range=[0,0], y_range=[0,0], z_range=[0,0], q=-6, t_list=[0], mode=0):
+    def renderTask(self, x_range=[0,0], y_range=[0,0], z_range=[0,0], q=-6, t_list=[0], flip_axis=2, transpose=False, mode=0):
         dims = [100, 100, 100]
         total_data = []
         t_names = []
@@ -59,25 +104,19 @@ class AnimationHandler:
         for t in t_list:
             print(t)
             start_time = time.monotonic()
-            #data=db.read(time=t,x=x_range,y=y_range,z=[0,90],quality=q) # compressed, quality=0 is full res
-            data = self.readData(t=t, x_range=x_range, y_range=y_range, z_range=z_range, q=q)
+            data = self.readData(t=t, x_range=x_range, y_range=y_range, z_range=z_range, q=q, flip_axis=flip_axis, transpose=transpose)
             end_time = time.monotonic()
             print('Read Duration: {}'.format(timedelta(seconds=end_time - start_time)))
-
-            # prepare raw data for rendering
-            data = np.flip(data, 2)
-            if (mode == 2): # special treatment for spherical rendering
-                data = np.transpose(data, (2, 1, 0))
-            
+    
             # concate all timesteps
             dims = data.shape
             total_data = np.concatenate((total_data, data.ravel()), axis=None)
-            t_names.append(getFileName(*data.shape, t))
+            t_names.append(getRawFileName(data.shape[2], data.shape[1], data.shape[0], t))
             counter += 1
 
             # save a copy of the data if needed
             if (0):
-                saveFile(getFileName(*data.shape, t))
+                saveFile(getRawFileName(data.shape[2], data.shape[1], data.shape[0], t))
     
         print(dims)
         print("count ", counter)

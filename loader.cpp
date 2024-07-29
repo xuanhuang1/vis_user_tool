@@ -126,7 +126,13 @@ void visuser::AniObjWidget::advanceFrame(){
 }
 
 
+// object handler
+
 visuser::AniObjHandler::AniObjHandler(const char* filename){
+    init(filename);
+}
+
+void visuser::AniObjHandler::init(const char* filename){
     jsonFromFile(filename, header_config);
     is_header = header_config["isheader"];
     
@@ -161,6 +167,7 @@ visuser::AniObjHandler::AniObjHandler(const char* filename){
     	}
     }
 }
+
 
 void visuser::writeSampleJsonFile(std::string meta_file_name){
     std::vector<uint32_t> data_i_list_kf = {0, 0, 1};

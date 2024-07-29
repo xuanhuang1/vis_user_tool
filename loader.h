@@ -78,6 +78,8 @@ namespace visuser{
     	// init
     	AniObjHandler(){};
     	AniObjHandler(const char* filename);
+
+	void init(const char* filename);
     };
 }
 

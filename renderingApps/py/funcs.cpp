@@ -10,6 +10,13 @@ void echo(int i) {
     std::cout << i <<std::endl;
 }
 
+template<class T>
+std::vector<T>makeVectorFromPyArray( py::array_t<T>py_array )
+{
+    return std::vector<T>(py_array.data(), py_array.data() + py_array.size());
+}
+
+
 // Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -48,7 +55,6 @@ void echo(int i) {
 
 using json = nlohmann::json;
 using namespace visuser;
-
 
 enum DATATYPE{TRI_MESH, VOL, TOTAL_DATA_TYPES};
 std::string dataTypeString[] = {"triangle_mesh", "volume"};
@@ -398,38 +404,41 @@ int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y
 
 
 
-void loadWidget(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, std::vector<float> &voxels, float &max, float &min)
+void loadWidget(GLFWOSPWindow &glfwOspWindow, AniObjWidget &widget, std::vector<float> &voxels, float &max, float &min)
 {
+    vec3i volumeDimensions(widget.dims[0], widget.dims[1], widget.dims[2]);
+    min=std::numeric_limits<float>::infinity();
+    max=0;
+	
     std::fstream file;
-    file.open(widget->file_name, std::fstream::in | std::fstream::binary);
-    std::cout <<"dim "<<widget->dims[0]<<" "<<widget->dims[1]<<" "<<widget->dims[2]<<"\nLoad "<< voxels.size()<< " :";
-
-    // load value field
-    for (size_t z=0; z<widget->dims[2]; z++){
-	long long offset = z * widget->dims[0] * widget->dims[1];
-	for (size_t y=0; y<widget->dims[1]; y++){
-	    for (size_t x =0 ; x < widget->dims[0]; x++){
+    file.open(widget.file_name, std::fstream::in | std::fstream::binary);
+    std::cout <<"dim "<<widget.dims[0]<<" "<<widget.dims[1]<<" "<<widget.dims[2]<<"\nLoad "<< voxels.size()<< " :";
+    for (size_t z=0; z<volumeDimensions[2]; z++){
+	long long offset = z * volumeDimensions[0] * volumeDimensions[1];
+	for (size_t y=0; y<volumeDimensions[1]; y++){
+	    for (size_t x =0 ; x < volumeDimensions[0]; x++){
 		float buff;
 		file.read((char*)(&buff), sizeof(buff));
-		voxels[offset + y*widget->dims[0] + x] = float(buff);
+		voxels[offset + y*volumeDimensions[0] + x] = float(buff);
 		if (float(buff) > max) max = float(buff);
 		if (float(buff) < min) min = float(buff);
 	    }
 	}
 	for (int k=0; k<10; k++)
-	    if (z == (widget->dims[2]/10)*k)
-		std::cout <<z*widget->dims[0] * widget->dims[1]<<" "<< k<<"0% \n";    
+	    if (z == (volumeDimensions[2]/10)*k)
+		std::cout <<z*volumeDimensions[0] * volumeDimensions[1]<<" "<< k<<"0% \n";    
     }
     std::cout <<"End load \n";
     file.close();
     glfwOspWindow.voxel_data = &voxels;
+    glfwOspWindow.tf_range[0] = min;
+    glfwOspWindow.tf_range[1] = max;
     std::cout <<"range: "<< max <<" "<<min<<"\n";
-
-    // load tf
-    glfwOspWindow.tfn = loadTransferFunction(*widget, glfwOspWindow.tfn_widget);
-
+    glfwOspWindow.tfn = loadTransferFunction(widget, glfwOspWindow.tfn_widget);
+    glfwOspWindow.volumeDimensions = volumeDimensions;
+	
     // load camera
-    auto c = widget->cameras[0];
+    auto c = widget.cameras[0];
     vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
     vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
     vec3f up(c.up[0], c.up[1], c.up[2]);
@@ -441,82 +450,40 @@ void loadWidget(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, std::vector<
     camera->commit(); // commit each object to indicate modifications are done	
 }
 
-
-void renderKeyFrame(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, int kf_idx)
-{
-    auto t1 = std::chrono::high_resolution_clock::now();
-
-    // render
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_TEXTURE_2D);      
-    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
-    glfwOspWindow.display();
-    glfwOspWindow.renderNewFrame();
-    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
-    glDisable(GL_TEXTURE_2D);
-    // Swap buffers
-    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
-    glfwSwapBuffers(glfwOspWindow.glfwWindow);
-
-    // save file
-    std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
-    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
-    outname = "img_"+outname+"_kf"+std::to_string(kf_idx)+".png";
-    glfwOspWindow.saveFrame(outname);
-
-    auto t2 = std::chrono::high_resolution_clock::now();
-    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-    std::cout <<"write: "<< outname <<" "<< time_span.count() <<"sec \n\n";
-}
-
-void renderAllFrames(GLFWOSPWindow &glfwOspWindow, AniObjWidget *widget, int kf_idx)
-{
-    std::cout <<"\nrender frame "
-	      << widget->frameRange[0] <<" - "
-	      << widget->frameRange[1] <<" sec \n";
+void renderLoop(GLFWOSPWindow &glfwOspWindow){
+    std::cout << "Begin render loop\n";
+    do{
+	glfwPollEvents();
     
-    for (int f = widget->frameRange[0]; f <= widget->frameRange[1]; f++){
 	auto t1 = std::chrono::high_resolution_clock::now();
-
-	// render
+      
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);      
 	glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
 	glfwOspWindow.display();
-	glfwOspWindow.renderNewFrame();	    
 	glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
 	glDisable(GL_TEXTURE_2D);
+      
+	// Start the Dear ImGui frame
+	ImGui_ImplGlfwGL3_NewFrame();
+	glfwOspWindow.buildUI();
+	ImGui::Render();
+	ImGui_ImplGlfwGL3_Render();
+      
 	// Swap buffers
 	glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
 	glfwSwapBuffers(glfwOspWindow.glfwWindow);
-
-	std::string base_filename = widget->file_name.substr(widget->file_name.find_last_of("/\\") + 1);
-	std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
-	outname = "img_"+outname+"_f"+std::to_string(f)+".png";
-	glfwOspWindow.saveFrame(outname);
+      
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-	std::cout <<"write: f"<< f  <<" "<< time_span.count() <<"sec \n";
+	glfwSetWindowTitle(glfwOspWindow.glfwWindow, (std::string("Render FPS:")+std::to_string(int(1.f / time_span.count()))).c_str());
 
-	if (f < widget->frameRange[1]){
-	    // advance frame 
-	    widget->advanceFrame();
-	    auto c = Camera();
-	    widget->getFrameCam(c);
-	    vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
-	    vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
-	    vec3f up(c.up[0], c.up[1], c.up[2]);
-	    glfwOspWindow.camera.setParam("position", pos);
-	    glfwOspWindow.camera.setParam("direction", dir);
-	    glfwOspWindow.camera.setParam("up", up);
-	    glfwOspWindow.camera.commit();
-	}
-    }
+    } // Check if the ESC key was pressed or the window was closed
+    while( glfwGetKey(glfwOspWindow.glfwWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+	   glfwWindowShouldClose(glfwOspWindow.glfwWindow) == 0 );
     
-    std::cout <<"\n";
 }
-
 
 
 int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_sel) 
@@ -544,33 +511,66 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
 	// load json
 	std::cout << "\n\nStart json loading ... \n";
       
-	AniObjWidget *widget;
 	AniObjHandler h(jsonStr.c_str());
-	if (header_sel < 0)
-	    widget = &h.widgets[0];
-	else widget = &h.widgets[header_sel];
-        
-    	std::cout << "\nEnd json loading ... \n\n";
 
 	if (overwrite_inputf != ""){
-	    widget->file_name = overwrite_inputf;
+	    h.widgets[0].file_name = overwrite_inputf;
 	}
 
-	vec3i volumeDimensions(widget->dims[0], widget->dims[1], widget->dims[2]);
+    	std::cout << "\nEnd json loading ... \n\n";
+	
+	vec3i volumeDimensions(h.widgets[0].dims[0], h.widgets[0].dims[1], h.widgets[0].dims[2]);
 	float min=std::numeric_limits<float>::infinity(), max=0;
 	std::vector<float> voxels(volumeDimensions.long_product());
+
+	std::fstream file;
+	file.open(h.widgets[0].file_name, std::fstream::in | std::fstream::binary);
+	std::cout <<"dim "<<h.widgets[0].dims[0]<<" "<<h.widgets[0].dims[1]<<" "<<h.widgets[0].dims[2]<<"\nLoad "<< voxels.size()<< " :";
+	for (size_t z=0; z<volumeDimensions[2]; z++){
+	    long long offset = z * volumeDimensions[0] * volumeDimensions[1];
+	    for (size_t y=0; y<volumeDimensions[1]; y++){
+		for (size_t x =0 ; x < volumeDimensions[0]; x++){
+		    float buff;
+		    file.read((char*)(&buff), sizeof(buff));
+		    voxels[offset + y*volumeDimensions[0] + x] = float(buff);
+		    if (float(buff) > max) max = float(buff);
+		    if (float(buff) < min) min = float(buff);
+		}
+	    }
+	    for (int k=0; k<10; k++)
+		if (z == (volumeDimensions[2]/10)*k)
+		    std::cout <<z*volumeDimensions[0] * volumeDimensions[1]<<" "<< k<<"0% \n";    
+	}
+	std::cout <<"End load \n";
+	file.close();
+	glfwOspWindow.voxel_data = &voxels;
+	glfwOspWindow.tf_range[0] = min;
+	glfwOspWindow.tf_range[1] = max;
+	std::cout <<"init range: "<< max <<" "<<min<<"\n";
+	glfwOspWindow.tfn = loadTransferFunction(h.widgets[0], glfwOspWindow.tfn_widget);
+	glfwOspWindow.volumeDimensions = volumeDimensions;
 	
-	// load new value field, camera and tf from the key frame script
-        loadWidget(glfwOspWindow, widget, voxels, max, min);
-        
+	// load camera
+	auto c = h.widgets[0].cameras[0];
+	vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+	vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+	vec3f up(c.up[0], c.up[1], c.up[2]);
+	ospray::cpp::Camera* camera = &glfwOspWindow.camera;
+	camera->setParam("aspect", glfwOspWindow.imgSize.x / (float)glfwOspWindow.imgSize.y);
+	camera->setParam("position", pos);
+	camera->setParam("direction", dir);
+	camera->setParam("up", up);
+	camera->commit(); // commit each object to indicate modifications are done	
+
+
 	// construct one time objects
         // init volume mesh
 	ospray::cpp::Group group;
-	if (widget->type_name == "structured"){
+	if (h.widgets[0].type_name == "structured"){
 	    glfwOspWindow.initVolume(volumeDimensions, glfwOspWindow.world_size_x);
-	}else if (widget->type_name == "unstructured"){
+	}else if (h.widgets[0].type_name == "unstructured"){
 	    glfwOspWindow.initVolumeOceanZMap(volumeDimensions, glfwOspWindow.world_size_x);
-	}else if (widget->type_name == "structuredSpherical"){
+	}else if (h.widgets[0].type_name == "structuredSpherical"){
 	    glfwOspWindow.initVolumeSphere(volumeDimensions);
 	    group.setParam("geometry", ospray::cpp::CopiedData(glfwOspWindow.gmodel));
 	}
@@ -598,16 +598,152 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
 
 	glfwOspWindow.preRenderInit();
 
-	if (header_sel >= 0){
-	    renderKeyFrame(glfwOspWindow, widget, header_sel);
-	}else{
+	if (header_sel >= 0){ // render selected keyframe
+	    glfwPollEvents();
+	    auto t1 = std::chrono::high_resolution_clock::now();
+
+	    // render
+	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	    glEnable(GL_TEXTURE_2D);      
+	    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+	    glfwOspWindow.display();
+	    glfwOspWindow.renderNewFrame();
+	    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+	    glDisable(GL_TEXTURE_2D);
+	    // Swap buffers
+	    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+	    glfwSwapBuffers(glfwOspWindow.glfwWindow);
+
+	    // save file
+	    std::string base_filename = h.widgets[header_sel].file_name.substr(h.widgets[header_sel].file_name.find_last_of("/\\") + 1);
+	    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+	    outname = "img_"+outname+"_kf"+std::to_string(header_sel)+".png";
+	    glfwOspWindow.saveFrame(outname);
+
+	    auto t2 = std::chrono::high_resolution_clock::now();
+	    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+	    std::cout <<"write: "<< outname <<" "<< time_span.count() <<"sec \n\n";
+	}else{ // render all key frames
+
+	    // reload widget for each key frame
 	    for (int kf_idx=0; kf_idx<h.widgets.size(); kf_idx++){
-		widget = &h.widgets[kf_idx];
-		loadWidget(glfwOspWindow, widget, voxels, max, min);
-		if      (header_sel == -1) renderKeyFrame(glfwOspWindow, widget, kf_idx);
-		else if (header_sel == -2) renderAllFrames(glfwOspWindow, widget, kf_idx);
+		min=std::numeric_limits<float>::infinity();
+		max=0;
+	
+		std::fstream file;
+		file.open(h.widgets[kf_idx].file_name, std::fstream::in | std::fstream::binary);
+		for (size_t z=0; z<volumeDimensions[2]; z++){
+		    long long offset = z * volumeDimensions[0] * volumeDimensions[1];
+		    for (size_t y=0; y<volumeDimensions[1]; y++){
+			for (size_t x =0 ; x < volumeDimensions[0]; x++){
+			    float buff;
+			    file.read((char*)(&buff), sizeof(buff));
+			    voxels[offset + y*volumeDimensions[0] + x] = float(buff);
+			    if (float(buff) > max) max = float(buff);
+			    if (float(buff) < min) min = float(buff);
+			}
+		    }
+		    for (int k=0; k<10; k++)
+			if (z == (volumeDimensions[2]/10)*k)
+			    std::cout <<z*volumeDimensions[0] * volumeDimensions[1]<<" "<< k<<"0% \n";    
+		}
+		std::cout <<"End load \n";
+		file.close();
+		glfwOspWindow.voxel_data = &voxels;
+		glfwOspWindow.tf_range[0] = min;
+		glfwOspWindow.tf_range[1] = max;
+		std::cout <<"range: "<< max <<" "<<min<<"\n";
+		glfwOspWindow.tfn = loadTransferFunction(h.widgets[kf_idx], glfwOspWindow.tfn_widget);
+		glfwOspWindow.volumeDimensions = volumeDimensions;
+	
+		// load camera
+		auto c = h.widgets[kf_idx].cameras[0];
+		vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+		vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+		vec3f up(c.up[0], c.up[1], c.up[2]);
+		ospray::cpp::Camera* camera = &glfwOspWindow.camera;
+		camera->setParam("aspect", glfwOspWindow.imgSize.x / (float)glfwOspWindow.imgSize.y);
+		camera->setParam("position", pos);
+		camera->setParam("direction", dir);
+		camera->setParam("up", up);
+		camera->commit(); // commit each object to indicate modifications are done	
+
+		if (header_sel == -1){// render key frames
+		    glfwPollEvents();
+		    auto t1 = std::chrono::high_resolution_clock::now();
+
+		    // render
+		    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		    glEnable(GL_TEXTURE_2D);      
+		    glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+		    glfwOspWindow.display();
+		    glfwOspWindow.renderNewFrame();
+		    glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+		    glDisable(GL_TEXTURE_2D);
+		    // Swap buffers
+		    glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+		    glfwSwapBuffers(glfwOspWindow.glfwWindow);
+
+		    // save file
+		    std::string base_filename = h.widgets[kf_idx].file_name.substr(h.widgets[kf_idx].file_name.find_last_of("/\\") + 1);
+		    std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+		    outname = "img_"+outname+"_kf"+std::to_string(kf_idx)+".png";
+		    glfwOspWindow.saveFrame(outname);
+
+		    auto t2 = std::chrono::high_resolution_clock::now();
+		    auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+		    std::cout <<"write: "<< outname <<" "<< time_span.count() <<"sec \n\n";
+
+		}else if (header_sel == -2){//renderAllFrames
+		    
+		    std::cout <<"\nrender frame "
+			      << h.widgets[kf_idx].frameRange[0] <<" - "
+			      << h.widgets[kf_idx].frameRange[1] <<" sec \n";
+    
+		    for (int f = h.widgets[kf_idx].frameRange[0]; f <= h.widgets[kf_idx].frameRange[1]; f++){
+			auto t1 = std::chrono::high_resolution_clock::now();
+
+			// render
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_TEXTURE_2D);      
+			glEnable(GL_FRAMEBUFFER_SRGB); // Turn on sRGB conversion for OSPRay frame
+			glfwOspWindow.display();
+			glfwOspWindow.renderNewFrame();	    
+			glDisable(GL_FRAMEBUFFER_SRGB); // Disable SRGB conversion for UI
+			glDisable(GL_TEXTURE_2D);
+			// Swap buffers
+			glfwMakeContextCurrent(glfwOspWindow.glfwWindow);
+			glfwSwapBuffers(glfwOspWindow.glfwWindow);
+
+			std::string base_filename = h.widgets[kf_idx].file_name.substr(h.widgets[kf_idx].file_name.find_last_of("/\\") + 1);
+			std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
+			outname = "img_"+outname+"_f"+std::to_string(f)+".png";
+			glfwOspWindow.saveFrame(outname);
+
+			auto t2 = std::chrono::high_resolution_clock::now();
+			auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+			std::cout <<"write: f"<< f  <<" "<< time_span.count() <<"sec \n";
+
+			if (f < h.widgets[kf_idx].frameRange[1]){
+			    // advance frame 
+			    h.widgets[kf_idx].advanceFrame();
+			    auto c = Camera();
+			    h.widgets[kf_idx].getFrameCam(c);
+			    vec3f pos(c.pos[0], c.pos[1], c.pos[2]);
+			    vec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+			    vec3f up(c.up[0], c.up[1], c.up[2]);
+			    glfwOspWindow.camera.setParam("position", pos);
+			    glfwOspWindow.camera.setParam("direction", dir);
+			    glfwOspWindow.camera.setParam("up", up);
+			    glfwOspWindow.camera.commit();
+			}
+		    }
+    
+		    std::cout <<"\n";
+
+		}
 	    }
-        }
+	}
 	
 	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
@@ -619,6 +755,7 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
 }
 
 
+
 nlohmann::json generateScript(){
     nlohmann::json j = {{"value", 1}};
 
@@ -627,6 +764,116 @@ nlohmann::json generateScript(){
     return j;
 }
 
+nlohmann::json fixedCamHelper(std::string meta_file_name,
+			      std::vector<std::string> &filenames,
+			      int kf_interval,
+			      std::vector<int> dims,
+			      std::string meshType,
+			      int world_bbx_len,
+			      std::vector<float> &cam,
+			      std::vector<float> &tf_range)
+
+{
+    nlohmann::ordered_json j;
+    std::vector<uint32_t> data_i_list_kf;
+    std::string base_file_name = meta_file_name+"_kf";
+    std::filesystem::path p = std::filesystem::current_path();
+    std::string p_str = p.generic_string() + "/";
+
+    j["isheader"] = true;
+    for (int i=0; i<filenames.size();i++){
+	data_i_list_kf.push_back(i);
+	j["data_list"][i]["name"] = p_str+filenames[i];
+	j["data_list"][i]["dims"] = {dims[0], dims[1], dims[2]};
+    }
+       
+    // export all key frames to json file
+    // write a header of file names 
+    for (size_t i=0; i<data_i_list_kf.size();i++){
+	std::string file_name = base_file_name + std::to_string(i) + ".json";
+	j["file_list"][i]["keyframe"] = file_name;
+	j["file_list"][i]["data_i"] = i;
+
+	// write json for each keyframe interval
+	nlohmann::ordered_json tmp_j;
+	tmp_j["isheader"] = false;
+	tmp_j["data"]["type"] = meshType;
+	tmp_j["data"]["name"] = p_str+filenames[i];
+	tmp_j["data"]["dims"] = {dims[0], dims[1], dims[2]};
+	tmp_j["data"]["world_bbox"] = {world_bbx_len, world_bbx_len, world_bbx_len};
+	tmp_j["data"]["frameRange"] = {i*kf_interval, (i+1)*kf_interval};
+
+	// cameras
+	for (size_t j=0; j<2; j++)
+	    {
+		nlohmann::ordered_json tmp_cam;
+		tmp_cam["frame"] = (i+j)*kf_interval;
+		for (size_t c=0; c<3; c++){
+		    tmp_cam["pos"].push_back(cam[c]);
+		    tmp_cam["dir"].push_back(cam[3+c]);
+		    tmp_cam["up"].push_back(cam[6+c]);
+		}
+		tmp_j["camera"].push_back(tmp_cam);
+	    }
+
+	// tf
+	tmp_j["transferFunc"][0]["frame"] = i*kf_interval;
+	tmp_j["transferFunc"][0]["range"] = {tf_range[0], tf_range[1]};
+
+	// fixed tf for now
+        tmp_j["transferFunc"][0]["colors"] = {0, 0, 0.562493,  0, 0, 1,  0, 1, 1,  0.500008, 1, 0.500008,  1, 1, 0,  1, 0, 0,  0.500008, 0, 0};
+        tmp_j["transferFunc"][0]["opacities"].push_back(0);
+	tmp_j["transferFunc"][0]["opacities"].push_back(20);
+	    
+	std::ofstream o(file_name);
+	o << std::setw(4)<< tmp_j <<std::endl;
+	o.close();
+    }
+    std::ofstream o_meta(meta_file_name+".json");
+    o_meta << std::setw(4) << j <<std::endl;
+    o_meta.close();
+
+    return j;
+}
+
+
+nlohmann::json generateScriptFixedCam(std::string meta_file_name,
+				      py::list &input_names,
+				      int kf_interval,
+				      py::array_t<int> dims_in,
+				      std::string meshType,
+				      int world_bbx_len,
+				      py::array_t<float> cam_in,
+				      py::array_t<float> tf_range_in
+				      )
+{
+    std::vector<std::string> filenames = input_names.cast<std::vector<std::string>>();
+    std::vector<int> dims = makeVectorFromPyArray(dims_in);
+    std::vector<float> cam = makeVectorFromPyArray(cam_in);
+    std::vector<float> tf_range = makeVectorFromPyArray(tf_range_in);
+
+    if (1){
+	std::cout << "output file name "   << meta_file_name << "\n";
+	std::cout << "filenames: "; for (auto s : filenames) std::cout << s <<" "; std::cout << "\n";
+	std::cout << "dims: ";      for (auto d : dims)      std::cout << d <<" "; std::cout << "\n";
+	std::cout << "cam: ";       for (auto c : cam)       std::cout << c <<" "; std::cout << "\n";
+	std::cout << "tf_range: ";  for (auto v : tf_range)  std::cout << v <<" "; std::cout << "\n";
+	std::cout << "key frame interval = " << kf_interval << "\n";
+	std::cout << "mesh type = "          << meshType << "\n";
+	std::cout << "world bbox size = "    << world_bbx_len << "\n";
+    }
+
+    return fixedCamHelper(meta_file_name, filenames, kf_interval, dims, meshType, world_bbx_len, cam, tf_range);
+}
+
+
+nlohmann::json readScript(std::string path){
+    nlohmann::json j;
+    std::ifstream f(path);
+    f >> j;
+
+    return j;
+}
 
 
 PYBIND11_MODULE(vistool_py, m) {
@@ -638,4 +885,6 @@ PYBIND11_MODULE(vistool_py, m) {
     m.def("run_offline_app", &run_offline, "run render app");
 
     m.def("generateScript", &generateScript, "generate preset script");
+    m.def("generateScriptFixedCam", &generateScriptFixedCam, "generate preset script");
+    m.def("readScript", &readScript, "read key frame script from file");
 }
