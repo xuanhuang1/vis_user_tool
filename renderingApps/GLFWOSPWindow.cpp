@@ -484,7 +484,7 @@ void GLFWOSPWindow::buildUI(){
         if (ImGui::Button("export")) {
 	    int dims[3] = {volumeDimensions.x, volumeDimensions.y, volumeDimensions.z};
 	    int world_bbox[3] = {world_size_x, world_size_x, world_size_x};
-	    kf_widget.exportKFs("expt", dims, world_bbox, file_names, slider_tf_min, slider_tf_max);
+	    kf_widget.exportKFs("viewer_script", dims, world_bbox, file_names, slider_tf_min, slider_tf_max);
 	    std::cout << "keyframes exported, data dims: "
 		      << dims[0] <<" "<<dims[1] <<" "<< dims[2]
 		      << " tf ranges" << slider_tf_min <<" "<<slider_tf_max <<"\n";
