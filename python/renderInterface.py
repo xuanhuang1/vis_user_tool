@@ -30,7 +30,7 @@ class AnimationHandler:
             self.srcType = pathType
             if (self.srcType == "visus"): # use visus to load
                 self.dataSrc = LoadDataset(path)
-                #print(self.dataSrc.getDatasetBody().toString())
+                print(self.dataSrc.getDatasetBody().toString())
             elif (pathType == "local"): # set local file path
                 self.dataSrc = path
 

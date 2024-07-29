@@ -117,6 +117,59 @@ void GLFWOSPWindow::initBGMap(){
     gmodel = model_;
 }
 
+void GLFWOSPWindow::initBGMap(const std::string mapfile){
+    // triangle mesh data
+    std::vector<vec3f> vertex;
+    std::vector<vec4f> color;
+    std::vector<vec4ui> index;
+
+    int mapx = 100;
+    int mapy = 100;
+
+    int comp;
+    stbi_set_flip_vertically_on_load(1);
+    float* image = stbi_loadf(mapfile.c_str(), &mapx, &mapy, &comp, 0);
+
+    if(image == nullptr)
+	throw(std::string("Failed to load texture"));
+    else std::cout << "load earth image: " << mapx <<" "<<mapy <<" "<<comp <<"\n";
+    
+    for (size_t j=0; j<mapy; j++){
+	for (size_t i=0; i<mapx; i++){
+	    float angle_h = i/float(mapx)*M_PI*2; // radius h, 0-PI
+	    float angle_v = j/float(mapy)*M_PI; // radius v, 0-PI/2;
+	    float r = 10.1; // radius r, 0-1
+	    float p_x = r*sin(angle_v)*cos(angle_h);
+	    float p_y = r*sin(angle_v)*sin(angle_h);
+	    float p_z = r*cos(angle_v);
+
+	    vertex.push_back(vec3f(p_x, p_y, p_z));
+	    size_t c_i = (j*mapx+i)*comp;
+	    color.push_back(vec4f(image[c_i], image[c_i+1], image[c_i+2], image[c_i+3]));
+	    //color.push_back(vec4f(float(i)/mapx, float(j)/mapy, 0, 1.f));
+	}
+    }
+
+    for (size_t i=0; i<mapx-1; i++){
+	for (size_t j=0; j<mapy-1; j++){
+	    index.push_back(vec4ui(i + j*mapx, i+1+j*mapx, i+1+(j+1)*mapx, i+(j+1)*mapx));
+	}
+    }
+    
+    // create and setup model and mesh
+    ospray::cpp::Geometry mesh("mesh");
+    mesh.setParam("vertex.position", ospray::cpp::CopiedData(vertex));
+    mesh.setParam("vertex.color", ospray::cpp::CopiedData(color));
+    mesh.setParam("index", ospray::cpp::CopiedData(index));
+    mesh.commit();
+    
+    
+    // put the mesh into a model
+    ospray::cpp::GeometricModel model_(mesh);
+    model_.commit();
+    gmodel = model_;
+}
+
 void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &widget){
  
 	// volume
@@ -158,6 +211,7 @@ void GLFWOSPWindow::initVolume(vec3i volumeDimensions, float bb_x){
 	    
 	volume = vol;
 	model = mdl;
+	volume_type = "structuredRegular";
 }
 
 
@@ -180,6 +234,7 @@ void GLFWOSPWindow::initVolumeSphere(vec3i volumeDimensions){
 	    
     volume = vol;
     model = mdl;
+    volume_type = "structuredSpherical";
     
     initBGMap();
 }
@@ -226,6 +281,7 @@ void GLFWOSPWindow::initVolumeOceanZMap(vec3i volumeDimensions, float bbx){
 	    
     volume = vol;
     model = mdl;
+    volume_type = "unstructured";
 }
 
 void GLFWOSPWindow::initClippingPlanes(){    
@@ -381,13 +437,54 @@ void GLFWOSPWindow::buildUI(){
     static int data_time = 0;
     static float slider_tf_max = tf_range[1];
     static float slider_tf_min = tf_range[0];
+    static float map_on = true;
+    static ImGui::FileBrowser fileDialog;
+    // (optional) set browser properties
+    fileDialog.SetTitle("title");
+    fileDialog.SetTypeFilters({ ".png"});
+    
     ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
     bool camera_need_commit = false;
     bool tf_need_commit = false;
 
     ImGui::Begin("Menu Window", nullptr, flags);
+    
+    if (volume_type == "structuredSpherical"){
+    	ImGui::Text("Spherical view options"); 
+    	if (ImGui::Button("toggle bg map")) {
+    	    map_on = !map_on;
+    	    ospray::cpp::Group tmp_group;
+    	    if (map_on) tmp_group.setParam("geometry", ospray::cpp::SharedData(gmodel));
+    	    tmp_group.setParam("volume", ospray::cpp::SharedData(model));
+    	    tmp_group.commit();
+    	    instance = ospray::cpp::Instance(tmp_group);
+    	    instance.commit();
+	    world.setParam("instance", ospray::cpp::SharedData(instance));
+	    world.commit();
+    	}
+    	ImGui::SameLine();
+    	if (ImGui::Button("load map")){
+    	    fileDialog.Open();
+    	}
+    	fileDialog.Display();
+        
+        if(fileDialog.HasSelected())
+        {
+            std::cout << "Selected filename" << fileDialog.GetSelected().string() << std::endl;
+            initBGMap(fileDialog.GetSelected().string());
+            ospray::cpp::Group tmp_group;
+    	    if (map_on) tmp_group.setParam("geometry", ospray::cpp::SharedData(gmodel));
+    	    tmp_group.setParam("volume", ospray::cpp::SharedData(model));
+    	    tmp_group.commit();
+    	    instance = ospray::cpp::Instance(tmp_group);
+    	    instance.commit();
+	    world.setParam("instance", ospray::cpp::SharedData(instance));
+	    world.commit();
+            fileDialog.ClearSelected();
+        }
+    }
 
-    ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+    ImGui::Text("Options");               // Display some text (you can use a format strings too)
     if (ImGui::TreeNode("clipping planes")){
 	for (size_t i = 0; i < clipping_params.param.size(); ++i) {
 	    ImGui::PushID(i);

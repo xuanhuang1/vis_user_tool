@@ -9,6 +9,7 @@
 // imgui
 #include "./imgui/imgui.h"
 #include "./imgui/imgui_impl_glfw_gl3.h"
+#include "./imgui/imfilebrowser.h"
 
 #include "../loader.h"
 #include "ArcballCamera.h"
@@ -45,6 +46,7 @@ public:
     vec3i volumeDimensions;
     float* all_data_ptr; // pointer to all data
     int count = 1;
+    std::string volume_type="structured";
   
     static GLFWOSPWindow *activeWindow;
     ospray::cpp::FrameBuffer framebuffer;
@@ -96,6 +98,7 @@ public:
     void initVolumeOceanZMap(vec3i volumeDimensions, float bb_x);
     void initVolumeSphere(vec3i dim);
     void initBGMap();
+    void initBGMap(const std::string s);
     void initClippingPlanes();
     void setFileNames(std::vector<std::string> names);
     

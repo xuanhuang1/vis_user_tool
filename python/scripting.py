@@ -24,6 +24,7 @@ t_list = np.arange(0, 5000, 2160, dtype=int).tolist()
 x_range = [0, a.x_max]
 y_range = [0, a.y_max]
 z_range = [0, a.z_max]
+quality=-6
 
 # the mediterranean sea region
 #x_range = [int(a.x_max*0.057), int(a.x_max*0.134)]
@@ -53,11 +54,22 @@ outputName_viewer = "viewer_script"
 flip_axis=2
 transpose=False
 
+#testing_scene="flat"
+testing_scene="sphere"
+if(testing_scene=="flat"):
+    flip_axis=2
+    transpose=False
+    render_mode=0
+elif(testing_scene=="sphere"):
+    flip_axis=2
+    transpose=True
+    render_mode=2
+    
 # produce scripts from one of
 if (scriptingType == "viewer"):
     # 1. interactive app
     print ("launch interactive viewer")
-    Thread(target = a.renderTask(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, mode=0, flip_axis=flip_axis, transpose=transpose)).start()
+    Thread(target = a.renderTask(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, q=quality, mode=render_mode, flip_axis=flip_axis, transpose=transpose)).start()
 
 elif (scriptingType == "text"):
     # 2. text scripting
@@ -65,7 +77,7 @@ elif (scriptingType == "text"):
     # i.e. generate animation w/ fixed cam all for all timesteps
 
     # read one timestep for data stats
-    data = a.readData(t=t_list[0], x_range=x_range, y_range=y_range,z_range=z_range, q=-6, flip_axis=flip_axis, transpose=transpose)
+    data = a.readData(t=t_list[0], x_range=x_range, y_range=y_range,z_range=z_range, q=quality, flip_axis=flip_axis, transpose=transpose)
     dim = data.shape
     d_max = np.max(data)
     d_min = np.min(data)
@@ -75,20 +87,24 @@ elif (scriptingType == "text"):
     script_template="fixedCam"
     input_names = a.getRawFileNames(data.shape[2], data.shape[1], data.shape[0], t_list)
     kf_interval = 1 # frames per keyframe
-    dims = [data.shape[2], data.shape[1], data.shape[0]]
-    #meshType = "structuredSpherical"
+    dims = [data.shape[2], data.shape[1], data.shape[0]] # flip axis from py array
     meshType = "structured"
     world_bbx_len = 10
-    #cam = [-30, 0, 0, 1, 0, 0, 0, 0, -1] # camera params, pos, dir, up
     cam = [4, 3, -11, 0, 0, 1, 0, 1, 0] # camera params, pos, dir, up
     tf_range = [d_min, d_max]
+    
+    if(testing_scene=="flat"):
+        meshType = "structured"
+        cam = [4, 3, -11, 0, 0, 1, 0, 1, 0]
+    elif(testing_scene=="sphere"):
+        meshType = "structuredSpherical"
+        cam = [-30, 0, 0, 1, 0, 0, 0, 0, -1]
 
     # generate script
     a.generateScript(input_names, kf_interval, dims, meshType, world_bbx_len, cam, tf_range, template=script_template, outfile=outputName_text);
-
 #
 # download data for offline render
 #
-a.saveRawFilesByVisusRead(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, flip_axis=flip_axis, transpose=transpose)
+#a.saveRawFilesByVisusRead(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, flip_axis=flip_axis, transpose=transpose)
 
 
