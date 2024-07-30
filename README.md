@@ -4,6 +4,7 @@
 json based textfiles + loader for automated animation scripting and production
 
 **build**
+
 dependencies includes:
 ospray v2.12 (for rendering)
 pybind11 (for python interface)
@@ -17,7 +18,9 @@ set ospray_DIR and rkcommon_DIR (included in ospray build&install)
 examples with opengl and ospray v2.12
 
 **python/**
+
 python interface with examples:
+
 ```
 // to read, download and script by either preset templates or an interactive viewer
 // produce a list of json files
