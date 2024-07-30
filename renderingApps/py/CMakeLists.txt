@@ -34,6 +34,7 @@ include_directories(
   	${RKCOMMON_INCLUDE_DIRS})
 
 find_package(pybind11 REQUIRED)
+
 pybind11_add_module(vistool_py 
 	${SOURCE_FILES}
 	${PYTHON_FILES}
@@ -41,6 +42,7 @@ pybind11_add_module(vistool_py
 
 			
 target_link_libraries(vistool_py
+			PRIVATE
 			glfw
 			${OPENGL_LIBRARIES}
 			ospray::ospray)
