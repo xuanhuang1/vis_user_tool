@@ -7,6 +7,13 @@ endif()
 
 find_package(OpenGL 3 REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(ospray REQUIRED)
+find_package(rkcommon REQUIRED)
+
+get_target_property(RKCOMMON_INCLUDE_DIRS rkcommon::rkcommon
+      INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(OSPRAY_INCLUDE_DIRS ospray::ospray
+      INTERFACE_INCLUDE_DIRECTORIES)
 
 file (GLOB SOURCE_FILES
   "../ArcballCamera.cpp"
@@ -19,9 +26,12 @@ file (GLOB SOURCE_FILES
 
 file (GLOB PYTHON_FILES "funcs.cpp" "")
 
+message(OSPRAY_INCLUDE_DIRS=${OSPRAY_INCLUDE_DIRS})
+message(RKCOMMON_INCLUDE_DIRS=${RKCOMMON_INCLUDE_DIRS})
+
 include_directories(
-  PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
-  PUBLIC /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
+  PUBLIC ${OSPRAY_INCLUDE_DIRS} 
+  	${RKCOMMON_INCLUDE_DIRS})
 
 find_package(pybind11 REQUIRED)
 pybind11_add_module(vistool_py 
@@ -30,10 +40,10 @@ pybind11_add_module(vistool_py
 )
 
 			
-target_link_libraries(vistool_py PUBLIC
+target_link_libraries(vistool_py
 			glfw
 			${OPENGL_LIBRARIES}
-			/home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
+			ospray::ospray)
 
 
 

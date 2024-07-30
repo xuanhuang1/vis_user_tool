@@ -1,20 +1,37 @@
 # vis_user_tool
 
 ## animation system for large scivis data
-json based textfiles + loader
+json based textfiles + loader for automated animation scripting and production
+
+**build**
+dependencies includes:
+ospray v2.12 (for rendering)
+pybind11 (for python interface)
+
+build and install ospray following https://github.com/RenderKit/ospray/tree/release-2.12.x
+
+set ospray_DIR and rkcommon_DIR (included in ospray build&install)
 
 **examples/**
 
 examples with opengl and ospray v2.12
 
+**python/**
+python interface with examples:
+```
+// to read, download and script by either preset templates or an interactive viewer
+// produce a list of json files
+python3 scripting.py 
+// render with json file
+python3 render.py path_to_json 
+```
 **jupter_notebook_example/**
 
-remote data access through jupternotebook and basic 3D slicer, see basic_loader.ipynb
+remote data access through jupternotebook, see animationToolTutorial.ipynb.
 
-**interactApp/**
+**renderingApps/**
 
-an interactive local viewer with raw data (download code available in basic_loader.ipynb)
-ospray linked manually, change path in CMAKE
+different rendering backends with raw data 
 
 ## Images
 

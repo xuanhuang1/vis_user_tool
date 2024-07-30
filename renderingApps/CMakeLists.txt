@@ -7,14 +7,20 @@ endif()
 
 find_package(OpenGL 3 REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(ospray REQUIRED)
+find_package(rkcommon REQUIRED)
 
-
+get_target_property(RKCOMMON_INCLUDE_DIRS rkcommon::rkcommon
+      INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(OSPRAY_INCLUDE_DIRS ospray::ospray
+      INTERFACE_INCLUDE_DIRECTORIES)
+      
 add_executable(interactiveRender
     interactiveRender.cpp
     ArcballCamera.cpp
     clipping_plane.cpp
     TransferFunctionWidget.cpp
-    KeyframeWidget.cpp
+    KeyframeWidget.cpp 
     GLFWOSPWindow.cpp
     imgui/imgui.cpp
     imgui/imgui_draw.cpp
@@ -24,15 +30,19 @@ add_executable(interactiveRender
     ../loader.cpp
     ../util.cpp
     mesh/rectMesh.cpp)
+ 
+message(OSPRAY_INCLUDE_DIRS=${OSPRAY_INCLUDE_DIRS})
+message(RKCOMMON_INCLUDE_DIRS=${RKCOMMON_INCLUDE_DIRS})
 
 target_include_directories(interactiveRender
-			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
-			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
+			PUBLIC
+			 ${OSPRAY_INCLUDE_DIRS}
+			 ${RKCOMMON_INCLUDE_DIRS})
 			
 target_link_libraries(interactiveRender 
 			glfw
 			${OPENGL_LIBRARIES}
-			/home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
+			ospray::ospray)
 
 
 
@@ -53,13 +63,14 @@ add_executable(offlineRender
     mesh/rectMesh.cpp)
 
 target_include_directories(offlineRender
-			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/ospray/include 
-			PUBLIC /home/xuanhuang/packages/ospray_all/ospray/build/install/rkcommon/include )
+			PUBLIC
+			${OSPRAY_INCLUDE_DIRS} 
+			${RKCOMMON_INCLUDE_DIRS})
 			
 target_link_libraries(offlineRender 
 			glfw
 			${OPENGL_LIBRARIES}
-			/home/xuanhuang/packages/ospray_all/ospray/build/ospray/build/libospray.so)
+			ospray::ospray)
 
 
 
