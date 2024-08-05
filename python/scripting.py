@@ -68,7 +68,8 @@ elif(testing_scene=="sphere"):
     flip_axis=2
     transpose=True
     render_mode=2
-    bgImg = '/home/xuanhuang/projects/vis_interface/vis_user_tool/renderingApps/mesh/land.png'
+    bgImg = os.path.join(os.path.dirname(sys.path[0]), 'renderingApps', 'mesh', 'land.png')
+    #bgImg = '/home/xuanhuang/projects/vis_interface/vis_user_tool/renderingApps/mesh/land.png'
     
 # produce scripts from one of
 if (scriptingType == "viewer"):
