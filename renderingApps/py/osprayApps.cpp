@@ -51,7 +51,7 @@ std::vector<T>makeVectorFromPyArray( py::array_t<T>py_array )
 #endif
 
 #include "rkcommon/utility/SaveImage.h"
-#include "../GLFWOSPWindow.h"
+#include "../osprayApps/GLFWOSPWindow.h"
 
 using json = nlohmann::json;
 using namespace visuser;

@@ -15,7 +15,7 @@
  */
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../stb_image_write.h"
+#include "../../stb_image_write.h"
 
 #include <errno.h>
 #include <stdint.h>

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include "KeyframeWidget.h"
-#include "../loader.h"
+#include "../../loader.h"
 //#ifndef TFN_WIDGET_NO_STB_IMAGE_IMPL
 //#define STB_IMAGE_IMPLEMENTATION
 //#endif

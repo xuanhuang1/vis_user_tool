@@ -7,8 +7,8 @@ endif()
 
 option(BUILD_EXAMPLES "Build mini example programs" OFF)
 option(BUILD_AIEXAMPLE "Build the AI example program" OFF)
-option(BUILD_RENDERING_APPS "Build ospray rendering programs" OFF)
-option(BUILD_RENDERING_APPS_PY "Build ospray rendering python program" OFF)
+option(BUILD_RENDERING_APPS "Build rendering programs" OFF)
+option(BUILD_RENDERING_APPS_PY "Build rendering python libs" OFF)
 
 add_executable(basic_usage
     basic_usage.cpp

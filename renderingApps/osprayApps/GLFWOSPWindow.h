@@ -7,18 +7,18 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // imgui
-#include "./imgui/imgui.h"
-#include "./imgui/imgui_impl_glfw_gl3.h"
-#include "./imgui/imfilebrowser.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_glfw_gl3.h"
+#include "../imgui/imfilebrowser.h"
 
-#include "../loader.h"
+#include "../../loader.h"
 #include "ArcballCamera.h"
 #include "TransferFunctionWidget.h"
 #include "clipping_plane.h"
 #include "app_params.h"
 
 #include "KeyframeWidget.h"
-#include "mesh/rectMesh.h"
+#include "rectMesh.h"
 
 using namespace rkcommon::math;
 

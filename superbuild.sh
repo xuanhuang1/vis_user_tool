@@ -2,7 +2,7 @@
 
 mkdir dependency_dir
 cd dependency_dir/
-git clone git@github.com:RenderKit/ospray.git
+git clone https://github.com/RenderKit/ospray.git
 cd ospray
 git checkout v2.12.0
 mkdir build

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "imgui/imgui.h"
+#include "../imgui/imgui.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
