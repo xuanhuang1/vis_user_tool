@@ -12,11 +12,13 @@
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
 
+#include <fstream>
+
 int main(int argc, char* argv[])
 {
-  if (argc < 2)
+  if (argc < 5)
   {
-    std::cout << "Usage: " << argv[0] << " ironProt.vtk" << std::endl;
+    std::cout << "Usage: " << argv[0] << " <filename> x y z" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -40,31 +42,40 @@ int main(int argc, char* argv[])
   //vtkSmartPointer<vtkImageData> input;
   //reader->SetFileName(argv[1]);
   
-  int dim[3] = {100, 100, 100};
+  int dim[3] = {atoi(argv[2]), atoi(argv[3]), atoi(argv[4])};
   double spc[3] = {1.0, 1.0, 1.0};
   vtkNew<vtkImageData> img;
   img->SetDimensions(dim);
   img->AllocateScalars(VTK_INT, 1);
   img->SetSpacing(spc);
+  
+  std::cout <<"Loading volume with dim "<<dim[0]<<" "<<dim[1]<<" "<<dim[2]<<"\n";
+  std::fstream file;
+  file.open(argv[1], std::fstream::in | std::fstream::binary);
   for (int x = 0; x < dim[0]; ++x)
     for (int y = 0; y < dim[1]; ++y)
       for (int z = 0; z < dim[2]; ++z)
       {
-        img->SetScalarComponentFromDouble(x, y, z, 0, x);
+        float buff;
+        file.read((char*)(&buff), sizeof(buff));
+        img->SetScalarComponentFromDouble(x, y, z, 0, buff);
       }
 
+  file.close();
+  std::cout<< "End load\n";
+  
   // Create transfer mapping scalar value to opacity
   vtkNew<vtkPiecewiseFunction> opacityTransferFunction;
   opacityTransferFunction->AddPoint(0, 0.0);
-  opacityTransferFunction->AddPoint(dim[0], 1.0);
+  opacityTransferFunction->AddPoint(100, 0.1);
 
   // Create transfer mapping scalar value to color
   vtkNew<vtkColorTransferFunction> colorTransferFunction;
   colorTransferFunction->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-  colorTransferFunction->AddRGBPoint(dim[0]*0.25f, 1.0, 0.0, 0.0);
-  colorTransferFunction->AddRGBPoint(dim[0]*0.5f, 0.0, 0.0, 1.0);
-  colorTransferFunction->AddRGBPoint(dim[0]*0.75f, 0.0, 1.0, 0.0);
-  colorTransferFunction->AddRGBPoint(dim[0], 1.0, 1.0, 1.0);
+  //colorTransferFunction->AddRGBPoint(dim[0]*0.25f, 1.0, 0.0, 0.0);
+  //colorTransferFunction->AddRGBPoint(dim[0]*0.5f, 0.0, 0.0, 1.0);
+  //colorTransferFunction->AddRGBPoint(dim[0]*0.75f, 0.0, 1.0, 0.0);
+  colorTransferFunction->AddRGBPoint(100, 1.0, 1.0, 1.0);
 
   // The property describes how the data will look
   vtkNew<vtkVolumeProperty> volumeProperty;
