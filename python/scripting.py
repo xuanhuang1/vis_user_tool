@@ -56,8 +56,8 @@ flip_axis=2
 transpose=False
 bgImg = ''
 
-#testing_scene="flat"
-testing_scene="sphere"
+testing_scene="flat"
+#testing_scene="sphere"
 
 if(testing_scene=="flat"):
     flip_axis=2
@@ -107,10 +107,10 @@ elif (scriptingType == "text"):
         cam = [-30, 0, 0, 1, 0, 0, 0, 0, -1]
 
     # generate script
-    a.generateScript(input_names, kf_interval, dims, meshType, world_bbx_len, cam, tf_range, template=script_template, outfile=outputName_text, bgImg=bgImg);
+    a.generateScript(input_names, kf_interval, dims, meshType, world_bbx_len, cam, tf_range, template=script_template, outfile=outputName_text, bgImg=bgImg, outputName=outputName_viewer);
 #
 # download data for offline render
 #
-#a.saveRawFilesByVisusRead(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, flip_axis=flip_axis, transpose=transpose)
+a.saveRawFilesByVisusRead(t_list=t_list, x_range=x_range, y_range=y_range,z_range=z_range, q=quality, flip_axis=flip_axis, transpose=transpose)
 
 

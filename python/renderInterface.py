@@ -96,7 +96,7 @@ class AnimationHandler:
         return vistool_py.readScript(p);
         
     # launch rendering
-    def renderTask(self, x_range=[0,0], y_range=[0,0], z_range=[0,0], q=-6, t_list=[0], flip_axis=2, transpose=False, mode=0, bgImg=""):
+    def renderTask(self, x_range=[0,0], y_range=[0,0], z_range=[0,0], q=-6, t_list=[0], flip_axis=2, transpose=False, mode=0, bgImg="", outputName="viewer_script"):
         dims = [100, 100, 100]
         total_data = []
         t_names = []
@@ -124,7 +124,7 @@ class AnimationHandler:
         #print(total_data.shape)
 
         vistool_py.init_app(sys.argv)
-        vistool_py.run_app(total_data, t_names, dims[2], dims[1], dims[0], counter, mode, bgImg)
+        vistool_py.run_app(total_data, t_names, dims[2], dims[1], dims[0], counter, mode, bgImg, outputName)
         #return dims
 
 

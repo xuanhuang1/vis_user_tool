@@ -211,7 +211,7 @@ init_app(const std::vector<std::string>& args)
     return newargs;
 }
 
-int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y, int z, int count, int mode, std::string path_to_bgmap)
+int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y, int z, int count, int mode, std::string path_to_bgmap, std::string outputName)
 {
  
 #ifdef _WIN32
@@ -252,6 +252,7 @@ int run_app(py::array_t<float> &input_array, py::list &input_names, int x, int y
 	glfwOspWindow.volumeDimensions[0] = x; 
 	glfwOspWindow.volumeDimensions[1] = y; 
 	glfwOspWindow.volumeDimensions[2] = z;
+	glfwOspWindow.kf_widget.outputName = outputName;
 	std::cout << "shape:" <<count <<" of "<< x <<" "<<y<<" "<<z <<std::endl;
 	std::cout << "file names: ";
 	for (auto f : glfwOspWindow.file_names)

@@ -193,6 +193,8 @@ void GLFWOSPWindow::initVolume(vec3i volumeDimensions, visuser::AniObjWidget &wi
 	    
 	volume = vol;
 	model = mdl;
+
+	volume_type = "structured";
    
 }
 
@@ -211,7 +213,7 @@ void GLFWOSPWindow::initVolume(vec3i volumeDimensions, float bb_x){
 	    
 	volume = vol;
 	model = mdl;
-	volume_type = "structuredRegular";
+	volume_type = "structured";
 }
 
 
@@ -441,7 +443,7 @@ void GLFWOSPWindow::buildUI(){
     static float map_on = true;
     static ImGui::FileBrowser fileDialog;
     // (optional) set browser properties
-    fileDialog.SetTitle("title");
+    fileDialog.SetTitle("land map");
     fileDialog.SetTypeFilters({ ".png"});
     
     ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
@@ -464,7 +466,7 @@ void GLFWOSPWindow::buildUI(){
 	    world.commit();
     	}
     	ImGui::SameLine();
-    	if (ImGui::Button("load map")){
+    	if (ImGui::Button("load bg image")){
     	    fileDialog.Open();
     	}
     	fileDialog.Display();
@@ -542,7 +544,7 @@ void GLFWOSPWindow::buildUI(){
 	    model.commit();
 	}
     
-	if (ImGui::SliderFloat("float", &f, 0.01f, 30.0f)){changeF = true;}
+	//if (ImGui::SliderFloat("float", &f, 0.01f, 30.0f)){changeF = true;}
     
   	if (tfn_widget.changed() || changeF) {
 	    std::vector<float> tmpOpacities, tmpColors; 
@@ -583,11 +585,44 @@ void GLFWOSPWindow::buildUI(){
         if (ImGui::Button("export")) {
 	    int dims[3] = {volumeDimensions.x, volumeDimensions.y, volumeDimensions.z};
 	    int world_bbox[3] = {world_size_x, world_size_x, world_size_x};
-	    kf_widget.exportKFs("viewer_script", dims, volume_type, world_bbox, file_names, slider_tf_min, slider_tf_max, bgImg);
+	    kf_widget.exportKFs(dims, volume_type, world_bbox, file_names, slider_tf_min, slider_tf_max, bgImg);
 	    std::cout << "keyframes exported, data dims: "
 		      << dims[0] <<" "<<dims[1] <<" "<< dims[2]
 		      << " tf ranges" << slider_tf_min <<" "<<slider_tf_max <<"\n";
 	}
+
+
+	ImGui::Text("Generate Key frames");
+	const char* items[] = { "fixedCam"};
+	static int item_current_idx = 0; // Here we store our selection data as an index.
+	const char* combo_preview_value = items[item_current_idx];
+
+	if (ImGui::BeginCombo("", combo_preview_value))
+	    {
+		for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+		    {
+			const bool is_selected = (item_current_idx == n);
+			if (ImGui::Selectable(items[n], is_selected))
+			    item_current_idx = n;
+
+			if (is_selected)
+			    ImGui::SetItemDefaultFocus();
+		    }
+		ImGui::EndCombo();
+	    }
+	ImGui::SameLine();
+	if (ImGui::Button("set")) {
+	    std::vector<float> tmpOpacities, tmpColors;
+	    tfn_widget.get_osp_colormapf(tmpColors, tmpOpacities);
+	    for (uint32_t i=0;i<tmpOpacities.size();i++){
+	    	tmpOpacities[i] = tmpOpacities[i]*f;
+	    }
+	    
+	    kf_widget.generatePresetKF(items[item_current_idx], *arcballCamera, tmpColors, tmpOpacities, count, clippingBox);
+	    
+	    std::cout << "Generate " << items[item_current_idx] <<"\n";
+	}
+	ImGui::NewLine();
 	
 	kf_widget.draw_ui();
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,0,255));
@@ -675,6 +710,14 @@ void GLFWOSPWindow::playAnimationFrame(){
     vec3f dir(cam[3], cam[4], cam[5]);
     vec3f up(cam[6], cam[7], cam[8]);
 
+    // update timestep
+    long long offset = data_index * volumeDimensions.long_product();
+    for (long long i =0 ; i < volumeDimensions.long_product(); i++){
+	(*voxel_data)[i] = all_data_ptr[i+offset];
+    }
+    volume.setParam("data", ospray::cpp::SharedData(voxel_data->data(), volumeDimensions));
+    volume.commit();
+    //model.commit();
     
     // update camera
     camera.setParam("aspect", windowSize.x / float(windowSize.y));

@@ -88,6 +88,28 @@ namespace keyframe {
     KeyframeWidget::KeyframeWidget()
     {
     }
+
+    void KeyframeWidget::insert_point(float x){
+	time_ctrl_points.push_back(x);
+	dataIndex_ctrl_points.push_back(x);
+	cam_ctrl_points.push_back(x);
+	tfn_ctrl_points.push_back(x);
+    }
+
+    void KeyframeWidget::sort_points_by_x(){
+	std::sort(time_ctrl_points.begin(), time_ctrl_points.end());
+	std::sort(dataIndex_ctrl_points.begin(), dataIndex_ctrl_points.end());
+	std::sort(cam_ctrl_points.begin(), cam_ctrl_points.end());
+	std::sort(tfn_ctrl_points.begin(), tfn_ctrl_points.end());
+    }
+
+    void KeyframeWidget::clear_points(){
+	time_ctrl_points.resize(0);
+	dataIndex_ctrl_points.resize(0);
+	cam_ctrl_points.resize(0);
+	tfn_ctrl_points.resize(0);
+    }
+    
     
     void KeyframeWidget::draw_attribute_line(ImDrawList *draw_list, 
     					const vec2f view_scale,
@@ -307,8 +329,9 @@ namespace keyframe {
     }
 
 
-    void KeyframeWidget::exportKFs(std::string meta_file_name, int dims[3], std::string meshType, int world_bbox[3], std::vector<std::string> &data_fnames, float tf_range_x, float tf_range_y, std::string bgImg){
+    void KeyframeWidget::exportKFs(int dims[3], std::string meshType, int world_bbox[3], std::vector<std::string> &data_fnames, float tf_range_x, float tf_range_y, std::string bgImg){
 	// create a header file
+	std::string meta_file_name = outputName;
 	nlohmann::ordered_json j;
 	std::string base_file_name = meta_file_name+"_kf";
 	j["isheader"] = true;
@@ -428,6 +451,38 @@ namespace keyframe {
 	    data_indices.push_back(kfs[i].data_i);
 	}
 	
+    }
+
+    void KeyframeWidget::generatePresetKF(std::string presetName,
+					  ArcballCamera &cam,
+					  std::vector<float> &tf_colors,
+					  std::vector<float> &tf_opacities,
+					  uint32_t data_count,
+					  std::vector<float> &cbox){
+	if (presetName == "fixedCam"){
+	    clear_points();
+	    kfs.resize(0);
+	    
+	    uint32_t interval = timeFrameMax/data_count;
+	    for (uint32_t i=0; i<data_count; i++){
+		record_frame = i*interval;
+		recordKeyFrame(cam, tf_colors, tf_opacities, i, cbox);
+		insert_point(float(i)/data_count);
+	    }
+
+	    // insert an end padding point to keep the last key frame
+	    record_frame = timeFrameMax;
+	    recordKeyFrame(cam, tf_colors, tf_opacities, data_count-1, cbox);
+	    insert_point(1.f);
+
+	    // should be sorted by x already
+	    // sort_points_by_x();
+	}else{
+	    std::cout << "Key frame preset not recognized:" << presetName <<"\n";
+	}
+
+	std::cout << kfs.size() << "\n";
+
     }
 
 }

@@ -53,11 +53,12 @@ namespace keyframe {
 	std::vector<float> cam_ctrl_points = {0.f, 1.f};
 	std::vector<float> tfn_ctrl_points = {0.f, 1.f};
 	std::vector<Keyframe> kfs;
-	uint32_t timeFrameMax = 100;
+	uint32_t timeFrameMax = 20;
 	uint32_t viewFrame = 0;
 	int record_frame = -1;
 	uint32_t playFrame = 0;
 	bool play = false;
+	std::string outputName = "viewer_script";
 
 	void draw_ui();
 	void setGuiText(std::string in) { guiText = in;}
@@ -84,8 +85,7 @@ namespace keyframe {
 			    int &data_i,
 			    int f);
 	
-	void exportKFs(     std::string filename,
-			    int dim[3],
+	void exportKFs(     int dim[3],
 			    std::string meshType,
 			    int world_bbox[3],
 			    std::vector<std::string> &data_fnames,
@@ -96,7 +96,18 @@ namespace keyframe {
 	void getDataFilterFromKF(float bbox[4],
 				 std::vector<float>
 				 &data_indices);
-private:
+
+	void generatePresetKF(std::string presetName,
+			      ArcballCamera &cam,
+			      std::vector<float> &tf_colors,
+			      std::vector<float> &tf_opacities,
+			      uint32_t data_count,
+			      std::vector<float> &cbox);
+	
+    private:
+	void insert_point(float x);
+	void sort_points_by_x();
+	void clear_points();
 	void draw_attribute_line(ImDrawList *draw_list, const vec2f view_scale, const vec2f view_offset, std::vector<float>& pts, uint32_t index, std::string txt);
 	float display_offsets[4]  = {0.85f, 0.5f, 0.3f, 0.1f};
     };
