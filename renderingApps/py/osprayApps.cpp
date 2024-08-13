@@ -720,7 +720,12 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
 
 			std::string base_filename = h.widgets[kf_idx].file_name.substr(h.widgets[kf_idx].file_name.find_last_of("/\\") + 1);
 			std::string outname = base_filename.substr(0, base_filename.find_last_of("."));
-			outname = "img_"+outname+"_f"+std::to_string(f)+".png";
+			outname = "img_f";
+			if (f < 100)
+			    outname += "0";
+			if (f < 10)
+			    outname += "0";
+		        outname += std::to_string(f)+".png";
 			glfwOspWindow.saveFrame(outname);
 
 			auto t2 = std::chrono::high_resolution_clock::now();
