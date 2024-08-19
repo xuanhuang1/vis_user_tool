@@ -205,17 +205,15 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
     //vtkNew<vtkStructuredPointsReader> reader;
     //vtkSmartPointer<vtkImageData> input;
     //reader->SetFileName(argv[1]);
-    std::cout << "\n Load first frame, init \n\n";
+    //std::cout << "\n Load first frame, init \n\n";
     vtkNew<vtkImageData> img;
-    loadKF(h.widgets[0], img, ren1);
-  
-    renWin->SetSize(600, 600);
-    renWin->SetWindowName("SimpleRayCast");
-    renWin->Render();
-
-    std::cout << "\n Start rendering \n\n";
+    //std::cout << "\n Start rendering \n\n";
 
     if (header_sel >= 0){ // render selected keyframe
+	loadKF(h.widgets[header_sel], img, ren1);
+	renWin->SetSize(600, 600);
+	renWin->SetWindowName("SimpleRayCast");
+	renWin->Render();
 	// save file
 	writeImage(getOutName(h.widgets[header_sel].file_name, header_sel), renWin, false);
     }else{

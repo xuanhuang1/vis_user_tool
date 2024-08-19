@@ -33,7 +33,7 @@ a.setDataDim(8640, 6480, 90, 10269);
 #
 
 # global
-t_list = np.arange(0, 1000, 120, dtype=int).tolist()
+t_list = np.arange(0, 10000, 2400, dtype=int).tolist()
 x_range = [0, a.x_max]
 y_range = [0, a.y_max]
 z_range = [0, a.z_max]
