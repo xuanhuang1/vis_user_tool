@@ -832,8 +832,8 @@ nlohmann_loader::json fixedCamHelper(std::string meta_file_name,
 
 	// fixed tf for now
         tmp_j["transferFunc"][0]["colors"] = {0, 0, 0.562493,  0, 0, 1,  0, 1, 1,  0.500008, 1, 0.500008,  1, 1, 0,  1, 0, 0,  0.500008, 0, 0};
-        tmp_j["transferFunc"][0]["opacities"].push_back(0);
-	tmp_j["transferFunc"][0]["opacities"].push_back(20);
+	for (int i=0; i<7; i++)
+	    tmp_j["transferFunc"][0]["opacities"].push_back(i/float(7));
 	    
 	std::ofstream o(file_name);
 	o << std::setw(4)<< tmp_j <<std::endl;
