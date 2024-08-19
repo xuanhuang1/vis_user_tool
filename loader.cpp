@@ -10,7 +10,7 @@
 //#include "util.h"
 #include "ext/glm/gtx/string_cast.hpp"
 
-using json = nlohmann::json;
+using json = nlohmann_loader::json;
 
 visuser::Camera::Camera(): pos(glm::vec3(1,0,0)), dir(glm::vec3(-1,0,0)), up(glm::vec3(0,0,1)){
 	frame = 0;
@@ -41,7 +41,7 @@ visuser::Camera visuser::interpolate(visuser::Camera &a, visuser::Camera &b, glm
 	return visuser::Camera(pos, dir, up);
 }
     
-void visuser::jsonFromFile(const char* name, nlohmann::json &j){
+void visuser::jsonFromFile(const char* name, nlohmann_loader::json &j){
     std::ifstream cfg_file(name);
     if (!cfg_file) {
         std::cerr << "[error]: Failed to open config file " << name << "\n";
@@ -52,7 +52,7 @@ void visuser::jsonFromFile(const char* name, nlohmann::json &j){
 }
     
     
-visuser::AniObjWidget::AniObjWidget(const nlohmann::json in_file){
+visuser::AniObjWidget::AniObjWidget(const nlohmann_loader::json in_file){
     config = in_file;
 }
 
@@ -64,7 +64,7 @@ void visuser::AniObjWidget::init(){
 }
 
 
-void visuser::AniObjWidget::init_from_json(const nlohmann::json in_file){
+void visuser::AniObjWidget::init_from_json(const nlohmann_loader::json in_file){
     config = in_file;
     load_info();
     load_cameras();
@@ -153,7 +153,7 @@ void visuser::AniObjHandler::init(const char* filename){
 	std::cout << "path: "<< p_str <<"\n";
     	widgets.resize(filenames.size());
     	for (size_t i=0; i<filenames.size(); i++){
-	    nlohmann::json config;
+	    nlohmann_loader::json config;
 	    std::string kf_name = filenames[i]["keyframe"];
 	    jsonFromFile((p_str+kf_name).c_str(), config);
 	    widgets[i].init_from_json(config);
@@ -176,7 +176,7 @@ void visuser::AniObjHandler::init(const char* filename){
 void visuser::writeSampleJsonFile(std::string meta_file_name){
     std::vector<uint32_t> data_i_list_kf = {0, 0, 1};
     std::map<uint32_t, uint32_t > data_i_list;
-    nlohmann::ordered_json j;
+    nlohmann_loader::ordered_json j;
     std::string base_file_name = meta_file_name+"_kf";
     
     j["isheader"] = true;
@@ -198,7 +198,7 @@ void visuser::writeSampleJsonFile(std::string meta_file_name){
 	j["file_list"][i]["data_i"] = data_i_list[data_i_list_kf[i]];
 
 	// write json for each keyframe interval
-	nlohmann::ordered_json tmp_j;
+	nlohmann_loader::ordered_json tmp_j;
 	tmp_j["isheader"] = false;
 	tmp_j["data"]["type"] = "structured";
 	tmp_j["data"]["name"] = "";
@@ -209,7 +209,7 @@ void visuser::writeSampleJsonFile(std::string meta_file_name){
 	// cameras
 	for (size_t j=0; j<2; j++)
 	    {
-		nlohmann::ordered_json tmp_cam;
+		nlohmann_loader::ordered_json tmp_cam;
 		tmp_cam["frame"] = (i+j)*5;
 		for (size_t c=0; c<3; c++){
 		    tmp_cam["pos"].push_back(c);

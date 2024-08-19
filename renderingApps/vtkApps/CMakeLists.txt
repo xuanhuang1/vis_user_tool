@@ -7,7 +7,9 @@ find_package(VTK COMPONENTS
   CommonColor
   CommonCore
   CommonDataModel
-  IOLegacy
+  FiltersSources
+  IOImage
+  #IOLegacy
   InteractionStyle
   RenderingContextOpenGL2
   RenderingCore
@@ -16,6 +18,7 @@ find_package(VTK COMPONENTS
   RenderingOpenGL2
   RenderingVolume
   RenderingVolumeOpenGL2
+  
 )
 
 if (NOT VTK_FOUND)
@@ -24,7 +27,10 @@ endif()
 
 # Prevent a "command line is too long" failure in Windows.
 set(CMAKE_NINJA_FORCE_RESPONSE_FILE "ON" CACHE BOOL "Force Ninja to use response files.")
-add_executable(SimpleRayCast MACOSX_BUNDLE SimpleRayCast.cxx )
+add_executable(SimpleRayCast
+   		SimpleRayCast.cpp 
+		../../loader.cpp
+		../../util.cpp)
   target_link_libraries(SimpleRayCast PRIVATE ${VTK_LIBRARIES}
 )
 # vtk_module_autoinit is needed

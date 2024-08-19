@@ -38,7 +38,7 @@
 #include "../loader.h"
 
 using namespace rkcommon::math;
-using json = nlohmann::json;
+using json = nlohmann_loader::json;
 using namespace visuser;
 
 enum DATATYPE{TRI_MESH, VOL, TOTAL_DATA_TYPES};

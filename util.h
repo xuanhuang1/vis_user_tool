@@ -6,7 +6,6 @@
 #include "ext/glm/glm.hpp"
 
 using namespace glm;
-using json = nlohmann::json;
 
 // Read the contents of a file into the string
 std::string get_file_content(const std::string &fname);
@@ -21,7 +20,7 @@ bool starts_with(const std::string &str, const std::string &prefix);
 
 std::vector<glm::vec3> generate_fibonacci_sphere(const size_t n_points, const float radius);
 
-inline glm::vec3 get_vec3f(const json &j)
+inline glm::vec3 get_vec3f(const nlohmann_loader::json &j)
 {
     glm::vec3 v;
     for (size_t i = 0; i < 3; ++i) {
@@ -30,7 +29,7 @@ inline glm::vec3 get_vec3f(const json &j)
     return v;
 }
 
-inline glm::vec3 get_vec2f(const json &j)
+inline glm::vec3 get_vec2f(const nlohmann_loader::json &j)
 {
     glm::vec3 v;
     for (size_t i = 0; i < 2; ++i) {
@@ -39,7 +38,7 @@ inline glm::vec3 get_vec2f(const json &j)
     return v;
 }
 
-inline glm::vec3 get_vec3i(const json &j)
+inline glm::vec3 get_vec3i(const nlohmann_loader::json &j)
 {
     glm::vec3 v;
     for (size_t i = 0; i < 3; ++i) {
@@ -48,7 +47,7 @@ inline glm::vec3 get_vec3i(const json &j)
     return v;
 }
 
-inline glm::vec2 get_vec2i(const json &j)
+inline glm::vec2 get_vec2i(const nlohmann_loader::json &j)
 {
     glm::vec3 v;
     for (size_t i = 0; i < 2; ++i) {

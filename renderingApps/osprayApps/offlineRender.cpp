@@ -34,7 +34,7 @@
 #include "rkcommon/utility/SaveImage.h"
 #include "GLFWOSPWindow.h"
 
-using json = nlohmann::json;
+using json = nlohmann_loader::json;
 using namespace visuser;
 
 enum DATATYPE{TRI_MESH, VOL, TOTAL_DATA_TYPES};

@@ -5,7 +5,6 @@ import argparse
 
 # path to the rendering app libs
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'build', 'renderingApps', 'py'))
-#sys.path.append("/home/xuanhuang/projects/vis_interface/vis_user_tool/build/renderingApps/py/")
 import renderInterface
 
 parser = argparse.ArgumentParser(description='animation scripting tool examples')
@@ -34,7 +33,7 @@ a.setDataDim(8640, 6480, 90, 10269);
 #
 
 # global
-t_list = np.arange(0, 5000, 2160, dtype=int).tolist()
+t_list = np.arange(0, 1000, 120, dtype=int).tolist()
 x_range = [0, a.x_max]
 y_range = [0, a.y_max]
 z_range = [0, a.z_max]

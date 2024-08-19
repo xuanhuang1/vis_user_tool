@@ -6,7 +6,7 @@
 
 #include "../loader.h"
 
-using json = nlohmann::json;
+using json = nlohmann_loader::json;
 using namespace visuser;
 
 const std::string USAGE =

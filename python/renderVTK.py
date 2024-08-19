@@ -15,4 +15,4 @@ a = renderInterface.AnimationHandler()
 #f_path = '/home/xuanhuang/projects/vis_interface/vis_user_tool/jsonSamples/example_kf_header.json'
 f_path = sys.argv[1]
 
-Thread(target = a.renderTaskOffline(f_path)).start()
+Thread(target = a.renderTaskOfflineVTK(f_path)).start()

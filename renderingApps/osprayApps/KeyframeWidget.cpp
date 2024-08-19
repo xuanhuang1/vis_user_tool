@@ -332,7 +332,7 @@ namespace keyframe {
     void KeyframeWidget::exportKFs(int dims[3], std::string meshType, int world_bbox[3], std::vector<std::string> &data_fnames, float tf_range_x, float tf_range_y, std::string bgImg){
 	// create a header file
 	std::string meta_file_name = outputName;
-	nlohmann::ordered_json j;
+	nlohmann_loader::ordered_json j;
 	std::string base_file_name = meta_file_name+"_kf";
 	j["isheader"] = true;
 	j["data_list"][0] = {};
@@ -358,7 +358,7 @@ namespace keyframe {
 	    j["file_list"][i]["data_i"] = data_i_list[kfs[i].data_i];
 
 	    // write json for each keyframe interval
-	    nlohmann::ordered_json tmp_j;
+	    nlohmann_loader::ordered_json tmp_j;
 	    tmp_j["isheader"] = false;
 	    tmp_j["data"]["type"] = meshType;
 	    tmp_j["data"]["name"] = p_str+data_fnames[kfs[i].data_i];
@@ -370,7 +370,7 @@ namespace keyframe {
 	    // cameras
 	    for (size_t j=0; j<2; j++)
 	    {
-		nlohmann::ordered_json tmp_cam;
+		nlohmann_loader::ordered_json tmp_cam;
 		tmp_cam["frame"] = kfs[i+j].timeFrame;
 		for (size_t c=0; c<3; c++){
 		    tmp_cam["pos"].push_back(kfs[i+j].arcballCam.eyePos()[c]);

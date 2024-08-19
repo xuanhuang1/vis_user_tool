@@ -53,7 +53,7 @@ std::vector<T>makeVectorFromPyArray( py::array_t<T>py_array )
 #include "rkcommon/utility/SaveImage.h"
 #include "../osprayApps/GLFWOSPWindow.h"
 
-using json = nlohmann::json;
+using json = nlohmann_loader::json;
 using namespace visuser;
 
 enum DATATYPE{TRI_MESH, VOL, TOTAL_DATA_TYPES};
@@ -764,15 +764,15 @@ int run_offline(std::string jsonStr, std::string overwrite_inputf, int header_se
 
 
 
-nlohmann::json generateScript(){
-    nlohmann::json j = {{"value", 1}};
+nlohmann_loader::json generateScript(){
+    nlohmann_loader::json j = {{"value", 1}};
 
-    std::cout << "This function returns an nlohmann::json instance: "  << j << std::endl;
+    std::cout << "This function returns an nlohmann_loader::json instance: "  << j << std::endl;
 
     return j;
 }
 
-nlohmann::json fixedCamHelper(std::string meta_file_name,
+nlohmann_loader::json fixedCamHelper(std::string meta_file_name,
 			      std::vector<std::string> &filenames,
 			      int kf_interval,
 			      std::vector<int> dims,
@@ -783,7 +783,7 @@ nlohmann::json fixedCamHelper(std::string meta_file_name,
 			      std::string bgImg)
 
 {
-    nlohmann::ordered_json j;
+    nlohmann_loader::ordered_json j;
     std::vector<uint32_t> data_i_list_kf;
     std::string base_file_name = meta_file_name+"_kf";
     std::filesystem::path p = std::filesystem::current_path();
@@ -804,7 +804,7 @@ nlohmann::json fixedCamHelper(std::string meta_file_name,
 	j["file_list"][i]["data_i"] = i;
 
 	// write json for each keyframe interval
-	nlohmann::ordered_json tmp_j;
+	nlohmann_loader::ordered_json tmp_j;
 	tmp_j["isheader"] = false;
 	tmp_j["data"]["type"] = meshType;
 	tmp_j["data"]["name"] = p_str+filenames[i];
@@ -816,7 +816,7 @@ nlohmann::json fixedCamHelper(std::string meta_file_name,
 	// cameras
 	for (size_t j=0; j<2; j++)
 	    {
-		nlohmann::ordered_json tmp_cam;
+		nlohmann_loader::ordered_json tmp_cam;
 		tmp_cam["frame"] = (i+j)*kf_interval;
 		for (size_t c=0; c<3; c++){
 		    tmp_cam["pos"].push_back(cam[c]);
@@ -847,7 +847,7 @@ nlohmann::json fixedCamHelper(std::string meta_file_name,
 }
 
 
-nlohmann::json generateScriptFixedCam(std::string meta_file_name,
+nlohmann_loader::json generateScriptFixedCam(std::string meta_file_name,
 				      py::list &input_names,
 				      int kf_interval,
 				      py::array_t<int> dims_in,
@@ -879,8 +879,8 @@ nlohmann::json generateScriptFixedCam(std::string meta_file_name,
 }
 
 
-nlohmann::json readScript(std::string path){
-    nlohmann::json j;
+nlohmann_loader::json readScript(std::string path){
+    nlohmann_loader::json j;
     std::ifstream f(path);
     f >> j;
 
@@ -890,7 +890,7 @@ nlohmann::json readScript(std::string path){
 
 PYBIND11_MODULE(vistool_py, m) {
     // Optional docstring
-    m.doc() = "the renderer's py library";
+    m.doc() = "the ospray renderer's py library";
         
     m.def("init_app", &init_app, "init render app");
     m.def("run_app", &run_app, "run render app");

@@ -1,22 +1,22 @@
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 /****************************************************************************\
  * Note on documentation: The source files contain links to the online      *
- * documentation of the public API at https://json.nlohmann.me. This URL    *
+ * documentation of the public API at https://json.nlohmann_loader.me. This URL    *
  * contains the most recent documentation and should also be applicable to  *
  * previous versions; documentation for deprecated functions is not         *
  * removed, but marked deprecated. See "Generate documentation" section in  *
  * file docs/README.md.                                                     *
 \****************************************************************************/
 
-#ifndef INCLUDE_NLOHMANN_JSON_HPP_
-#define INCLUDE_NLOHMANN_JSON_HPP_
+#ifndef INCLUDE_NLOHMANN_LOADER_JSON_HPP_
+#define INCLUDE_NLOHMANN_LOADER_JSON_HPP_
 
 #include <algorithm> // all_of, find, for_each
 #include <cstddef> // nullptr_t, ptrdiff_t, size_t
@@ -31,26 +31,26 @@
 #include <utility> // declval, forward, move, pair, swap
 #include <vector> // vector
 
-// #include <nlohmann/adl_serializer.hpp>
+// #include <nlohmann_loader/adl_serializer.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
 #include <utility>
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -58,16 +58,16 @@
 // This file contains all macro definitions affecting or depending on the ABI
 
 #ifndef JSON_SKIP_LIBRARY_VERSION_CHECK
-    #if defined(NLOHMANN_JSON_VERSION_MAJOR) && defined(NLOHMANN_JSON_VERSION_MINOR) && defined(NLOHMANN_JSON_VERSION_PATCH)
-        #if NLOHMANN_JSON_VERSION_MAJOR != 3 || NLOHMANN_JSON_VERSION_MINOR != 11 || NLOHMANN_JSON_VERSION_PATCH != 3
+    #if defined(NLOHMANN_LOADER_JSON_VERSION_MAJOR) && defined(NLOHMANN_LOADER_JSON_VERSION_MINOR) && defined(NLOHMANN_LOADER_JSON_VERSION_PATCH)
+        #if NLOHMANN_LOADER_JSON_VERSION_MAJOR != 3 || NLOHMANN_LOADER_JSON_VERSION_MINOR != 11 || NLOHMANN_LOADER_JSON_VERSION_PATCH != 3
             #warning "Already included a different version of the library!"
         #endif
     #endif
 #endif
 
-#define NLOHMANN_JSON_VERSION_MAJOR 3   // NOLINT(modernize-macro-to-enum)
-#define NLOHMANN_JSON_VERSION_MINOR 11  // NOLINT(modernize-macro-to-enum)
-#define NLOHMANN_JSON_VERSION_PATCH 3   // NOLINT(modernize-macro-to-enum)
+#define NLOHMANN_LOADER_JSON_VERSION_MAJOR 3   // NOLINT(modernize-macro-to-enum)
+#define NLOHMANN_LOADER_JSON_VERSION_MINOR 11  // NOLINT(modernize-macro-to-enum)
+#define NLOHMANN_LOADER_JSON_VERSION_PATCH 3   // NOLINT(modernize-macro-to-enum)
 
 #ifndef JSON_DIAGNOSTICS
     #define JSON_DIAGNOSTICS 0
@@ -78,81 +78,81 @@
 #endif
 
 #if JSON_DIAGNOSTICS
-    #define NLOHMANN_JSON_ABI_TAG_DIAGNOSTICS _diag
+    #define NLOHMANN_LOADER_JSON_ABI_TAG_DIAGNOSTICS _diag
 #else
-    #define NLOHMANN_JSON_ABI_TAG_DIAGNOSTICS
+    #define NLOHMANN_LOADER_JSON_ABI_TAG_DIAGNOSTICS
 #endif
 
 #if JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
-    #define NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON _ldvcmp
+    #define NLOHMANN_LOADER_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON _ldvcmp
 #else
-    #define NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON
+    #define NLOHMANN_LOADER_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON
 #endif
 
-#ifndef NLOHMANN_JSON_NAMESPACE_NO_VERSION
-    #define NLOHMANN_JSON_NAMESPACE_NO_VERSION 0
+#ifndef NLOHMANN_LOADER_JSON_NAMESPACE_NO_VERSION
+    #define NLOHMANN_LOADER_JSON_NAMESPACE_NO_VERSION 0
 #endif
 
 // Construct the namespace ABI tags component
-#define NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b) json_abi ## a ## b
-#define NLOHMANN_JSON_ABI_TAGS_CONCAT(a, b) \
-    NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b)
+#define NLOHMANN_LOADER_JSON_ABI_TAGS_CONCAT_EX(a, b) json_abi ## a ## b
+#define NLOHMANN_LOADER_JSON_ABI_TAGS_CONCAT(a, b) \
+    NLOHMANN_LOADER_JSON_ABI_TAGS_CONCAT_EX(a, b)
 
-#define NLOHMANN_JSON_ABI_TAGS                                       \
-    NLOHMANN_JSON_ABI_TAGS_CONCAT(                                   \
-            NLOHMANN_JSON_ABI_TAG_DIAGNOSTICS,                       \
-            NLOHMANN_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON)
+#define NLOHMANN_LOADER_JSON_ABI_TAGS                                       \
+    NLOHMANN_LOADER_JSON_ABI_TAGS_CONCAT(                                   \
+            NLOHMANN_LOADER_JSON_ABI_TAG_DIAGNOSTICS,                       \
+            NLOHMANN_LOADER_JSON_ABI_TAG_LEGACY_DISCARDED_VALUE_COMPARISON)
 
 // Construct the namespace version component
-#define NLOHMANN_JSON_NAMESPACE_VERSION_CONCAT_EX(major, minor, patch) \
+#define NLOHMANN_LOADER_JSON_NAMESPACE_VERSION_CONCAT_EX(major, minor, patch) \
     _v ## major ## _ ## minor ## _ ## patch
-#define NLOHMANN_JSON_NAMESPACE_VERSION_CONCAT(major, minor, patch) \
-    NLOHMANN_JSON_NAMESPACE_VERSION_CONCAT_EX(major, minor, patch)
+#define NLOHMANN_LOADER_JSON_NAMESPACE_VERSION_CONCAT(major, minor, patch) \
+    NLOHMANN_LOADER_JSON_NAMESPACE_VERSION_CONCAT_EX(major, minor, patch)
 
-#if NLOHMANN_JSON_NAMESPACE_NO_VERSION
-#define NLOHMANN_JSON_NAMESPACE_VERSION
+#if NLOHMANN_LOADER_JSON_NAMESPACE_NO_VERSION
+#define NLOHMANN_LOADER_JSON_NAMESPACE_VERSION
 #else
-#define NLOHMANN_JSON_NAMESPACE_VERSION                                 \
-    NLOHMANN_JSON_NAMESPACE_VERSION_CONCAT(NLOHMANN_JSON_VERSION_MAJOR, \
-                                           NLOHMANN_JSON_VERSION_MINOR, \
-                                           NLOHMANN_JSON_VERSION_PATCH)
+#define NLOHMANN_LOADER_JSON_NAMESPACE_VERSION                                 \
+    NLOHMANN_LOADER_JSON_NAMESPACE_VERSION_CONCAT(NLOHMANN_LOADER_JSON_VERSION_MAJOR, \
+                                           NLOHMANN_LOADER_JSON_VERSION_MINOR, \
+                                           NLOHMANN_LOADER_JSON_VERSION_PATCH)
 #endif
 
 // Combine namespace components
-#define NLOHMANN_JSON_NAMESPACE_CONCAT_EX(a, b) a ## b
-#define NLOHMANN_JSON_NAMESPACE_CONCAT(a, b) \
-    NLOHMANN_JSON_NAMESPACE_CONCAT_EX(a, b)
+#define NLOHMANN_LOADER_JSON_NAMESPACE_CONCAT_EX(a, b) a ## b
+#define NLOHMANN_LOADER_JSON_NAMESPACE_CONCAT(a, b) \
+    NLOHMANN_LOADER_JSON_NAMESPACE_CONCAT_EX(a, b)
 
-#ifndef NLOHMANN_JSON_NAMESPACE
-#define NLOHMANN_JSON_NAMESPACE               \
-    nlohmann::NLOHMANN_JSON_NAMESPACE_CONCAT( \
-            NLOHMANN_JSON_ABI_TAGS,           \
-            NLOHMANN_JSON_NAMESPACE_VERSION)
+#ifndef NLOHMANN_LOADER_JSON_NAMESPACE
+#define NLOHMANN_LOADER_JSON_NAMESPACE               \
+    nlohmann_loader::NLOHMANN_LOADER_JSON_NAMESPACE_CONCAT( \
+            NLOHMANN_LOADER_JSON_ABI_TAGS,           \
+            NLOHMANN_LOADER_JSON_NAMESPACE_VERSION)
 #endif
 
-#ifndef NLOHMANN_JSON_NAMESPACE_BEGIN
-#define NLOHMANN_JSON_NAMESPACE_BEGIN                \
-    namespace nlohmann                               \
+#ifndef NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
+#define NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN                \
+    namespace nlohmann_loader                               \
     {                                                \
-    inline namespace NLOHMANN_JSON_NAMESPACE_CONCAT( \
-                NLOHMANN_JSON_ABI_TAGS,              \
-                NLOHMANN_JSON_NAMESPACE_VERSION)     \
+    inline namespace NLOHMANN_LOADER_JSON_NAMESPACE_CONCAT( \
+                NLOHMANN_LOADER_JSON_ABI_TAGS,              \
+                NLOHMANN_LOADER_JSON_NAMESPACE_VERSION)     \
     {
 #endif
 
-#ifndef NLOHMANN_JSON_NAMESPACE_END
-#define NLOHMANN_JSON_NAMESPACE_END                                     \
+#ifndef NLOHMANN_LOADER_JSON_NAMESPACE_END
+#define NLOHMANN_LOADER_JSON_NAMESPACE_END                                     \
     }  /* namespace (inline namespace) NOLINT(readability/namespace) */ \
-    }  // namespace nlohmann
+    }  // namespace nlohmann_loader
 #endif
 
-// #include <nlohmann/detail/conversions/from_json.hpp>
+// #include <nlohmann_loader/detail/conversions/from_json.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -169,13 +169,13 @@
 #include <utility> // pair, declval
 #include <valarray> // valarray
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -189,13 +189,13 @@
 #include <string> // to_string
 #include <vector> // vector
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -205,46 +205,46 @@
 #include <cstdint> // uint8_t
 #include <string> // string
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
 #include <utility> // declval, pair
-// #include <nlohmann/detail/meta/detected.hpp>
+// #include <nlohmann_loader/detail/meta/detected.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
 #include <type_traits>
 
-// #include <nlohmann/detail/meta/void_t.hpp>
+// #include <nlohmann_loader/detail/meta/void_t.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -255,10 +255,10 @@ template<typename ...Ts> struct make_void
 template<typename ...Ts> using void_t = typename make_void<Ts...>::type;
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -313,17 +313,17 @@ using is_detected_convertible =
     std::is_convertible<detected_t<Op, Args...>, To>;
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/thirdparty/hedley/hedley.hpp>
+// #include <nlohmann_loader/thirdparty/hedley/hedley.hpp>
 
 
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-FileCopyrightText: 2016-2021 Evan Nemerson <evan@nemerson.com>
 // SPDX-License-Identifier: MIT
 
@@ -2366,18 +2366,18 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 // This file contains all internal macro definitions (except those affecting ABI)
 // You MUST include macro_unscope.hpp at the end of json.hpp to undef all of them
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
 // exclude unsupported compilers
 #if !defined(JSON_SKIP_UNSUPPORTED_COMPILER_CHECK)
     #if defined(__clang__)
         #if (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__) < 30400
-            #error "unsupported Clang version - see https://github.com/nlohmann/json#supported-compilers"
+            #error "unsupported Clang version - see https://github.com/nlohmann_loader/json#supported-compilers"
         #endif
     #elif defined(__GNUC__) && !(defined(__ICC) || defined(__INTEL_COMPILER))
         #if (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) < 40800
-            #error "unsupported GCC version - see https://github.com/nlohmann/json#supported-compilers"
+            #error "unsupported GCC version - see https://github.com/nlohmann_loader/json#supported-compilers"
         #endif
     #endif
 #endif
@@ -2561,10 +2561,10 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 
 /*!
 @brief macro to briefly define a mapping between an enum and JSON
-@def NLOHMANN_JSON_SERIALIZE_ENUM
+@def NLOHMANN_LOADER_JSON_SERIALIZE_ENUM
 @since version 3.4.0
 */
-#define NLOHMANN_JSON_SERIALIZE_ENUM(ENUM_TYPE, ...)                                            \
+#define NLOHMANN_LOADER_JSON_SERIALIZE_ENUM(ENUM_TYPE, ...)                                            \
     template<typename BasicJsonType>                                                            \
     inline void to_json(BasicJsonType& j, const ENUM_TYPE& e)                                   \
     {                                                                                           \
@@ -2593,7 +2593,7 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 // Ugly macros to avoid uglier copy-paste when specializing basic_json. They
 // may be removed in the future once the class is split.
 
-#define NLOHMANN_BASIC_JSON_TPL_DECLARATION                                \
+#define NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION                                \
     template<template<typename, typename, typename...> class ObjectType,   \
              template<typename, typename...> class ArrayType,              \
              class StringType, class BooleanType, class NumberIntegerType, \
@@ -2603,179 +2603,179 @@ JSON_HEDLEY_DIAGNOSTIC_POP
              class BinaryType,                                             \
              class CustomBaseClass>
 
-#define NLOHMANN_BASIC_JSON_TPL                                            \
+#define NLOHMANN_LOADER_BASIC_JSON_TPL                                            \
     basic_json<ObjectType, ArrayType, StringType, BooleanType,             \
     NumberIntegerType, NumberUnsignedType, NumberFloatType,                \
     AllocatorType, JSONSerializer, BinaryType, CustomBaseClass>
 
 // Macros to simplify conversion from/to types
 
-#define NLOHMANN_JSON_EXPAND( x ) x
-#define NLOHMANN_JSON_GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, NAME,...) NAME
-#define NLOHMANN_JSON_PASTE(...) NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_GET_MACRO(__VA_ARGS__, \
-        NLOHMANN_JSON_PASTE64, \
-        NLOHMANN_JSON_PASTE63, \
-        NLOHMANN_JSON_PASTE62, \
-        NLOHMANN_JSON_PASTE61, \
-        NLOHMANN_JSON_PASTE60, \
-        NLOHMANN_JSON_PASTE59, \
-        NLOHMANN_JSON_PASTE58, \
-        NLOHMANN_JSON_PASTE57, \
-        NLOHMANN_JSON_PASTE56, \
-        NLOHMANN_JSON_PASTE55, \
-        NLOHMANN_JSON_PASTE54, \
-        NLOHMANN_JSON_PASTE53, \
-        NLOHMANN_JSON_PASTE52, \
-        NLOHMANN_JSON_PASTE51, \
-        NLOHMANN_JSON_PASTE50, \
-        NLOHMANN_JSON_PASTE49, \
-        NLOHMANN_JSON_PASTE48, \
-        NLOHMANN_JSON_PASTE47, \
-        NLOHMANN_JSON_PASTE46, \
-        NLOHMANN_JSON_PASTE45, \
-        NLOHMANN_JSON_PASTE44, \
-        NLOHMANN_JSON_PASTE43, \
-        NLOHMANN_JSON_PASTE42, \
-        NLOHMANN_JSON_PASTE41, \
-        NLOHMANN_JSON_PASTE40, \
-        NLOHMANN_JSON_PASTE39, \
-        NLOHMANN_JSON_PASTE38, \
-        NLOHMANN_JSON_PASTE37, \
-        NLOHMANN_JSON_PASTE36, \
-        NLOHMANN_JSON_PASTE35, \
-        NLOHMANN_JSON_PASTE34, \
-        NLOHMANN_JSON_PASTE33, \
-        NLOHMANN_JSON_PASTE32, \
-        NLOHMANN_JSON_PASTE31, \
-        NLOHMANN_JSON_PASTE30, \
-        NLOHMANN_JSON_PASTE29, \
-        NLOHMANN_JSON_PASTE28, \
-        NLOHMANN_JSON_PASTE27, \
-        NLOHMANN_JSON_PASTE26, \
-        NLOHMANN_JSON_PASTE25, \
-        NLOHMANN_JSON_PASTE24, \
-        NLOHMANN_JSON_PASTE23, \
-        NLOHMANN_JSON_PASTE22, \
-        NLOHMANN_JSON_PASTE21, \
-        NLOHMANN_JSON_PASTE20, \
-        NLOHMANN_JSON_PASTE19, \
-        NLOHMANN_JSON_PASTE18, \
-        NLOHMANN_JSON_PASTE17, \
-        NLOHMANN_JSON_PASTE16, \
-        NLOHMANN_JSON_PASTE15, \
-        NLOHMANN_JSON_PASTE14, \
-        NLOHMANN_JSON_PASTE13, \
-        NLOHMANN_JSON_PASTE12, \
-        NLOHMANN_JSON_PASTE11, \
-        NLOHMANN_JSON_PASTE10, \
-        NLOHMANN_JSON_PASTE9, \
-        NLOHMANN_JSON_PASTE8, \
-        NLOHMANN_JSON_PASTE7, \
-        NLOHMANN_JSON_PASTE6, \
-        NLOHMANN_JSON_PASTE5, \
-        NLOHMANN_JSON_PASTE4, \
-        NLOHMANN_JSON_PASTE3, \
-        NLOHMANN_JSON_PASTE2, \
-        NLOHMANN_JSON_PASTE1)(__VA_ARGS__))
-#define NLOHMANN_JSON_PASTE2(func, v1) func(v1)
-#define NLOHMANN_JSON_PASTE3(func, v1, v2) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE2(func, v2)
-#define NLOHMANN_JSON_PASTE4(func, v1, v2, v3) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE3(func, v2, v3)
-#define NLOHMANN_JSON_PASTE5(func, v1, v2, v3, v4) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE4(func, v2, v3, v4)
-#define NLOHMANN_JSON_PASTE6(func, v1, v2, v3, v4, v5) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE5(func, v2, v3, v4, v5)
-#define NLOHMANN_JSON_PASTE7(func, v1, v2, v3, v4, v5, v6) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE6(func, v2, v3, v4, v5, v6)
-#define NLOHMANN_JSON_PASTE8(func, v1, v2, v3, v4, v5, v6, v7) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE7(func, v2, v3, v4, v5, v6, v7)
-#define NLOHMANN_JSON_PASTE9(func, v1, v2, v3, v4, v5, v6, v7, v8) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE8(func, v2, v3, v4, v5, v6, v7, v8)
-#define NLOHMANN_JSON_PASTE10(func, v1, v2, v3, v4, v5, v6, v7, v8, v9) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE9(func, v2, v3, v4, v5, v6, v7, v8, v9)
-#define NLOHMANN_JSON_PASTE11(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE10(func, v2, v3, v4, v5, v6, v7, v8, v9, v10)
-#define NLOHMANN_JSON_PASTE12(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE11(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)
-#define NLOHMANN_JSON_PASTE13(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE12(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12)
-#define NLOHMANN_JSON_PASTE14(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE13(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13)
-#define NLOHMANN_JSON_PASTE15(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE14(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14)
-#define NLOHMANN_JSON_PASTE16(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE15(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15)
-#define NLOHMANN_JSON_PASTE17(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE16(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16)
-#define NLOHMANN_JSON_PASTE18(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE17(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17)
-#define NLOHMANN_JSON_PASTE19(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE18(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18)
-#define NLOHMANN_JSON_PASTE20(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE19(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19)
-#define NLOHMANN_JSON_PASTE21(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE20(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20)
-#define NLOHMANN_JSON_PASTE22(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE21(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21)
-#define NLOHMANN_JSON_PASTE23(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE22(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22)
-#define NLOHMANN_JSON_PASTE24(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE23(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23)
-#define NLOHMANN_JSON_PASTE25(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE24(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24)
-#define NLOHMANN_JSON_PASTE26(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE25(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25)
-#define NLOHMANN_JSON_PASTE27(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE26(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26)
-#define NLOHMANN_JSON_PASTE28(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE27(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27)
-#define NLOHMANN_JSON_PASTE29(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE28(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28)
-#define NLOHMANN_JSON_PASTE30(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE29(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29)
-#define NLOHMANN_JSON_PASTE31(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE30(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30)
-#define NLOHMANN_JSON_PASTE32(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE31(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31)
-#define NLOHMANN_JSON_PASTE33(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE32(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32)
-#define NLOHMANN_JSON_PASTE34(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE33(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33)
-#define NLOHMANN_JSON_PASTE35(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE34(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34)
-#define NLOHMANN_JSON_PASTE36(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE35(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35)
-#define NLOHMANN_JSON_PASTE37(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE36(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36)
-#define NLOHMANN_JSON_PASTE38(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE37(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37)
-#define NLOHMANN_JSON_PASTE39(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE38(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38)
-#define NLOHMANN_JSON_PASTE40(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE39(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39)
-#define NLOHMANN_JSON_PASTE41(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE40(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40)
-#define NLOHMANN_JSON_PASTE42(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE41(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41)
-#define NLOHMANN_JSON_PASTE43(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE42(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42)
-#define NLOHMANN_JSON_PASTE44(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE43(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43)
-#define NLOHMANN_JSON_PASTE45(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE44(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44)
-#define NLOHMANN_JSON_PASTE46(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE45(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45)
-#define NLOHMANN_JSON_PASTE47(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE46(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46)
-#define NLOHMANN_JSON_PASTE48(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE47(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47)
-#define NLOHMANN_JSON_PASTE49(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE48(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48)
-#define NLOHMANN_JSON_PASTE50(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE49(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49)
-#define NLOHMANN_JSON_PASTE51(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE50(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50)
-#define NLOHMANN_JSON_PASTE52(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE51(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51)
-#define NLOHMANN_JSON_PASTE53(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE52(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52)
-#define NLOHMANN_JSON_PASTE54(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE53(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53)
-#define NLOHMANN_JSON_PASTE55(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE54(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54)
-#define NLOHMANN_JSON_PASTE56(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE55(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55)
-#define NLOHMANN_JSON_PASTE57(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE56(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56)
-#define NLOHMANN_JSON_PASTE58(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE57(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57)
-#define NLOHMANN_JSON_PASTE59(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE58(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58)
-#define NLOHMANN_JSON_PASTE60(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE59(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59)
-#define NLOHMANN_JSON_PASTE61(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE60(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60)
-#define NLOHMANN_JSON_PASTE62(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE61(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61)
-#define NLOHMANN_JSON_PASTE63(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE62(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62)
-#define NLOHMANN_JSON_PASTE64(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62, v63) NLOHMANN_JSON_PASTE2(func, v1) NLOHMANN_JSON_PASTE63(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62, v63)
+#define NLOHMANN_LOADER_JSON_EXPAND( x ) x
+#define NLOHMANN_LOADER_JSON_GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, NAME,...) NAME
+#define NLOHMANN_LOADER_JSON_PASTE(...) NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_GET_MACRO(__VA_ARGS__, \
+        NLOHMANN_LOADER_JSON_PASTE64, \
+        NLOHMANN_LOADER_JSON_PASTE63, \
+        NLOHMANN_LOADER_JSON_PASTE62, \
+        NLOHMANN_LOADER_JSON_PASTE61, \
+        NLOHMANN_LOADER_JSON_PASTE60, \
+        NLOHMANN_LOADER_JSON_PASTE59, \
+        NLOHMANN_LOADER_JSON_PASTE58, \
+        NLOHMANN_LOADER_JSON_PASTE57, \
+        NLOHMANN_LOADER_JSON_PASTE56, \
+        NLOHMANN_LOADER_JSON_PASTE55, \
+        NLOHMANN_LOADER_JSON_PASTE54, \
+        NLOHMANN_LOADER_JSON_PASTE53, \
+        NLOHMANN_LOADER_JSON_PASTE52, \
+        NLOHMANN_LOADER_JSON_PASTE51, \
+        NLOHMANN_LOADER_JSON_PASTE50, \
+        NLOHMANN_LOADER_JSON_PASTE49, \
+        NLOHMANN_LOADER_JSON_PASTE48, \
+        NLOHMANN_LOADER_JSON_PASTE47, \
+        NLOHMANN_LOADER_JSON_PASTE46, \
+        NLOHMANN_LOADER_JSON_PASTE45, \
+        NLOHMANN_LOADER_JSON_PASTE44, \
+        NLOHMANN_LOADER_JSON_PASTE43, \
+        NLOHMANN_LOADER_JSON_PASTE42, \
+        NLOHMANN_LOADER_JSON_PASTE41, \
+        NLOHMANN_LOADER_JSON_PASTE40, \
+        NLOHMANN_LOADER_JSON_PASTE39, \
+        NLOHMANN_LOADER_JSON_PASTE38, \
+        NLOHMANN_LOADER_JSON_PASTE37, \
+        NLOHMANN_LOADER_JSON_PASTE36, \
+        NLOHMANN_LOADER_JSON_PASTE35, \
+        NLOHMANN_LOADER_JSON_PASTE34, \
+        NLOHMANN_LOADER_JSON_PASTE33, \
+        NLOHMANN_LOADER_JSON_PASTE32, \
+        NLOHMANN_LOADER_JSON_PASTE31, \
+        NLOHMANN_LOADER_JSON_PASTE30, \
+        NLOHMANN_LOADER_JSON_PASTE29, \
+        NLOHMANN_LOADER_JSON_PASTE28, \
+        NLOHMANN_LOADER_JSON_PASTE27, \
+        NLOHMANN_LOADER_JSON_PASTE26, \
+        NLOHMANN_LOADER_JSON_PASTE25, \
+        NLOHMANN_LOADER_JSON_PASTE24, \
+        NLOHMANN_LOADER_JSON_PASTE23, \
+        NLOHMANN_LOADER_JSON_PASTE22, \
+        NLOHMANN_LOADER_JSON_PASTE21, \
+        NLOHMANN_LOADER_JSON_PASTE20, \
+        NLOHMANN_LOADER_JSON_PASTE19, \
+        NLOHMANN_LOADER_JSON_PASTE18, \
+        NLOHMANN_LOADER_JSON_PASTE17, \
+        NLOHMANN_LOADER_JSON_PASTE16, \
+        NLOHMANN_LOADER_JSON_PASTE15, \
+        NLOHMANN_LOADER_JSON_PASTE14, \
+        NLOHMANN_LOADER_JSON_PASTE13, \
+        NLOHMANN_LOADER_JSON_PASTE12, \
+        NLOHMANN_LOADER_JSON_PASTE11, \
+        NLOHMANN_LOADER_JSON_PASTE10, \
+        NLOHMANN_LOADER_JSON_PASTE9, \
+        NLOHMANN_LOADER_JSON_PASTE8, \
+        NLOHMANN_LOADER_JSON_PASTE7, \
+        NLOHMANN_LOADER_JSON_PASTE6, \
+        NLOHMANN_LOADER_JSON_PASTE5, \
+        NLOHMANN_LOADER_JSON_PASTE4, \
+        NLOHMANN_LOADER_JSON_PASTE3, \
+        NLOHMANN_LOADER_JSON_PASTE2, \
+        NLOHMANN_LOADER_JSON_PASTE1)(__VA_ARGS__))
+#define NLOHMANN_LOADER_JSON_PASTE2(func, v1) func(v1)
+#define NLOHMANN_LOADER_JSON_PASTE3(func, v1, v2) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE2(func, v2)
+#define NLOHMANN_LOADER_JSON_PASTE4(func, v1, v2, v3) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE3(func, v2, v3)
+#define NLOHMANN_LOADER_JSON_PASTE5(func, v1, v2, v3, v4) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE4(func, v2, v3, v4)
+#define NLOHMANN_LOADER_JSON_PASTE6(func, v1, v2, v3, v4, v5) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE5(func, v2, v3, v4, v5)
+#define NLOHMANN_LOADER_JSON_PASTE7(func, v1, v2, v3, v4, v5, v6) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE6(func, v2, v3, v4, v5, v6)
+#define NLOHMANN_LOADER_JSON_PASTE8(func, v1, v2, v3, v4, v5, v6, v7) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE7(func, v2, v3, v4, v5, v6, v7)
+#define NLOHMANN_LOADER_JSON_PASTE9(func, v1, v2, v3, v4, v5, v6, v7, v8) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE8(func, v2, v3, v4, v5, v6, v7, v8)
+#define NLOHMANN_LOADER_JSON_PASTE10(func, v1, v2, v3, v4, v5, v6, v7, v8, v9) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE9(func, v2, v3, v4, v5, v6, v7, v8, v9)
+#define NLOHMANN_LOADER_JSON_PASTE11(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE10(func, v2, v3, v4, v5, v6, v7, v8, v9, v10)
+#define NLOHMANN_LOADER_JSON_PASTE12(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE11(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)
+#define NLOHMANN_LOADER_JSON_PASTE13(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE12(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12)
+#define NLOHMANN_LOADER_JSON_PASTE14(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE13(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13)
+#define NLOHMANN_LOADER_JSON_PASTE15(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE14(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14)
+#define NLOHMANN_LOADER_JSON_PASTE16(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE15(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15)
+#define NLOHMANN_LOADER_JSON_PASTE17(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE16(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16)
+#define NLOHMANN_LOADER_JSON_PASTE18(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE17(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17)
+#define NLOHMANN_LOADER_JSON_PASTE19(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE18(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18)
+#define NLOHMANN_LOADER_JSON_PASTE20(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE19(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19)
+#define NLOHMANN_LOADER_JSON_PASTE21(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE20(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20)
+#define NLOHMANN_LOADER_JSON_PASTE22(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE21(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21)
+#define NLOHMANN_LOADER_JSON_PASTE23(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE22(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22)
+#define NLOHMANN_LOADER_JSON_PASTE24(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE23(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23)
+#define NLOHMANN_LOADER_JSON_PASTE25(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE24(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24)
+#define NLOHMANN_LOADER_JSON_PASTE26(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE25(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25)
+#define NLOHMANN_LOADER_JSON_PASTE27(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE26(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26)
+#define NLOHMANN_LOADER_JSON_PASTE28(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE27(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27)
+#define NLOHMANN_LOADER_JSON_PASTE29(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE28(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28)
+#define NLOHMANN_LOADER_JSON_PASTE30(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE29(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29)
+#define NLOHMANN_LOADER_JSON_PASTE31(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE30(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30)
+#define NLOHMANN_LOADER_JSON_PASTE32(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE31(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31)
+#define NLOHMANN_LOADER_JSON_PASTE33(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE32(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32)
+#define NLOHMANN_LOADER_JSON_PASTE34(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE33(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33)
+#define NLOHMANN_LOADER_JSON_PASTE35(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE34(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34)
+#define NLOHMANN_LOADER_JSON_PASTE36(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE35(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35)
+#define NLOHMANN_LOADER_JSON_PASTE37(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE36(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36)
+#define NLOHMANN_LOADER_JSON_PASTE38(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE37(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37)
+#define NLOHMANN_LOADER_JSON_PASTE39(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE38(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38)
+#define NLOHMANN_LOADER_JSON_PASTE40(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE39(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39)
+#define NLOHMANN_LOADER_JSON_PASTE41(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE40(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40)
+#define NLOHMANN_LOADER_JSON_PASTE42(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE41(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41)
+#define NLOHMANN_LOADER_JSON_PASTE43(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE42(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42)
+#define NLOHMANN_LOADER_JSON_PASTE44(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE43(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43)
+#define NLOHMANN_LOADER_JSON_PASTE45(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE44(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44)
+#define NLOHMANN_LOADER_JSON_PASTE46(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE45(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45)
+#define NLOHMANN_LOADER_JSON_PASTE47(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE46(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46)
+#define NLOHMANN_LOADER_JSON_PASTE48(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE47(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47)
+#define NLOHMANN_LOADER_JSON_PASTE49(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE48(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48)
+#define NLOHMANN_LOADER_JSON_PASTE50(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE49(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49)
+#define NLOHMANN_LOADER_JSON_PASTE51(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE50(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50)
+#define NLOHMANN_LOADER_JSON_PASTE52(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE51(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51)
+#define NLOHMANN_LOADER_JSON_PASTE53(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE52(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52)
+#define NLOHMANN_LOADER_JSON_PASTE54(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE53(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53)
+#define NLOHMANN_LOADER_JSON_PASTE55(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE54(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54)
+#define NLOHMANN_LOADER_JSON_PASTE56(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE55(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55)
+#define NLOHMANN_LOADER_JSON_PASTE57(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE56(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56)
+#define NLOHMANN_LOADER_JSON_PASTE58(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE57(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57)
+#define NLOHMANN_LOADER_JSON_PASTE59(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE58(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58)
+#define NLOHMANN_LOADER_JSON_PASTE60(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE59(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59)
+#define NLOHMANN_LOADER_JSON_PASTE61(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE60(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60)
+#define NLOHMANN_LOADER_JSON_PASTE62(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE61(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61)
+#define NLOHMANN_LOADER_JSON_PASTE63(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE62(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62)
+#define NLOHMANN_LOADER_JSON_PASTE64(func, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62, v63) NLOHMANN_LOADER_JSON_PASTE2(func, v1) NLOHMANN_LOADER_JSON_PASTE63(func, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62, v63)
 
-#define NLOHMANN_JSON_TO(v1) nlohmann_json_j[#v1] = nlohmann_json_t.v1;
-#define NLOHMANN_JSON_FROM(v1) nlohmann_json_j.at(#v1).get_to(nlohmann_json_t.v1);
-#define NLOHMANN_JSON_FROM_WITH_DEFAULT(v1) nlohmann_json_t.v1 = nlohmann_json_j.value(#v1, nlohmann_json_default_obj.v1);
-
-/*!
-@brief macro
-@def NLOHMANN_DEFINE_TYPE_INTRUSIVE
-@since version 3.9.0
-*/
-#define NLOHMANN_DEFINE_TYPE_INTRUSIVE(Type, ...)  \
-    friend void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
-    friend void from_json(const nlohmann::json& nlohmann_json_j, Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__)) }
-
-#define NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(Type, ...)  \
-    friend void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
-    friend void from_json(const nlohmann::json& nlohmann_json_j, Type& nlohmann_json_t) { const Type nlohmann_json_default_obj{}; NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
-
-#define NLOHMANN_DEFINE_TYPE_INTRUSIVE_ONLY_SERIALIZE(Type, ...)  \
-    friend void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) }
+#define NLOHMANN_LOADER_JSON_TO(v1) nlohmann_loader_json_j[#v1] = nlohmann_loader_json_t.v1;
+#define NLOHMANN_LOADER_JSON_FROM(v1) nlohmann_loader_json_j.at(#v1).get_to(nlohmann_loader_json_t.v1);
+#define NLOHMANN_LOADER_JSON_FROM_WITH_DEFAULT(v1) nlohmann_loader_json_t.v1 = nlohmann_loader_json_j.value(#v1, nlohmann_loader_json_default_obj.v1);
 
 /*!
 @brief macro
-@def NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE
+@def NLOHMANN_LOADER_DEFINE_TYPE_INTRUSIVE
 @since version 3.9.0
 */
-#define NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)  \
-    inline void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
-    inline void from_json(const nlohmann::json& nlohmann_json_j, Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM, __VA_ARGS__)) }
+#define NLOHMANN_LOADER_DEFINE_TYPE_INTRUSIVE(Type, ...)  \
+    friend void to_json(nlohmann_loader::json& nlohmann_loader_json_j, const Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_TO, __VA_ARGS__)) } \
+    friend void from_json(const nlohmann_loader::json& nlohmann_loader_json_j, Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_FROM, __VA_ARGS__)) }
 
-#define NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_ONLY_SERIALIZE(Type, ...)  \
-    inline void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) }
+#define NLOHMANN_LOADER_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(Type, ...)  \
+    friend void to_json(nlohmann_loader::json& nlohmann_loader_json_j, const Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_TO, __VA_ARGS__)) } \
+    friend void from_json(const nlohmann_loader::json& nlohmann_loader_json_j, Type& nlohmann_loader_json_t) { const Type nlohmann_loader_json_default_obj{}; NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
 
-#define NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Type, ...)  \
-    inline void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t) { NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_TO, __VA_ARGS__)) } \
-    inline void from_json(const nlohmann::json& nlohmann_json_j, Type& nlohmann_json_t) { const Type nlohmann_json_default_obj{}; NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NLOHMANN_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
+#define NLOHMANN_LOADER_DEFINE_TYPE_INTRUSIVE_ONLY_SERIALIZE(Type, ...)  \
+    friend void to_json(nlohmann_loader::json& nlohmann_loader_json_j, const Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_TO, __VA_ARGS__)) }
+
+/*!
+@brief macro
+@def NLOHMANN_LOADER_DEFINE_TYPE_NON_INTRUSIVE
+@since version 3.9.0
+*/
+#define NLOHMANN_LOADER_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)  \
+    inline void to_json(nlohmann_loader::json& nlohmann_loader_json_j, const Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_TO, __VA_ARGS__)) } \
+    inline void from_json(const nlohmann_loader::json& nlohmann_loader_json_j, Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_FROM, __VA_ARGS__)) }
+
+#define NLOHMANN_LOADER_DEFINE_TYPE_NON_INTRUSIVE_ONLY_SERIALIZE(Type, ...)  \
+    inline void to_json(nlohmann_loader::json& nlohmann_loader_json_j, const Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_TO, __VA_ARGS__)) }
+
+#define NLOHMANN_LOADER_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Type, ...)  \
+    inline void to_json(nlohmann_loader::json& nlohmann_loader_json_j, const Type& nlohmann_loader_json_t) { NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_TO, __VA_ARGS__)) } \
+    inline void from_json(const nlohmann_loader::json& nlohmann_loader_json_j, Type& nlohmann_loader_json_t) { const Type nlohmann_loader_json_default_obj{}; NLOHMANN_LOADER_JSON_EXPAND(NLOHMANN_LOADER_JSON_PASTE(NLOHMANN_LOADER_JSON_FROM_WITH_DEFAULT, __VA_ARGS__)) }
 
 // inspired from https://stackoverflow.com/a/26745591
 // allows to call any std function as if (e.g. with begin):
@@ -2783,7 +2783,7 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 //
 // it allows using the detected idiom to retrieve the return type
 // of such an expression
-#define NLOHMANN_CAN_CALL_STD_FUNC_IMPL(std_name)                                 \
+#define NLOHMANN_LOADER_CAN_CALL_STD_FUNC_IMPL(std_name)                                 \
     namespace detail {                                                            \
     using std::std_name;                                                          \
     \
@@ -2805,7 +2805,7 @@ JSON_HEDLEY_DIAGNOSTIC_POP
     template<typename... T>                                                       \
     struct would_call_std_##std_name                                              \
     {                                                                             \
-        static constexpr auto const value = ::nlohmann::detail::                  \
+        static constexpr auto const value = ::nlohmann_loader::detail::                  \
                                             is_detected_exact<std_name##_tag, result_of_##std_name, T...>::value; \
     };                                                                            \
     } /* namespace detail2 */ \
@@ -2837,7 +2837,7 @@ JSON_HEDLEY_DIAGNOSTIC_POP
     #include <compare> // partial_ordering
 #endif
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -2934,23 +2934,23 @@ inline bool operator<(const value_t lhs, const value_t rhs) noexcept
 #endif
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/string_escape.hpp>
+// #include <nlohmann_loader/detail/string_escape.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -3009,25 +3009,25 @@ static void unescape(StringType& s)
 }
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/input/position_t.hpp>
+// #include <nlohmann_loader/detail/input/position_t.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
 #include <cstddef> // size_t
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -3049,17 +3049,17 @@ struct position_t
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-FileCopyrightText: 2018 The Abseil Authors
 // SPDX-License-Identifier: MIT
 
@@ -3070,10 +3070,10 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <type_traits> // conditional, enable_if, false_type, integral_constant, is_constructible, is_integral, is_same, remove_cv, remove_reference, true_type
 #include <utility> // index_sequence, make_index_sequence, index_sequence_for
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -3225,15 +3225,15 @@ inline constexpr std::array<T, sizeof...(Args)> make_array(Args&& ... args)
 }
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -3244,27 +3244,27 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <tuple> // tuple
 #include <string> // char_traits
 
-// #include <nlohmann/detail/iterators/iterator_traits.hpp>
+// #include <nlohmann_loader/detail/iterators/iterator_traits.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
 #include <iterator> // random_access_iterator_tag
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
-// #include <nlohmann/detail/meta/void_t.hpp>
+// #include <nlohmann_loader/detail/meta/void_t.hpp>
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -3285,7 +3285,7 @@ struct iterator_types <
 };
 
 // This is required as some compilers implement std::iterator_traits in a way that
-// doesn't work with SFINAE. See https://github.com/nlohmann/json/issues/1341.
+// doesn't work with SFINAE. See https://github.com/nlohmann_loader/json/issues/1341.
 template<typename T, typename = void>
 struct iterator_traits
 {
@@ -3308,65 +3308,65 @@ struct iterator_traits<T*, enable_if_t<std::is_object<T>::value>>
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/call_std/begin.hpp>
+// #include <nlohmann_loader/detail/meta/call_std/begin.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
-NLOHMANN_CAN_CALL_STD_FUNC_IMPL(begin);
+NLOHMANN_LOADER_CAN_CALL_STD_FUNC_IMPL(begin);
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/meta/call_std/end.hpp>
+// #include <nlohmann_loader/detail/meta/call_std/end.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
-NLOHMANN_CAN_CALL_STD_FUNC_IMPL(end);
+NLOHMANN_LOADER_CAN_CALL_STD_FUNC_IMPL(end);
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
-// #include <nlohmann/detail/meta/detected.hpp>
+// #include <nlohmann_loader/detail/meta/detected.hpp>
 
-// #include <nlohmann/json_fwd.hpp>
+// #include <nlohmann_loader/json_fwd.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
-#ifndef INCLUDE_NLOHMANN_JSON_FWD_HPP_
-    #define INCLUDE_NLOHMANN_JSON_FWD_HPP_
+#ifndef INCLUDE_NLOHMANN_LOADER_JSON_FWD_HPP_
+    #define INCLUDE_NLOHMANN_LOADER_JSON_FWD_HPP_
 
     #include <cstdint> // int64_t, uint64_t
     #include <map> // map
@@ -3374,15 +3374,15 @@ NLOHMANN_JSON_NAMESPACE_END
     #include <string> // string
     #include <vector> // vector
 
-    // #include <nlohmann/detail/abi_macros.hpp>
+    // #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
     /*!
     @brief namespace for Niels Lohmann
-    @see https://github.com/nlohmann
+    @see https://github.com/nlohmann_loader
     @since version 1.0.0
     */
-    NLOHMANN_JSON_NAMESPACE_BEGIN
+    NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
     /*!
     @brief default JSONSerializer template argument
@@ -3395,7 +3395,7 @@ NLOHMANN_JSON_NAMESPACE_END
     struct adl_serializer;
 
     /// a class to store JSON values
-    /// @sa https://json.nlohmann.me/api/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/
     template<template<typename U, typename V, typename... Args> class ObjectType =
     std::map,
     template<typename U, typename... Args> class ArrayType = std::vector,
@@ -3411,31 +3411,31 @@ NLOHMANN_JSON_NAMESPACE_END
     class basic_json;
 
     /// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
-    /// @sa https://json.nlohmann.me/api/json_pointer/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/
     template<typename RefStringType>
     class json_pointer;
 
     /*!
     @brief default specialization
-    @sa https://json.nlohmann.me/api/json/
+    @sa https://json.nlohmann_loader.me/api/json/
     */
     using json = basic_json<>;
 
     /// @brief a minimal map-like container that preserves insertion order
-    /// @sa https://json.nlohmann.me/api/ordered_map/
+    /// @sa https://json.nlohmann_loader.me/api/ordered_map/
     template<class Key, class T, class IgnoredLess, class Allocator>
     struct ordered_map;
 
     /// @brief specialization that maintains the insertion order of object keys
-    /// @sa https://json.nlohmann.me/api/ordered_json/
-    using ordered_json = basic_json<nlohmann::ordered_map>;
+    /// @sa https://json.nlohmann_loader.me/api/ordered_json/
+    using ordered_json = basic_json<nlohmann_loader::ordered_map>;
 
-    NLOHMANN_JSON_NAMESPACE_END
+    NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-#endif  // INCLUDE_NLOHMANN_JSON_FWD_HPP_
+#endif  // INCLUDE_NLOHMANN_LOADER_JSON_FWD_HPP_
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 /*!
 @brief detail namespace with internal helper functions
 
@@ -3462,8 +3462,8 @@ namespace detail
 
 template<typename> struct is_basic_json : std::false_type {};
 
-NLOHMANN_BASIC_JSON_TPL_DECLARATION
-struct is_basic_json<NLOHMANN_BASIC_JSON_TPL> : std::true_type {};
+NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
+struct is_basic_json<NLOHMANN_LOADER_BASIC_JSON_TPL> : std::true_type {};
 
 // used by exceptions create() member functions
 // true_type for pointer to possibly cv-qualified basic_json or std::nullptr_t
@@ -3529,7 +3529,7 @@ struct has_from_json : std::false_type {};
 // trait checking if j.get<T> is valid
 // use this trait instead of std::is_constructible or std::is_convertible,
 // both rely on, or make use of implicit conversions, and thus fail when T
-// has several constructors/operator= (see https://github.com/nlohmann/json/issues/958)
+// has several constructors/operator= (see https://github.com/nlohmann_loader/json/issues/958)
 template <typename BasicJsonType, typename T>
 struct is_getable
 {
@@ -3847,7 +3847,7 @@ struct is_compatible_array_type_impl <
     is_detected<iterator_t, CompatibleArrayType>::value&&
     is_iterator_traits<iterator_traits<detected_t<iterator_t, CompatibleArrayType>>>::value&&
 // special case for types like std::filesystem::path whose iterator's value_type are themselves
-// c.f. https://github.com/nlohmann/json/pull/3073
+// c.f. https://github.com/nlohmann_loader/json/pull/3073
     !std::is_same<CompatibleArrayType, detected_t<range_value_t, CompatibleArrayType>>::value >>
 {
     static constexpr bool value =
@@ -3882,7 +3882,7 @@ is_detected<iterator_t, ConstructibleArrayType>::value&&
 is_iterator_traits<iterator_traits<detected_t<iterator_t, ConstructibleArrayType>>>::value&&
 is_detected<range_value_t, ConstructibleArrayType>::value&&
 // special case for types like std::filesystem::path whose iterator's value_type are themselves
-// c.f. https://github.com/nlohmann/json/pull/3073
+// c.f. https://github.com/nlohmann_loader/json/pull/3073
 !std::is_same<ConstructibleArrayType, detected_t<range_value_t, ConstructibleArrayType>>::value&&
         is_complete_type <
         detected_t<range_value_t, ConstructibleArrayType >>::value >>
@@ -3970,7 +3970,7 @@ template<template <typename...> class Primary, typename... Args>
 struct is_specialization_of<Primary, Primary<Args...>> : std::true_type {};
 
 template<typename T>
-using is_json_pointer = is_specialization_of<::nlohmann::json_pointer, uncvref_t<T>>;
+using is_json_pointer = is_specialization_of<::nlohmann_loader::json_pointer, uncvref_t<T>>;
 
 // checks if A and B are comparable using Compare functor
 template<typename Compare, typename A, typename B, typename = void>
@@ -4045,7 +4045,7 @@ struct is_ordered_map
     enum { value = sizeof(test<T>(nullptr)) == sizeof(char) }; // NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
 };
 
-// to avoid useless casts (see https://github.com/nlohmann/json/issues/2893#issuecomment-889152324)
+// to avoid useless casts (see https://github.com/nlohmann_loader/json/issues/2893#issuecomment-889152324)
 template < typename T, typename U, enable_if_t < !std::is_same<T, U>::value, int > = 0 >
 T conditional_static_cast(U value)
 {
@@ -4205,15 +4205,15 @@ struct is_transparent : bool_constant<impl::is_transparent<T>()> {};
 ///////////////////////////////////////////////////////////////////////////////
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -4222,12 +4222,12 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <string> // string
 #include <utility> // forward
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
-// #include <nlohmann/detail/meta/detected.hpp>
+// #include <nlohmann_loader/detail/meta/detected.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -4355,10 +4355,10 @@ inline OutStringType concat(Args && ... args)
 }
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -4367,7 +4367,7 @@ namespace detail
 ////////////////
 
 /// @brief general exception of the @ref basic_json class
-/// @sa https://json.nlohmann.me/api/basic_json/exception/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/exception/
 class exception : public std::exception
 {
   public:
@@ -4465,7 +4465,7 @@ class exception : public std::exception
 };
 
 /// @brief exception indicating a parse error
-/// @sa https://json.nlohmann.me/api/basic_json/parse_error/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/parse_error/
 class parse_error : public exception
 {
   public:
@@ -4518,7 +4518,7 @@ class parse_error : public exception
 };
 
 /// @brief exception indicating errors with iterators
-/// @sa https://json.nlohmann.me/api/basic_json/invalid_iterator/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/invalid_iterator/
 class invalid_iterator : public exception
 {
   public:
@@ -4536,7 +4536,7 @@ class invalid_iterator : public exception
 };
 
 /// @brief exception indicating executing a member function with a wrong type
-/// @sa https://json.nlohmann.me/api/basic_json/type_error/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/type_error/
 class type_error : public exception
 {
   public:
@@ -4553,7 +4553,7 @@ class type_error : public exception
 };
 
 /// @brief exception indicating access out of the defined range
-/// @sa https://json.nlohmann.me/api/basic_json/out_of_range/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/out_of_range/
 class out_of_range : public exception
 {
   public:
@@ -4570,7 +4570,7 @@ class out_of_range : public exception
 };
 
 /// @brief exception indicating other library errors
-/// @sa https://json.nlohmann.me/api/basic_json/other_error/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/other_error/
 class other_error : public exception
 {
   public:
@@ -4587,27 +4587,27 @@ class other_error : public exception
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
-// #include <nlohmann/detail/meta/identity_tag.hpp>
+// #include <nlohmann_loader/detail/meta/identity_tag.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -4615,48 +4615,48 @@ namespace detail
 template <class T> struct identity_tag {};
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/meta/std_fs.hpp>
+// #include <nlohmann_loader/detail/meta/std_fs.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
 
 #if JSON_HAS_EXPERIMENTAL_FILESYSTEM
 #include <experimental/filesystem>
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 namespace std_fs = std::experimental::filesystem;
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 #elif JSON_HAS_FILESYSTEM
 #include <filesystem>
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 namespace std_fs = std::filesystem;
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 #endif
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -5121,15 +5121,15 @@ JSON_INLINE_VARIABLE constexpr const auto& from_json = // NOLINT(misc-definition
 }  // namespace
 #endif
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/conversions/to_json.hpp>
+// #include <nlohmann_loader/detail/conversions/to_json.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -5143,13 +5143,13 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <valarray> // valarray
 #include <vector> // vector
 
-// #include <nlohmann/detail/iterators/iteration_proxy.hpp>
+// #include <nlohmann_loader/detail/iterators/iteration_proxy.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -5164,14 +5164,14 @@ NLOHMANN_JSON_NAMESPACE_END
     #include <ranges> // enable_borrowed_range
 #endif
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -5337,47 +5337,47 @@ template<typename IteratorType> class iteration_proxy
 
 // Structured Bindings Support
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
-// And see https://github.com/nlohmann/json/pull/1391
+// And see https://github.com/nlohmann_loader/json/pull/1391
 template<std::size_t N, typename IteratorType, enable_if_t<N == 0, int> = 0>
-auto get(const nlohmann::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
+auto get(const nlohmann_loader::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.key())
 {
     return i.key();
 }
 // Structured Bindings Support
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
-// And see https://github.com/nlohmann/json/pull/1391
+// And see https://github.com/nlohmann_loader/json/pull/1391
 template<std::size_t N, typename IteratorType, enable_if_t<N == 1, int> = 0>
-auto get(const nlohmann::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
+auto get(const nlohmann_loader::detail::iteration_proxy_value<IteratorType>& i) -> decltype(i.value())
 {
     return i.value();
 }
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
 // The Addition to the STD Namespace is required to add
 // Structured Bindings Support to the iteration_proxy_value class
 // For further reference see https://blog.tartanllama.xyz/structured-bindings/
-// And see https://github.com/nlohmann/json/pull/1391
+// And see https://github.com/nlohmann_loader/json/pull/1391
 namespace std
 {
 
 #if defined(__clang__)
-    // Fix: https://github.com/nlohmann/json/issues/1401
+    // Fix: https://github.com/nlohmann_loader/json/issues/1401
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 template<typename IteratorType>
-class tuple_size<::nlohmann::detail::iteration_proxy_value<IteratorType>> // NOLINT(cert-dcl58-cpp)
+class tuple_size<::nlohmann_loader::detail::iteration_proxy_value<IteratorType>> // NOLINT(cert-dcl58-cpp)
             : public std::integral_constant<std::size_t, 2> {};
 
 template<std::size_t N, typename IteratorType>
-class tuple_element<N, ::nlohmann::detail::iteration_proxy_value<IteratorType >> // NOLINT(cert-dcl58-cpp)
+class tuple_element<N, ::nlohmann_loader::detail::iteration_proxy_value<IteratorType >> // NOLINT(cert-dcl58-cpp)
 {
   public:
     using type = decltype(
                      get<N>(std::declval <
-                            ::nlohmann::detail::iteration_proxy_value<IteratorType >> ()));
+                            ::nlohmann_loader::detail::iteration_proxy_value<IteratorType >> ()));
 };
 #if defined(__clang__)
     #pragma clang diagnostic pop
@@ -5387,21 +5387,21 @@ class tuple_element<N, ::nlohmann::detail::iteration_proxy_value<IteratorType >>
 
 #if JSON_HAS_RANGES
     template <typename IteratorType>
-    inline constexpr bool ::std::ranges::enable_borrowed_range<::nlohmann::detail::iteration_proxy<IteratorType>> = true;
+    inline constexpr bool ::std::ranges::enable_borrowed_range<::nlohmann_loader::detail::iteration_proxy<IteratorType>> = true;
 #endif
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
-// #include <nlohmann/detail/meta/std_fs.hpp>
+// #include <nlohmann_loader/detail/meta/std_fs.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -5413,7 +5413,7 @@ namespace detail
  * Note all external_constructor<>::construct functions need to call
  * j.m_data.m_value.destroy(j.m_data.m_type) to avoid a memory leak in case j contains an
  * allocated value (e.g., a string). See bug issue
- * https://github.com/nlohmann/json/issues/2865 for more information.
+ * https://github.com/nlohmann_loader/json/issues/2865 for more information.
  */
 
 template<value_t> struct external_constructor;
@@ -5769,7 +5769,7 @@ inline void to_json(BasicJsonType& j, const std::pair<T1, T2>& p)
     j = { p.first, p.second };
 }
 
-// for https://github.com/nlohmann/json/pull/1134
+// for https://github.com/nlohmann_loader/json/pull/1134
 template<typename BasicJsonType, typename T,
          enable_if_t<std::is_same<T, iteration_proxy_value<typename BasicJsonType::iterator>>::value, int> = 0>
 inline void to_json(BasicJsonType& j, const T& b)
@@ -5821,57 +5821,57 @@ JSON_INLINE_VARIABLE constexpr const auto& to_json = // NOLINT(misc-definitions-
 }  // namespace
 #endif
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/meta/identity_tag.hpp>
+// #include <nlohmann_loader/detail/meta/identity_tag.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
-/// @sa https://json.nlohmann.me/api/adl_serializer/
+/// @sa https://json.nlohmann_loader.me/api/adl_serializer/
 template<typename ValueType, typename>
 struct adl_serializer
 {
     /// @brief convert a JSON value to any value type
-    /// @sa https://json.nlohmann.me/api/adl_serializer/from_json/
+    /// @sa https://json.nlohmann_loader.me/api/adl_serializer/from_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto from_json(BasicJsonType && j, TargetType& val) noexcept(
-        noexcept(::nlohmann::from_json(std::forward<BasicJsonType>(j), val)))
-    -> decltype(::nlohmann::from_json(std::forward<BasicJsonType>(j), val), void())
+        noexcept(::nlohmann_loader::from_json(std::forward<BasicJsonType>(j), val)))
+    -> decltype(::nlohmann_loader::from_json(std::forward<BasicJsonType>(j), val), void())
     {
-        ::nlohmann::from_json(std::forward<BasicJsonType>(j), val);
+        ::nlohmann_loader::from_json(std::forward<BasicJsonType>(j), val);
     }
 
     /// @brief convert a JSON value to any value type
-    /// @sa https://json.nlohmann.me/api/adl_serializer/from_json/
+    /// @sa https://json.nlohmann_loader.me/api/adl_serializer/from_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto from_json(BasicJsonType && j) noexcept(
-    noexcept(::nlohmann::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {})))
-    -> decltype(::nlohmann::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {}))
+    noexcept(::nlohmann_loader::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {})))
+    -> decltype(::nlohmann_loader::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {}))
     {
-        return ::nlohmann::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {});
+        return ::nlohmann_loader::from_json(std::forward<BasicJsonType>(j), detail::identity_tag<TargetType> {});
     }
 
     /// @brief convert any value type to a JSON value
-    /// @sa https://json.nlohmann.me/api/adl_serializer/to_json/
+    /// @sa https://json.nlohmann_loader.me/api/adl_serializer/to_json/
     template<typename BasicJsonType, typename TargetType = ValueType>
     static auto to_json(BasicJsonType& j, TargetType && val) noexcept(
-        noexcept(::nlohmann::to_json(j, std::forward<TargetType>(val))))
-    -> decltype(::nlohmann::to_json(j, std::forward<TargetType>(val)), void())
+        noexcept(::nlohmann_loader::to_json(j, std::forward<TargetType>(val))))
+    -> decltype(::nlohmann_loader::to_json(j, std::forward<TargetType>(val)), void())
     {
-        ::nlohmann::to_json(j, std::forward<TargetType>(val));
+        ::nlohmann_loader::to_json(j, std::forward<TargetType>(val));
     }
 };
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/byte_container_with_subtype.hpp>
+// #include <nlohmann_loader/byte_container_with_subtype.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -5880,13 +5880,13 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <tuple> // tie
 #include <utility> // move
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
 /// @brief an internal type for a backed binary type
-/// @sa https://json.nlohmann.me/api/byte_container_with_subtype/
+/// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/
 template<typename BinaryType>
 class byte_container_with_subtype : public BinaryType
 {
@@ -5894,29 +5894,29 @@ class byte_container_with_subtype : public BinaryType
     using container_type = BinaryType;
     using subtype_type = std::uint64_t;
 
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/byte_container_with_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/byte_container_with_subtype/
     byte_container_with_subtype() noexcept(noexcept(container_type()))
         : container_type()
     {}
 
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/byte_container_with_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/byte_container_with_subtype/
     byte_container_with_subtype(const container_type& b) noexcept(noexcept(container_type(b)))
         : container_type(b)
     {}
 
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/byte_container_with_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/byte_container_with_subtype/
     byte_container_with_subtype(container_type&& b) noexcept(noexcept(container_type(std::move(b))))
         : container_type(std::move(b))
     {}
 
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/byte_container_with_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/byte_container_with_subtype/
     byte_container_with_subtype(const container_type& b, subtype_type subtype_) noexcept(noexcept(container_type(b)))
         : container_type(b)
         , m_subtype(subtype_)
         , m_has_subtype(true)
     {}
 
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/byte_container_with_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/byte_container_with_subtype/
     byte_container_with_subtype(container_type&& b, subtype_type subtype_) noexcept(noexcept(container_type(std::move(b))))
         : container_type(std::move(b))
         , m_subtype(subtype_)
@@ -5935,7 +5935,7 @@ class byte_container_with_subtype : public BinaryType
     }
 
     /// @brief sets the binary subtype
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/set_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/set_subtype/
     void set_subtype(subtype_type subtype_) noexcept
     {
         m_subtype = subtype_;
@@ -5943,21 +5943,21 @@ class byte_container_with_subtype : public BinaryType
     }
 
     /// @brief return the binary subtype
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/subtype/
     constexpr subtype_type subtype() const noexcept
     {
         return m_has_subtype ? m_subtype : static_cast<subtype_type>(-1);
     }
 
     /// @brief return whether the value has a subtype
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/has_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/has_subtype/
     constexpr bool has_subtype() const noexcept
     {
         return m_has_subtype;
     }
 
     /// @brief clears the binary subtype
-    /// @sa https://json.nlohmann.me/api/byte_container_with_subtype/clear_subtype/
+    /// @sa https://json.nlohmann_loader.me/api/byte_container_with_subtype/clear_subtype/
     void clear_subtype() noexcept
     {
         m_subtype = 0;
@@ -5969,21 +5969,21 @@ class byte_container_with_subtype : public BinaryType
     bool m_has_subtype = false;
 };
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/conversions/from_json.hpp>
+// #include <nlohmann_loader/detail/conversions/from_json.hpp>
 
-// #include <nlohmann/detail/conversions/to_json.hpp>
+// #include <nlohmann_loader/detail/conversions/to_json.hpp>
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/hash.hpp>
+// #include <nlohmann_loader/detail/hash.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -5992,12 +5992,12 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <cstddef> // size_t
 #include <functional> // hash
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -6108,15 +6108,15 @@ std::size_t hash(const BasicJsonType& j)
 }
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/input/binary_reader.hpp>
+// #include <nlohmann_loader/detail/input/binary_reader.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -6134,15 +6134,15 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // make_pair, move
 #include <vector> // vector
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann_loader/detail/input/input_adapters.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -6162,14 +6162,14 @@ NLOHMANN_JSON_NAMESPACE_END
     #include <istream>  // istream
 #endif                  // JSON_NO_IO
 
-// #include <nlohmann/detail/iterators/iterator_traits.hpp>
+// #include <nlohmann_loader/detail/iterators/iterator_traits.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -6631,15 +6631,15 @@ class span_input_adapter
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/input/json_sax.hpp>
+// #include <nlohmann_loader/detail/input/json_sax.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -6649,19 +6649,19 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // move
 #include <vector> // vector
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
 /*!
 @brief SAX interface
 
-This class describes the SAX interface used by @ref nlohmann::json::sax_parse.
+This class describes the SAX interface used by @ref nlohmann_loader::json::sax_parse.
 Each function is called in different situations while the input is parsed. The
 boolean return value informs the parser whether to continue processing the
 input.
@@ -7233,7 +7233,7 @@ class json_sax_dom_callback_parser
         }
 
         // skip this value if we already decided to skip the parent
-        // (https://github.com/nlohmann/json/issues/971#issuecomment-413678360)
+        // (https://github.com/nlohmann_loader/json/issues/971#issuecomment-413678360)
         if (!ref_stack.back())
         {
             return {false, nullptr};
@@ -7363,15 +7363,15 @@ class json_sax_acceptor
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/input/lexer.hpp>
+// #include <nlohmann_loader/detail/input/lexer.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -7386,16 +7386,16 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // move
 #include <vector> // vector
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann_loader/detail/input/input_adapters.hpp>
 
-// #include <nlohmann/detail/input/position_t.hpp>
+// #include <nlohmann_loader/detail/input/position_t.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -9002,17 +9002,17 @@ scan_number_done:
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/is_sax.hpp>
+// #include <nlohmann_loader/detail/meta/is_sax.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -9021,14 +9021,14 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // declval
 #include <string> // string
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
-// #include <nlohmann/detail/meta/detected.hpp>
+// #include <nlohmann_loader/detail/meta/detected.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -9168,16 +9168,16 @@ struct is_sax_static_asserts
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -12152,19 +12152,19 @@ class binary_reader
 #endif
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann_loader/detail/input/input_adapters.hpp>
 
-// #include <nlohmann/detail/input/lexer.hpp>
+// #include <nlohmann_loader/detail/input/lexer.hpp>
 
-// #include <nlohmann/detail/input/parser.hpp>
+// #include <nlohmann_loader/detail/input/parser.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -12176,24 +12176,24 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // move
 #include <vector> // vector
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/input/input_adapters.hpp>
+// #include <nlohmann_loader/detail/input/input_adapters.hpp>
 
-// #include <nlohmann/detail/input/json_sax.hpp>
+// #include <nlohmann_loader/detail/input/json_sax.hpp>
 
-// #include <nlohmann/detail/input/lexer.hpp>
+// #include <nlohmann_loader/detail/input/lexer.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/is_sax.hpp>
+// #include <nlohmann_loader/detail/meta/is_sax.hpp>
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 ////////////
@@ -12685,28 +12685,28 @@ class parser
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/iterators/internal_iterator.hpp>
+// #include <nlohmann_loader/detail/iterators/internal_iterator.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
-// #include <nlohmann/detail/iterators/primitive_iterator.hpp>
+// #include <nlohmann_loader/detail/iterators/primitive_iterator.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -12714,10 +12714,10 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <cstddef> // ptrdiff_t
 #include <limits>  // numeric_limits
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -12833,10 +12833,10 @@ class primitive_iterator_t
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -12844,7 +12844,7 @@ namespace detail
 @brief an iterator value
 
 @note This structure could easily be a union, but MSVC currently does not allow
-unions members with complex constructors, see https://github.com/nlohmann/json/pull/105.
+unions members with complex constructors, see https://github.com/nlohmann_loader/json/pull/105.
 */
 template<typename BasicJsonType> struct internal_iterator
 {
@@ -12857,15 +12857,15 @@ template<typename BasicJsonType> struct internal_iterator
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/iterators/iter_impl.hpp>
+// #include <nlohmann_loader/detail/iterators/iter_impl.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -12873,22 +12873,22 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <iterator> // iterator, random_access_iterator_tag, bidirectional_iterator_tag, advance, next
 #include <type_traits> // conditional, is_const, remove_const
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/iterators/internal_iterator.hpp>
+// #include <nlohmann_loader/detail/iterators/internal_iterator.hpp>
 
-// #include <nlohmann/detail/iterators/primitive_iterator.hpp>
+// #include <nlohmann_loader/detail/iterators/primitive_iterator.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -12910,7 +12910,7 @@ This class implements a both iterators (iterator and const_iterator) for the
   The iterator that can be moved can be moved in both directions (i.e.
   incremented and decremented).
 @since version 1.0.0, simplified in version 2.0.9, change to bidirectional
-       iterators in version 3.0.0 (see https://github.com/nlohmann/json/issues/593)
+       iterators in version 3.0.0 (see https://github.com/nlohmann_loader/json/issues/593)
 */
 template<typename BasicJsonType>
 class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
@@ -13014,7 +13014,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
     @param[in] other const iterator to copy from
     @note This copy constructor had to be defined explicitly to circumvent a bug
           occurring on msvc v19.0 compiler (VS 2015) debug build. For more
-          information refer to: https://github.com/nlohmann/json/issues/1608
+          information refer to: https://github.com/nlohmann_loader/json/issues/1608
     */
     iter_impl(const iter_impl<const BasicJsonType>& other) noexcept
         : m_object(other.m_object), m_it(other.m_it)
@@ -13617,17 +13617,17 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/iterators/iteration_proxy.hpp>
+// #include <nlohmann_loader/detail/iterators/iteration_proxy.hpp>
 
-// #include <nlohmann/detail/iterators/json_reverse_iterator.hpp>
+// #include <nlohmann_loader/detail/iterators/json_reverse_iterator.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -13636,10 +13636,10 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <iterator> // reverse_iterator
 #include <utility> // declval
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -13752,27 +13752,27 @@ class json_reverse_iterator : public std::reverse_iterator<Base>
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/iterators/primitive_iterator.hpp>
+// #include <nlohmann_loader/detail/iterators/primitive_iterator.hpp>
 
-// #include <nlohmann/detail/json_custom_base_class.hpp>
+// #include <nlohmann_loader/detail/json_custom_base_class.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
 
 #include <type_traits> // conditional, is_same
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -13796,15 +13796,15 @@ using json_base_class = typename std::conditional <
                         >::type;
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/json_pointer.hpp>
+// #include <nlohmann_loader/detail/json_pointer.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -13822,26 +13822,26 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // move
 #include <vector> // vector
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
-// #include <nlohmann/detail/string_escape.hpp>
+// #include <nlohmann_loader/detail/string_escape.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
 /// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
-/// @sa https://json.nlohmann.me/api/json_pointer/
+/// @sa https://json.nlohmann_loader.me/api/json_pointer/
 template<typename RefStringType>
 class json_pointer
 {
     // allow basic_json to access private members
-    NLOHMANN_BASIC_JSON_TPL_DECLARATION
+    NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
     friend class basic_json;
 
     template<typename>
@@ -13853,8 +13853,8 @@ class json_pointer
         using type = T;
     };
 
-    NLOHMANN_BASIC_JSON_TPL_DECLARATION
-    struct string_t_helper<NLOHMANN_BASIC_JSON_TPL>
+    NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
+    struct string_t_helper<NLOHMANN_LOADER_BASIC_JSON_TPL>
     {
         using type = StringType;
     };
@@ -13864,13 +13864,13 @@ class json_pointer
     using string_t = typename string_t_helper<RefStringType>::type;
 
     /// @brief create JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/json_pointer/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/json_pointer/
     explicit json_pointer(const string_t& s = "")
         : reference_tokens(split(s))
     {}
 
     /// @brief return a string representation of the JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/to_string/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/to_string/
     string_t to_string() const
     {
         return std::accumulate(reference_tokens.begin(), reference_tokens.end(),
@@ -13882,7 +13882,7 @@ class json_pointer
     }
 
     /// @brief return a string representation of the JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_string/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_string/
     JSON_HEDLEY_DEPRECATED_FOR(3.11.0, to_string())
     operator string_t() const
     {
@@ -13891,7 +13891,7 @@ class json_pointer
 
 #ifndef JSON_NO_IO
     /// @brief write string representation of the JSON pointer to stream
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ltlt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ltlt/
     friend std::ostream& operator<<(std::ostream& o, const json_pointer& ptr)
     {
         o << ptr.to_string();
@@ -13900,7 +13900,7 @@ class json_pointer
 #endif
 
     /// @brief append another JSON pointer at the end of this JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_slasheq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_slasheq/
     json_pointer& operator/=(const json_pointer& ptr)
     {
         reference_tokens.insert(reference_tokens.end(),
@@ -13910,7 +13910,7 @@ class json_pointer
     }
 
     /// @brief append an unescaped reference token at the end of this JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_slasheq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_slasheq/
     json_pointer& operator/=(string_t token)
     {
         push_back(std::move(token));
@@ -13918,14 +13918,14 @@ class json_pointer
     }
 
     /// @brief append an array index at the end of this JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_slasheq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_slasheq/
     json_pointer& operator/=(std::size_t array_idx)
     {
         return *this /= std::to_string(array_idx);
     }
 
     /// @brief create a new JSON pointer by appending the right JSON pointer at the end of the left JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_slash/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_slash/
     friend json_pointer operator/(const json_pointer& lhs,
                                   const json_pointer& rhs)
     {
@@ -13933,21 +13933,21 @@ class json_pointer
     }
 
     /// @brief create a new JSON pointer by appending the unescaped token at the end of the JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_slash/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_slash/
     friend json_pointer operator/(const json_pointer& lhs, string_t token) // NOLINT(performance-unnecessary-value-param)
     {
         return json_pointer(lhs) /= std::move(token);
     }
 
     /// @brief create a new JSON pointer by appending the array-index-token at the end of the JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_slash/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_slash/
     friend json_pointer operator/(const json_pointer& lhs, std::size_t array_idx)
     {
         return json_pointer(lhs) /= array_idx;
     }
 
     /// @brief returns the parent of this JSON pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/parent_pointer/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/parent_pointer/
     json_pointer parent_pointer() const
     {
         if (empty())
@@ -13961,7 +13961,7 @@ class json_pointer
     }
 
     /// @brief remove last reference token
-    /// @sa https://json.nlohmann.me/api/json_pointer/pop_back/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/pop_back/
     void pop_back()
     {
         if (JSON_HEDLEY_UNLIKELY(empty()))
@@ -13973,7 +13973,7 @@ class json_pointer
     }
 
     /// @brief return last reference token
-    /// @sa https://json.nlohmann.me/api/json_pointer/back/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/back/
     const string_t& back() const
     {
         if (JSON_HEDLEY_UNLIKELY(empty()))
@@ -13985,21 +13985,21 @@ class json_pointer
     }
 
     /// @brief append an unescaped token at the end of the reference pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/push_back/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/push_back/
     void push_back(const string_t& token)
     {
         reference_tokens.push_back(token);
     }
 
     /// @brief append an unescaped token at the end of the reference pointer
-    /// @sa https://json.nlohmann.me/api/json_pointer/push_back/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/push_back/
     void push_back(string_t&& token)
     {
         reference_tokens.push_back(std::move(token));
     }
 
     /// @brief return whether pointer points to the root document
-    /// @sa https://json.nlohmann.me/api/json_pointer/empty/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/empty/
     bool empty() const noexcept
     {
         return reference_tokens.empty();
@@ -14045,7 +14045,7 @@ class json_pointer
         }
 
         // only triggered on special platforms (like 32bit), see also
-        // https://github.com/nlohmann/json/pull/2203
+        // https://github.com/nlohmann_loader/json/pull/2203
         if (res >= static_cast<unsigned long long>((std::numeric_limits<size_type>::max)()))  // NOLINT(runtime/int)
         {
             JSON_THROW(detail::out_of_range::create(410, detail::concat("array index ", s, " exceeds size_type"), nullptr));   // LCOV_EXCL_LINE
@@ -14655,7 +14655,7 @@ class json_pointer
   public:
 #if JSON_HAS_THREE_WAY_COMPARISON
     /// @brief compares two JSON pointers for equality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_eq/
     template<typename RefStringTypeRhs>
     bool operator==(const json_pointer<RefStringTypeRhs>& rhs) const noexcept
     {
@@ -14663,7 +14663,7 @@ class json_pointer
     }
 
     /// @brief compares JSON pointer and string for equality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_eq/
     JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator==(json_pointer))
     bool operator==(const string_t& rhs) const
     {
@@ -14678,42 +14678,42 @@ class json_pointer
     }
 #else
     /// @brief compares two JSON pointers for equality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_eq/
     template<typename RefStringTypeLhs, typename RefStringTypeRhs>
     // NOLINTNEXTLINE(readability-redundant-declaration)
     friend bool operator==(const json_pointer<RefStringTypeLhs>& lhs,
                            const json_pointer<RefStringTypeRhs>& rhs) noexcept;
 
     /// @brief compares JSON pointer and string for equality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_eq/
     template<typename RefStringTypeLhs, typename StringType>
     // NOLINTNEXTLINE(readability-redundant-declaration)
     friend bool operator==(const json_pointer<RefStringTypeLhs>& lhs,
                            const StringType& rhs);
 
     /// @brief compares string and JSON pointer for equality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_eq/
     template<typename RefStringTypeRhs, typename StringType>
     // NOLINTNEXTLINE(readability-redundant-declaration)
     friend bool operator==(const StringType& lhs,
                            const json_pointer<RefStringTypeRhs>& rhs);
 
     /// @brief compares two JSON pointers for inequality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_ne/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_ne/
     template<typename RefStringTypeLhs, typename RefStringTypeRhs>
     // NOLINTNEXTLINE(readability-redundant-declaration)
     friend bool operator!=(const json_pointer<RefStringTypeLhs>& lhs,
                            const json_pointer<RefStringTypeRhs>& rhs) noexcept;
 
     /// @brief compares JSON pointer and string for inequality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_ne/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_ne/
     template<typename RefStringTypeLhs, typename StringType>
     // NOLINTNEXTLINE(readability-redundant-declaration)
     friend bool operator!=(const json_pointer<RefStringTypeLhs>& lhs,
                            const StringType& rhs);
 
     /// @brief compares string and JSON pointer for inequality
-    /// @sa https://json.nlohmann.me/api/json_pointer/operator_ne/
+    /// @sa https://json.nlohmann_loader.me/api/json_pointer/operator_ne/
     template<typename RefStringTypeRhs, typename StringType>
     // NOLINTNEXTLINE(readability-redundant-declaration)
     friend bool operator!=(const StringType& lhs,
@@ -14791,15 +14791,15 @@ inline bool operator<(const json_pointer<RefStringTypeLhs>& lhs,
 }
 #endif
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/json_ref.hpp>
+// #include <nlohmann_loader/detail/json_ref.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -14807,12 +14807,12 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <initializer_list>
 #include <utility>
 
-// #include <nlohmann/detail/abi_macros.hpp>
+// #include <nlohmann_loader/detail/abi_macros.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -14873,25 +14873,25 @@ class json_ref
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
-// #include <nlohmann/detail/string_escape.hpp>
+// #include <nlohmann_loader/detail/string_escape.hpp>
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
-// #include <nlohmann/detail/output/binary_writer.hpp>
+// #include <nlohmann_loader/detail/output/binary_writer.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -14907,17 +14907,17 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // move
 #include <vector> // vector
 
-// #include <nlohmann/detail/input/binary_reader.hpp>
+// #include <nlohmann_loader/detail/input/binary_reader.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/output/output_adapters.hpp>
+// #include <nlohmann_loader/detail/output/output_adapters.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -14934,10 +14934,10 @@ NLOHMANN_JSON_NAMESPACE_END
     #include <ostream>  // basic_ostream
 #endif  // JSON_NO_IO
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -15059,12 +15059,12 @@ class output_adapter
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -16829,7 +16829,7 @@ class binary_writer
     // The following to_char_type functions are implement the conversion
     // between uint8_t and CharType. In case CharType is not unsigned,
     // such a conversion is required to allow values greater than 128.
-    // See <https://github.com/nlohmann/json/issues/1286> for a discussion.
+    // See <https://github.com/nlohmann_loader/json/issues/1286> for a discussion.
     template < typename C = CharType,
                enable_if_t < std::is_signed<C>::value && std::is_signed<char>::value > * = nullptr >
     static constexpr CharType to_char_type(std::uint8_t x) noexcept
@@ -16875,18 +16875,18 @@ class binary_writer
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/output/output_adapters.hpp>
+// #include <nlohmann_loader/detail/output/output_adapters.hpp>
 
-// #include <nlohmann/detail/output/serializer.hpp>
+// #include <nlohmann_loader/detail/output/serializer.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
 // SPDX-FileCopyrightText: 2008-2009 Björn Hoehrmann <bjoern@hoehrmann.de>
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -16904,14 +16904,14 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <type_traits> // is_same
 #include <utility> // move
 
-// #include <nlohmann/detail/conversions/to_chars.hpp>
+// #include <nlohmann_loader/detail/conversions/to_chars.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
 // SPDX-FileCopyrightText: 2009 Florian Loitsch <https://florian.loitsch.com/>
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -16923,10 +16923,10 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <limits> // numeric_limits
 #include <type_traits> // conditional
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -18023,24 +18023,24 @@ char* to_chars(char* first, const char* last, FloatType value)
 }
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/exceptions.hpp>
+// #include <nlohmann_loader/detail/exceptions.hpp>
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/cpp_future.hpp>
+// #include <nlohmann_loader/detail/meta/cpp_future.hpp>
 
-// #include <nlohmann/detail/output/binary_writer.hpp>
+// #include <nlohmann_loader/detail/output/binary_writer.hpp>
 
-// #include <nlohmann/detail/output/output_adapters.hpp>
+// #include <nlohmann_loader/detail/output/output_adapters.hpp>
 
-// #include <nlohmann/detail/string_concat.hpp>
+// #include <nlohmann_loader/detail/string_concat.hpp>
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -18829,7 +18829,7 @@ class serializer
     void dump_float(number_float_t x, std::true_type /*is_ieee_single_or_double*/)
     {
         auto* begin = number_buffer.data();
-        auto* end = ::nlohmann::detail::to_chars(begin, begin + number_buffer.size(), x);
+        auto* end = ::nlohmann_loader::detail::to_chars(begin, begin + number_buffer.size(), x);
 
         o->write_characters(begin, static_cast<size_t>(end - begin));
     }
@@ -18851,7 +18851,7 @@ class serializer
         // erase thousands separator
         if (thousands_sep != '\0')
         {
-            // NOLINTNEXTLINE(readability-qualified-auto,llvm-qualified-auto): std::remove returns an iterator, see https://github.com/nlohmann/json/issues/3081
+            // NOLINTNEXTLINE(readability-qualified-auto,llvm-qualified-auto): std::remove returns an iterator, see https://github.com/nlohmann_loader/json/issues/3081
             const auto end = std::remove(number_buffer.begin(), number_buffer.begin() + len, thousands_sep);
             std::fill(end, number_buffer.end(), '\0');
             JSON_ASSERT((end - number_buffer.begin()) <= len);
@@ -18861,7 +18861,7 @@ class serializer
         // convert decimal point to '.'
         if (decimal_point != '\0' && decimal_point != '.')
         {
-            // NOLINTNEXTLINE(readability-qualified-auto,llvm-qualified-auto): std::find returns an iterator, see https://github.com/nlohmann/json/issues/3081
+            // NOLINTNEXTLINE(readability-qualified-auto,llvm-qualified-auto): std::find returns an iterator, see https://github.com/nlohmann_loader/json/issues/3081
             const auto dec_pos = std::find(number_buffer.begin(), number_buffer.end(), decimal_point);
             if (dec_pos != number_buffer.end())
             {
@@ -18994,19 +18994,19 @@ class serializer
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
-// #include <nlohmann/detail/value_t.hpp>
+// #include <nlohmann_loader/detail/value_t.hpp>
 
-// #include <nlohmann/json_fwd.hpp>
+// #include <nlohmann_loader/json_fwd.hpp>
 
-// #include <nlohmann/ordered_map.hpp>
+// #include <nlohmann_loader/ordered_map.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -19020,15 +19020,15 @@ NLOHMANN_JSON_NAMESPACE_END
 #include <utility> // pair
 #include <vector> // vector
 
-// #include <nlohmann/detail/macro_scope.hpp>
+// #include <nlohmann_loader/detail/macro_scope.hpp>
 
-// #include <nlohmann/detail/meta/type_traits.hpp>
+// #include <nlohmann_loader/detail/meta/type_traits.hpp>
 
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
 /// ordered_map: a minimal map-like container that preserves insertion order
-/// for use within nlohmann::basic_json<ordered_map>
+/// for use within nlohmann_loader::basic_json<ordered_map>
 template <class Key, class T, class IgnoredLess = std::less<Key>,
           class Allocator = std::allocator<std::pair<const Key, T>>>
                   struct ordered_map : std::vector<std::pair<const Key, T>, Allocator>
@@ -19361,7 +19361,7 @@ private:
     JSON_NO_UNIQUE_ADDRESS key_compare m_compare = key_compare();
 };
 
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
 
 #if defined(JSON_HAS_CPP_17)
@@ -19373,10 +19373,10 @@ NLOHMANN_JSON_NAMESPACE_END
 
 /*!
 @brief namespace for Niels Lohmann
-@see https://github.com/nlohmann
+@see https://github.com/nlohmann_loader
 @since version 1.0.0
 */
-NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_LOADER_JSON_NAMESPACE_BEGIN
 
 /*!
 @brief a class to store JSON values
@@ -19396,77 +19396,77 @@ The invariants are checked by member function assert_invariant().
 
 @nosubgrouping
 */
-NLOHMANN_BASIC_JSON_TPL_DECLARATION
+NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
 class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
-    : public ::nlohmann::detail::json_base_class<CustomBaseClass>
+    : public ::nlohmann_loader::detail::json_base_class<CustomBaseClass>
 {
   private:
     template<detail::value_t> friend struct detail::external_constructor;
 
     template<typename>
-    friend class ::nlohmann::json_pointer;
+    friend class ::nlohmann_loader::json_pointer;
     // can be restored when json_pointer backwards compatibility is removed
-    // friend ::nlohmann::json_pointer<StringType>;
+    // friend ::nlohmann_loader::json_pointer<StringType>;
 
     template<typename BasicJsonType, typename InputType>
-    friend class ::nlohmann::detail::parser;
-    friend ::nlohmann::detail::serializer<basic_json>;
+    friend class ::nlohmann_loader::detail::parser;
+    friend ::nlohmann_loader::detail::serializer<basic_json>;
     template<typename BasicJsonType>
-    friend class ::nlohmann::detail::iter_impl;
+    friend class ::nlohmann_loader::detail::iter_impl;
     template<typename BasicJsonType, typename CharType>
-    friend class ::nlohmann::detail::binary_writer;
+    friend class ::nlohmann_loader::detail::binary_writer;
     template<typename BasicJsonType, typename InputType, typename SAX>
-    friend class ::nlohmann::detail::binary_reader;
+    friend class ::nlohmann_loader::detail::binary_reader;
     template<typename BasicJsonType>
-    friend class ::nlohmann::detail::json_sax_dom_parser;
+    friend class ::nlohmann_loader::detail::json_sax_dom_parser;
     template<typename BasicJsonType>
-    friend class ::nlohmann::detail::json_sax_dom_callback_parser;
-    friend class ::nlohmann::detail::exception;
+    friend class ::nlohmann_loader::detail::json_sax_dom_callback_parser;
+    friend class ::nlohmann_loader::detail::exception;
 
     /// workaround type for MSVC
-    using basic_json_t = NLOHMANN_BASIC_JSON_TPL;
-    using json_base_class_t = ::nlohmann::detail::json_base_class<CustomBaseClass>;
+    using basic_json_t = NLOHMANN_LOADER_BASIC_JSON_TPL;
+    using json_base_class_t = ::nlohmann_loader::detail::json_base_class<CustomBaseClass>;
 
   JSON_PRIVATE_UNLESS_TESTED:
     // convenience aliases for types residing in namespace detail;
-    using lexer = ::nlohmann::detail::lexer_base<basic_json>;
+    using lexer = ::nlohmann_loader::detail::lexer_base<basic_json>;
 
     template<typename InputAdapterType>
-    static ::nlohmann::detail::parser<basic_json, InputAdapterType> parser(
+    static ::nlohmann_loader::detail::parser<basic_json, InputAdapterType> parser(
         InputAdapterType adapter,
         detail::parser_callback_t<basic_json>cb = nullptr,
         const bool allow_exceptions = true,
         const bool ignore_comments = false
                                  )
     {
-        return ::nlohmann::detail::parser<basic_json, InputAdapterType>(std::move(adapter),
+        return ::nlohmann_loader::detail::parser<basic_json, InputAdapterType>(std::move(adapter),
                 std::move(cb), allow_exceptions, ignore_comments);
     }
 
   private:
-    using primitive_iterator_t = ::nlohmann::detail::primitive_iterator_t;
+    using primitive_iterator_t = ::nlohmann_loader::detail::primitive_iterator_t;
     template<typename BasicJsonType>
-    using internal_iterator = ::nlohmann::detail::internal_iterator<BasicJsonType>;
+    using internal_iterator = ::nlohmann_loader::detail::internal_iterator<BasicJsonType>;
     template<typename BasicJsonType>
-    using iter_impl = ::nlohmann::detail::iter_impl<BasicJsonType>;
+    using iter_impl = ::nlohmann_loader::detail::iter_impl<BasicJsonType>;
     template<typename Iterator>
-    using iteration_proxy = ::nlohmann::detail::iteration_proxy<Iterator>;
-    template<typename Base> using json_reverse_iterator = ::nlohmann::detail::json_reverse_iterator<Base>;
+    using iteration_proxy = ::nlohmann_loader::detail::iteration_proxy<Iterator>;
+    template<typename Base> using json_reverse_iterator = ::nlohmann_loader::detail::json_reverse_iterator<Base>;
 
     template<typename CharType>
-    using output_adapter_t = ::nlohmann::detail::output_adapter_t<CharType>;
+    using output_adapter_t = ::nlohmann_loader::detail::output_adapter_t<CharType>;
 
     template<typename InputType>
-    using binary_reader = ::nlohmann::detail::binary_reader<basic_json, InputType>;
-    template<typename CharType> using binary_writer = ::nlohmann::detail::binary_writer<basic_json, CharType>;
+    using binary_reader = ::nlohmann_loader::detail::binary_reader<basic_json, InputType>;
+    template<typename CharType> using binary_writer = ::nlohmann_loader::detail::binary_writer<basic_json, CharType>;
 
   JSON_PRIVATE_UNLESS_TESTED:
-    using serializer = ::nlohmann::detail::serializer<basic_json>;
+    using serializer = ::nlohmann_loader::detail::serializer<basic_json>;
 
   public:
     using value_t = detail::value_t;
-    /// JSON Pointer, see @ref nlohmann::json_pointer
-    using json_pointer = ::nlohmann::json_pointer<StringType>;
+    /// JSON Pointer, see @ref nlohmann_loader::json_pointer
+    using json_pointer = ::nlohmann_loader::json_pointer<StringType>;
     template<typename T, typename SFINAE>
     using json_serializer = JSONSerializer<T, SFINAE>;
     /// how to treat decoding errors
@@ -19477,7 +19477,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     using initializer_list_t = std::initializer_list<detail::json_ref<basic_json>>;
 
     using input_format_t = detail::input_format_t;
-    /// SAX interface type, see @ref nlohmann::json_sax
+    /// SAX interface type, see @ref nlohmann_loader::json_sax
     using json_sax_t = json_sax<basic_json>;
 
     ////////////////
@@ -19539,14 +19539,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @}
 
     /// @brief returns the allocator associated with the container
-    /// @sa https://json.nlohmann.me/api/basic_json/get_allocator/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_allocator/
     static allocator_type get_allocator()
     {
         return allocator_type();
     }
 
     /// @brief returns version information on the library
-    /// @sa https://json.nlohmann.me/api/basic_json/meta/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/meta/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json meta()
     {
@@ -19554,14 +19554,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
         result["copyright"] = "(C) 2013-2023 Niels Lohmann";
         result["name"] = "JSON for Modern C++";
-        result["url"] = "https://github.com/nlohmann/json";
+        result["url"] = "https://github.com/nlohmann_loader/json";
         result["version"]["string"] =
-            detail::concat(std::to_string(NLOHMANN_JSON_VERSION_MAJOR), '.',
-                           std::to_string(NLOHMANN_JSON_VERSION_MINOR), '.',
-                           std::to_string(NLOHMANN_JSON_VERSION_PATCH));
-        result["version"]["major"] = NLOHMANN_JSON_VERSION_MAJOR;
-        result["version"]["minor"] = NLOHMANN_JSON_VERSION_MINOR;
-        result["version"]["patch"] = NLOHMANN_JSON_VERSION_PATCH;
+            detail::concat(std::to_string(NLOHMANN_LOADER_JSON_VERSION_MAJOR), '.',
+                           std::to_string(NLOHMANN_LOADER_JSON_VERSION_MINOR), '.',
+                           std::to_string(NLOHMANN_LOADER_JSON_VERSION_PATCH));
+        result["version"]["major"] = NLOHMANN_LOADER_JSON_VERSION_MAJOR;
+        result["version"]["minor"] = NLOHMANN_LOADER_JSON_VERSION_MINOR;
+        result["version"]["patch"] = NLOHMANN_LOADER_JSON_VERSION_PATCH;
 
 #ifdef _WIN32
         result["platform"] = "win32";
@@ -19622,7 +19622,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief default object key comparator type
     /// The actual object key comparator type (@ref object_comparator_t) may be
     /// different.
-    /// @sa https://json.nlohmann.me/api/basic_json/default_object_comparator_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/default_object_comparator_t/
 #if defined(JSON_HAS_CPP_14)
     // use of transparent comparator avoids unnecessary repeated construction of temporaries
     // in functions involving lookup by key with types other than object_t::key_type (aka. StringType)
@@ -19632,7 +19632,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 #endif
 
     /// @brief a type for an object
-    /// @sa https://json.nlohmann.me/api/basic_json/object_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/object_t/
     using object_t = ObjectType<StringType,
           basic_json,
           default_object_comparator_t,
@@ -19640,35 +19640,35 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
           basic_json>>>;
 
     /// @brief a type for an array
-    /// @sa https://json.nlohmann.me/api/basic_json/array_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/array_t/
     using array_t = ArrayType<basic_json, AllocatorType<basic_json>>;
 
     /// @brief a type for a string
-    /// @sa https://json.nlohmann.me/api/basic_json/string_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/string_t/
     using string_t = StringType;
 
     /// @brief a type for a boolean
-    /// @sa https://json.nlohmann.me/api/basic_json/boolean_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/boolean_t/
     using boolean_t = BooleanType;
 
     /// @brief a type for a number (integer)
-    /// @sa https://json.nlohmann.me/api/basic_json/number_integer_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/number_integer_t/
     using number_integer_t = NumberIntegerType;
 
     /// @brief a type for a number (unsigned)
-    /// @sa https://json.nlohmann.me/api/basic_json/number_unsigned_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/number_unsigned_t/
     using number_unsigned_t = NumberUnsignedType;
 
     /// @brief a type for a number (floating-point)
-    /// @sa https://json.nlohmann.me/api/basic_json/number_float_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/number_float_t/
     using number_float_t = NumberFloatType;
 
     /// @brief a type for a packed binary type
-    /// @sa https://json.nlohmann.me/api/basic_json/binary_t/
-    using binary_t = nlohmann::byte_container_with_subtype<BinaryType>;
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/binary_t/
+    using binary_t = nlohmann_loader::byte_container_with_subtype<BinaryType>;
 
     /// @brief object key comparator type
-    /// @sa https://json.nlohmann.me/api/basic_json/object_comparator_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/object_comparator_t/
     using object_comparator_t = detail::actual_object_comparator_t<basic_json>;
 
     /// @}
@@ -20058,7 +20058,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 #if JSON_DIAGNOSTICS
         if (old_capacity != static_cast<std::size_t>(-1))
         {
-            // see https://github.com/nlohmann/json/issues/2838
+            // see https://github.com/nlohmann_loader/json/issues/2838
             JSON_ASSERT(type() == value_t::array);
             if (JSON_HEDLEY_UNLIKELY(m_data.m_value.array->capacity() != old_capacity))
             {
@@ -20069,7 +20069,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         }
 
         // ordered_json uses a vector internally, so pointers could have
-        // been invalidated; see https://github.com/nlohmann/json/issues/2962
+        // been invalidated; see https://github.com/nlohmann_loader/json/issues/2962
 #ifdef JSON_HEDLEY_MSVC_VERSION
 #pragma warning(push )
 #pragma warning(disable : 4127) // ignore warning to replace if with if constexpr
@@ -20097,11 +20097,11 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     //////////////////////////
 
     /// @brief parser event types
-    /// @sa https://json.nlohmann.me/api/basic_json/parse_event_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/parse_event_t/
     using parse_event_t = detail::parse_event_t;
 
     /// @brief per-element parser callback type
-    /// @sa https://json.nlohmann.me/api/basic_json/parser_callback_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/parser_callback_t/
     using parser_callback_t = detail::parser_callback_t<basic_json>;
 
     //////////////////
@@ -20114,7 +20114,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief create an empty value with a given type
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     basic_json(const value_t v)
         : m_data(v)
     {
@@ -20122,7 +20122,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a null object
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     basic_json(std::nullptr_t = nullptr) noexcept // NOLINT(bugprone-exception-escape)
         : basic_json(value_t::null)
     {
@@ -20130,7 +20130,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from compatible types
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     template < typename CompatibleType,
                typename U = detail::uncvref_t<CompatibleType>,
                detail::enable_if_t <
@@ -20145,7 +20145,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an existing one
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     template < typename BasicJsonType,
                detail::enable_if_t <
                    detail::is_basic_json<BasicJsonType>::value&& !std::is_same<basic_json, BasicJsonType>::value, int > = 0 >
@@ -20201,7 +20201,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a container (array or object) from an initializer list
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     basic_json(initializer_list_t init,
                bool type_deduction = true,
                value_t manual_type = value_t::array)
@@ -20259,7 +20259,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief explicitly create a binary array (without subtype)
-    /// @sa https://json.nlohmann.me/api/basic_json/binary/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/binary/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(const typename binary_t::container_type& init)
     {
@@ -20270,7 +20270,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief explicitly create a binary array (with subtype)
-    /// @sa https://json.nlohmann.me/api/basic_json/binary/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/binary/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(const typename binary_t::container_type& init, typename binary_t::subtype_type subtype)
     {
@@ -20281,7 +20281,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief explicitly create a binary array
-    /// @sa https://json.nlohmann.me/api/basic_json/binary/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/binary/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(typename binary_t::container_type&& init)
     {
@@ -20292,7 +20292,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief explicitly create a binary array (with subtype)
-    /// @sa https://json.nlohmann.me/api/basic_json/binary/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/binary/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(typename binary_t::container_type&& init, typename binary_t::subtype_type subtype)
     {
@@ -20303,7 +20303,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief explicitly create an array from an initializer list
-    /// @sa https://json.nlohmann.me/api/basic_json/array/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/array/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json array(initializer_list_t init = {})
     {
@@ -20311,7 +20311,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief explicitly create an object from an initializer list
-    /// @sa https://json.nlohmann.me/api/basic_json/object/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/object/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json object(initializer_list_t init = {})
     {
@@ -20319,7 +20319,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief construct an array with count copies of given value
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     basic_json(size_type cnt, const basic_json& val):
         m_data{cnt, val}
     {
@@ -20328,7 +20328,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief construct a JSON container given an iterator range
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     template < class InputIT, typename std::enable_if <
                    std::is_same<InputIT, typename basic_json_t::iterator>::value ||
                    std::is_same<InputIT, typename basic_json_t::const_iterator>::value, int >::type = 0 >
@@ -20444,7 +20444,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     basic_json(const JsonRef& ref) : basic_json(ref.moved_or_copied()) {}
 
     /// @brief copy constructor
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     basic_json(const basic_json& other)
         : json_base_class_t(other)
     {
@@ -20513,7 +20513,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief move constructor
-    /// @sa https://json.nlohmann.me/api/basic_json/basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/basic_json/
     basic_json(basic_json&& other) noexcept
         : json_base_class_t(std::forward<json_base_class_t>(other)),
           m_data(std::move(other.m_data))
@@ -20530,7 +20530,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief copy assignment
-    /// @sa https://json.nlohmann.me/api/basic_json/operator=/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator=/
     basic_json& operator=(basic_json other) noexcept (
         std::is_nothrow_move_constructible<value_t>::value&&
         std::is_nothrow_move_assignable<value_t>::value&&
@@ -20553,7 +20553,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief destructor
-    /// @sa https://json.nlohmann.me/api/basic_json/~basic_json/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/~basic_json/
     ~basic_json() noexcept
     {
         assert_invariant(false);
@@ -20571,7 +20571,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief serialization
-    /// @sa https://json.nlohmann.me/api/basic_json/dump/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/dump/
     string_t dump(const int indent = -1,
                   const char indent_char = ' ',
                   const bool ensure_ascii = false,
@@ -20593,105 +20593,105 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief return the type of the JSON value (explicit)
-    /// @sa https://json.nlohmann.me/api/basic_json/type/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/type/
     constexpr value_t type() const noexcept
     {
         return m_data.m_type;
     }
 
     /// @brief return whether type is primitive
-    /// @sa https://json.nlohmann.me/api/basic_json/is_primitive/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_primitive/
     constexpr bool is_primitive() const noexcept
     {
         return is_null() || is_string() || is_boolean() || is_number() || is_binary();
     }
 
     /// @brief return whether type is structured
-    /// @sa https://json.nlohmann.me/api/basic_json/is_structured/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_structured/
     constexpr bool is_structured() const noexcept
     {
         return is_array() || is_object();
     }
 
     /// @brief return whether value is null
-    /// @sa https://json.nlohmann.me/api/basic_json/is_null/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_null/
     constexpr bool is_null() const noexcept
     {
         return m_data.m_type == value_t::null;
     }
 
     /// @brief return whether value is a boolean
-    /// @sa https://json.nlohmann.me/api/basic_json/is_boolean/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_boolean/
     constexpr bool is_boolean() const noexcept
     {
         return m_data.m_type == value_t::boolean;
     }
 
     /// @brief return whether value is a number
-    /// @sa https://json.nlohmann.me/api/basic_json/is_number/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_number/
     constexpr bool is_number() const noexcept
     {
         return is_number_integer() || is_number_float();
     }
 
     /// @brief return whether value is an integer number
-    /// @sa https://json.nlohmann.me/api/basic_json/is_number_integer/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_number_integer/
     constexpr bool is_number_integer() const noexcept
     {
         return m_data.m_type == value_t::number_integer || m_data.m_type == value_t::number_unsigned;
     }
 
     /// @brief return whether value is an unsigned integer number
-    /// @sa https://json.nlohmann.me/api/basic_json/is_number_unsigned/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_number_unsigned/
     constexpr bool is_number_unsigned() const noexcept
     {
         return m_data.m_type == value_t::number_unsigned;
     }
 
     /// @brief return whether value is a floating-point number
-    /// @sa https://json.nlohmann.me/api/basic_json/is_number_float/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_number_float/
     constexpr bool is_number_float() const noexcept
     {
         return m_data.m_type == value_t::number_float;
     }
 
     /// @brief return whether value is an object
-    /// @sa https://json.nlohmann.me/api/basic_json/is_object/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_object/
     constexpr bool is_object() const noexcept
     {
         return m_data.m_type == value_t::object;
     }
 
     /// @brief return whether value is an array
-    /// @sa https://json.nlohmann.me/api/basic_json/is_array/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_array/
     constexpr bool is_array() const noexcept
     {
         return m_data.m_type == value_t::array;
     }
 
     /// @brief return whether value is a string
-    /// @sa https://json.nlohmann.me/api/basic_json/is_string/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_string/
     constexpr bool is_string() const noexcept
     {
         return m_data.m_type == value_t::string;
     }
 
     /// @brief return whether value is a binary array
-    /// @sa https://json.nlohmann.me/api/basic_json/is_binary/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_binary/
     constexpr bool is_binary() const noexcept
     {
         return m_data.m_type == value_t::binary;
     }
 
     /// @brief return whether value is discarded
-    /// @sa https://json.nlohmann.me/api/basic_json/is_discarded/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/is_discarded/
     constexpr bool is_discarded() const noexcept
     {
         return m_data.m_type == value_t::discarded;
     }
 
     /// @brief return the type of the JSON value (implicit)
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_value_t/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_value_t/
     constexpr operator value_t() const noexcept
     {
         return m_data.m_type;
@@ -20842,7 +20842,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief get a pointer value (implicit)
-    /// @sa https://json.nlohmann.me/api/basic_json/get_ptr/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_ptr/
     template<typename PointerType, typename std::enable_if<
                  std::is_pointer<PointerType>::value, int>::type = 0>
     auto get_ptr() noexcept -> decltype(std::declval<basic_json_t&>().get_impl_ptr(std::declval<PointerType>()))
@@ -20852,7 +20852,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief get a pointer value (implicit)
-    /// @sa https://json.nlohmann.me/api/basic_json/get_ptr/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_ptr/
     template < typename PointerType, typename std::enable_if <
                    std::is_pointer<PointerType>::value&&
                    std::is_const<typename std::remove_pointer<PointerType>::type>::value, int >::type = 0 >
@@ -21092,7 +21092,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief get a value (explicit)
-    /// @sa https://json.nlohmann.me/api/basic_json/get_to/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_to/
     template < typename ValueType,
                detail::enable_if_t <
                    !detail::is_basic_json<ValueType>::value&&
@@ -21106,7 +21106,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     // specialization to allow calling get_to with a basic_json value
-    // see https://github.com/nlohmann/json/issues/2175
+    // see https://github.com/nlohmann_loader/json/issues/2175
     template<typename ValueType,
              detail::enable_if_t <
                  detail::is_basic_json<ValueType>::value,
@@ -21131,7 +21131,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief get a reference value (implicit)
-    /// @sa https://json.nlohmann.me/api/basic_json/get_ref/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_ref/
     template<typename ReferenceType, typename std::enable_if<
                  std::is_reference<ReferenceType>::value, int>::type = 0>
     ReferenceType get_ref()
@@ -21141,7 +21141,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief get a reference value (implicit)
-    /// @sa https://json.nlohmann.me/api/basic_json/get_ref/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_ref/
     template < typename ReferenceType, typename std::enable_if <
                    std::is_reference<ReferenceType>::value&&
                    std::is_const<typename std::remove_reference<ReferenceType>::type>::value, int >::type = 0 >
@@ -21203,7 +21203,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief get a binary value
-    /// @sa https://json.nlohmann.me/api/basic_json/get_binary/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_binary/
     binary_t& get_binary()
     {
         if (!is_binary())
@@ -21215,7 +21215,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief get a binary value
-    /// @sa https://json.nlohmann.me/api/basic_json/get_binary/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/get_binary/
     const binary_t& get_binary() const
     {
         if (!is_binary())
@@ -21237,7 +21237,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief access specified array element with bounds checking
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     reference at(size_type idx)
     {
         // at only works for arrays
@@ -21260,7 +21260,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified array element with bounds checking
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     const_reference at(size_type idx) const
     {
         // at only works for arrays
@@ -21283,7 +21283,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element with bounds checking
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     reference at(const typename object_t::key_type& key)
     {
         // at only works for objects
@@ -21301,7 +21301,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element with bounds checking
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int> = 0>
     reference at(KeyType && key)
@@ -21321,7 +21321,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element with bounds checking
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     const_reference at(const typename object_t::key_type& key) const
     {
         // at only works for objects
@@ -21339,7 +21339,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element with bounds checking
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int> = 0>
     const_reference at(KeyType && key) const
@@ -21359,7 +21359,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified array element
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     reference operator[](size_type idx)
     {
         // implicitly convert null value to an empty array
@@ -21405,7 +21405,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified array element
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     const_reference operator[](size_type idx) const
     {
         // const operator[] only works for arrays
@@ -21418,7 +21418,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     reference operator[](typename object_t::key_type key)
     {
         // implicitly convert null value to an empty object
@@ -21440,7 +21440,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     const_reference operator[](const typename object_t::key_type& key) const
     {
         // const operator[] only works for objects
@@ -21469,7 +21469,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int > = 0 >
     reference operator[](KeyType && key)
@@ -21493,7 +21493,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int > = 0 >
     const_reference operator[](KeyType && key) const
@@ -21521,7 +21521,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
   public:
     /// @brief access specified object element with default value
-    /// @sa https://json.nlohmann.me/api/basic_json/value/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/value/
     template < class ValueType, detail::enable_if_t <
                    !detail::is_transparent<object_comparator_t>::value
                    && detail::is_getable<basic_json_t, ValueType>::value
@@ -21545,7 +21545,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element with default value
-    /// @sa https://json.nlohmann.me/api/basic_json/value/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/value/
     template < class ValueType, class ReturnType = typename value_return_type<ValueType>::type,
                detail::enable_if_t <
                    !detail::is_transparent<object_comparator_t>::value
@@ -21570,7 +21570,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element with default value
-    /// @sa https://json.nlohmann.me/api/basic_json/value/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/value/
     template < class ValueType, class KeyType, detail::enable_if_t <
                    detail::is_transparent<object_comparator_t>::value
                    && !detail::is_json_pointer<KeyType>::value
@@ -21596,7 +21596,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element via JSON Pointer with default value
-    /// @sa https://json.nlohmann.me/api/basic_json/value/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/value/
     template < class ValueType, class KeyType, class ReturnType = typename value_return_type<ValueType>::type,
                detail::enable_if_t <
                    detail::is_transparent<object_comparator_t>::value
@@ -21623,7 +21623,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element via JSON Pointer with default value
-    /// @sa https://json.nlohmann.me/api/basic_json/value/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/value/
     template < class ValueType, detail::enable_if_t <
                    detail::is_getable<basic_json_t, ValueType>::value
                    && !std::is_same<value_t, detail::uncvref_t<ValueType>>::value, int > = 0 >
@@ -21647,7 +21647,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access specified object element via JSON Pointer with default value
-    /// @sa https://json.nlohmann.me/api/basic_json/value/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/value/
     template < class ValueType, class ReturnType = typename value_return_type<ValueType>::type,
                detail::enable_if_t <
                    detail::is_getable<basic_json_t, ReturnType>::value
@@ -21675,8 +21675,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                    detail::is_basic_json<BasicJsonType>::value
                    && detail::is_getable<basic_json_t, ValueType>::value
                    && !std::is_same<value_t, detail::uncvref_t<ValueType>>::value, int > = 0 >
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    ValueType value(const ::nlohmann::json_pointer<BasicJsonType>& ptr, const ValueType& default_value) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann_loader::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    ValueType value(const ::nlohmann_loader::json_pointer<BasicJsonType>& ptr, const ValueType& default_value) const
     {
         return value(ptr.convert(), default_value);
     }
@@ -21686,28 +21686,28 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                    detail::is_basic_json<BasicJsonType>::value
                    && detail::is_getable<basic_json_t, ReturnType>::value
                    && !std::is_same<value_t, detail::uncvref_t<ValueType>>::value, int > = 0 >
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    ReturnType value(const ::nlohmann::json_pointer<BasicJsonType>& ptr, ValueType && default_value) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann_loader::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    ReturnType value(const ::nlohmann_loader::json_pointer<BasicJsonType>& ptr, ValueType && default_value) const
     {
         return value(ptr.convert(), std::forward<ValueType>(default_value));
     }
 
     /// @brief access the first element
-    /// @sa https://json.nlohmann.me/api/basic_json/front/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/front/
     reference front()
     {
         return *begin();
     }
 
     /// @brief access the first element
-    /// @sa https://json.nlohmann.me/api/basic_json/front/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/front/
     const_reference front() const
     {
         return *cbegin();
     }
 
     /// @brief access the last element
-    /// @sa https://json.nlohmann.me/api/basic_json/back/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/back/
     reference back()
     {
         auto tmp = end();
@@ -21716,7 +21716,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief access the last element
-    /// @sa https://json.nlohmann.me/api/basic_json/back/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/back/
     const_reference back() const
     {
         auto tmp = cend();
@@ -21725,7 +21725,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief remove element given an iterator
-    /// @sa https://json.nlohmann.me/api/basic_json/erase/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/erase/
     template < class IteratorType, detail::enable_if_t <
                    std::is_same<IteratorType, typename basic_json_t::iterator>::value ||
                    std::is_same<IteratorType, typename basic_json_t::const_iterator>::value, int > = 0 >
@@ -21795,7 +21795,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief remove elements given an iterator range
-    /// @sa https://json.nlohmann.me/api/basic_json/erase/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/erase/
     template < class IteratorType, detail::enable_if_t <
                    std::is_same<IteratorType, typename basic_json_t::iterator>::value ||
                    std::is_same<IteratorType, typename basic_json_t::const_iterator>::value, int > = 0 >
@@ -21903,7 +21903,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
   public:
 
     /// @brief remove element from a JSON object given a key
-    /// @sa https://json.nlohmann.me/api/basic_json/erase/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/erase/
     size_type erase(const typename object_t::key_type& key)
     {
         // the indirection via erase_internal() is added to avoid making this
@@ -21912,7 +21912,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief remove element from a JSON object given a key
-    /// @sa https://json.nlohmann.me/api/basic_json/erase/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/erase/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int> = 0>
     size_type erase(KeyType && key)
@@ -21921,7 +21921,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief remove element from a JSON array given an index
-    /// @sa https://json.nlohmann.me/api/basic_json/erase/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/erase/
     void erase(const size_type idx)
     {
         // this erase only works for arrays
@@ -21950,7 +21950,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief find an element in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/find/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/find/
     iterator find(const typename object_t::key_type& key)
     {
         auto result = end();
@@ -21964,7 +21964,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief find an element in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/find/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/find/
     const_iterator find(const typename object_t::key_type& key) const
     {
         auto result = cend();
@@ -21978,7 +21978,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief find an element in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/find/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/find/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int> = 0>
     iterator find(KeyType && key)
@@ -21994,7 +21994,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief find an element in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/find/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/find/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int> = 0>
     const_iterator find(KeyType && key) const
@@ -22010,7 +22010,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns the number of occurrences of a key in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/count/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/count/
     size_type count(const typename object_t::key_type& key) const
     {
         // return 0 for all nonobject types
@@ -22018,7 +22018,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns the number of occurrences of a key in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/count/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/count/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int> = 0>
     size_type count(KeyType && key) const
@@ -22028,14 +22028,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief check the existence of an element in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/contains/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/contains/
     bool contains(const typename object_t::key_type& key) const
     {
         return is_object() && m_data.m_value.object->find(key) != m_data.m_value.object->end();
     }
 
     /// @brief check the existence of an element in a JSON object
-    /// @sa https://json.nlohmann.me/api/basic_json/contains/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/contains/
     template<class KeyType, detail::enable_if_t<
                  detail::is_usable_as_basic_json_key_type<basic_json_t, KeyType>::value, int> = 0>
     bool contains(KeyType && key) const
@@ -22044,15 +22044,15 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief check the existence of an element in a JSON object given a JSON pointer
-    /// @sa https://json.nlohmann.me/api/basic_json/contains/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/contains/
     bool contains(const json_pointer& ptr) const
     {
         return ptr.contains(this);
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    bool contains(const typename ::nlohmann::json_pointer<BasicJsonType>& ptr) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann_loader::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    bool contains(const typename ::nlohmann_loader::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.contains(this);
     }
@@ -22067,7 +22067,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief returns an iterator to the first element
-    /// @sa https://json.nlohmann.me/api/basic_json/begin/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/begin/
     iterator begin() noexcept
     {
         iterator result(this);
@@ -22076,14 +22076,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns an iterator to the first element
-    /// @sa https://json.nlohmann.me/api/basic_json/begin/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/begin/
     const_iterator begin() const noexcept
     {
         return cbegin();
     }
 
     /// @brief returns a const iterator to the first element
-    /// @sa https://json.nlohmann.me/api/basic_json/cbegin/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/cbegin/
     const_iterator cbegin() const noexcept
     {
         const_iterator result(this);
@@ -22092,7 +22092,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns an iterator to one past the last element
-    /// @sa https://json.nlohmann.me/api/basic_json/end/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/end/
     iterator end() noexcept
     {
         iterator result(this);
@@ -22101,14 +22101,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns an iterator to one past the last element
-    /// @sa https://json.nlohmann.me/api/basic_json/end/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/end/
     const_iterator end() const noexcept
     {
         return cend();
     }
 
     /// @brief returns an iterator to one past the last element
-    /// @sa https://json.nlohmann.me/api/basic_json/cend/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/cend/
     const_iterator cend() const noexcept
     {
         const_iterator result(this);
@@ -22117,42 +22117,42 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns an iterator to the reverse-beginning
-    /// @sa https://json.nlohmann.me/api/basic_json/rbegin/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/rbegin/
     reverse_iterator rbegin() noexcept
     {
         return reverse_iterator(end());
     }
 
     /// @brief returns an iterator to the reverse-beginning
-    /// @sa https://json.nlohmann.me/api/basic_json/rbegin/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/rbegin/
     const_reverse_iterator rbegin() const noexcept
     {
         return crbegin();
     }
 
     /// @brief returns an iterator to the reverse-end
-    /// @sa https://json.nlohmann.me/api/basic_json/rend/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/rend/
     reverse_iterator rend() noexcept
     {
         return reverse_iterator(begin());
     }
 
     /// @brief returns an iterator to the reverse-end
-    /// @sa https://json.nlohmann.me/api/basic_json/rend/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/rend/
     const_reverse_iterator rend() const noexcept
     {
         return crend();
     }
 
     /// @brief returns a const reverse iterator to the last element
-    /// @sa https://json.nlohmann.me/api/basic_json/crbegin/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/crbegin/
     const_reverse_iterator crbegin() const noexcept
     {
         return const_reverse_iterator(cend());
     }
 
     /// @brief returns a const reverse iterator to one before the first
-    /// @sa https://json.nlohmann.me/api/basic_json/crend/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/crend/
     const_reverse_iterator crend() const noexcept
     {
         return const_reverse_iterator(cbegin());
@@ -22160,7 +22160,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
   public:
     /// @brief wrapper to access iterator member functions in range-based for
-    /// @sa https://json.nlohmann.me/api/basic_json/items/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/items/
     /// @deprecated This function is deprecated since 3.1.0 and will be removed in
     ///             version 4.0.0 of the library. Please use @ref items() instead;
     ///             that is, replace `json::iterator_wrapper(j)` with `j.items()`.
@@ -22171,7 +22171,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief wrapper to access iterator member functions in range-based for
-    /// @sa https://json.nlohmann.me/api/basic_json/items/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/items/
     /// @deprecated This function is deprecated since 3.1.0 and will be removed in
     ///         version 4.0.0 of the library. Please use @ref items() instead;
     ///         that is, replace `json::iterator_wrapper(j)` with `j.items()`.
@@ -22182,14 +22182,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief helper to access iterator member functions in range-based for
-    /// @sa https://json.nlohmann.me/api/basic_json/items/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/items/
     iteration_proxy<iterator> items() noexcept
     {
         return iteration_proxy<iterator>(*this);
     }
 
     /// @brief helper to access iterator member functions in range-based for
-    /// @sa https://json.nlohmann.me/api/basic_json/items/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/items/
     iteration_proxy<const_iterator> items() const noexcept
     {
         return iteration_proxy<const_iterator>(*this);
@@ -22205,7 +22205,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief checks whether the container is empty.
-    /// @sa https://json.nlohmann.me/api/basic_json/empty/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/empty/
     bool empty() const noexcept
     {
         switch (m_data.m_type)
@@ -22244,7 +22244,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns the number of elements
-    /// @sa https://json.nlohmann.me/api/basic_json/size/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/size/
     size_type size() const noexcept
     {
         switch (m_data.m_type)
@@ -22283,7 +22283,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief returns the maximum possible number of elements
-    /// @sa https://json.nlohmann.me/api/basic_json/max_size/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/max_size/
     size_type max_size() const noexcept
     {
         switch (m_data.m_type)
@@ -22326,7 +22326,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief clears the contents
-    /// @sa https://json.nlohmann.me/api/basic_json/clear/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/clear/
     void clear() noexcept
     {
         switch (m_data.m_type)
@@ -22387,7 +22387,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an array
-    /// @sa https://json.nlohmann.me/api/basic_json/push_back/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/push_back/
     void push_back(basic_json&& val)
     {
         // push_back only works for null objects or arrays
@@ -22412,7 +22412,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an array
-    /// @sa https://json.nlohmann.me/api/basic_json/operator+=/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator+=/
     reference operator+=(basic_json&& val)
     {
         push_back(std::move(val));
@@ -22420,7 +22420,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an array
-    /// @sa https://json.nlohmann.me/api/basic_json/push_back/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/push_back/
     void push_back(const basic_json& val)
     {
         // push_back only works for null objects or arrays
@@ -22444,7 +22444,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an array
-    /// @sa https://json.nlohmann.me/api/basic_json/operator+=/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator+=/
     reference operator+=(const basic_json& val)
     {
         push_back(val);
@@ -22452,7 +22452,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an object
-    /// @sa https://json.nlohmann.me/api/basic_json/push_back/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/push_back/
     void push_back(const typename object_t::value_type& val)
     {
         // push_back only works for null objects or objects
@@ -22475,7 +22475,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an object
-    /// @sa https://json.nlohmann.me/api/basic_json/operator+=/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator+=/
     reference operator+=(const typename object_t::value_type& val)
     {
         push_back(val);
@@ -22483,7 +22483,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an object
-    /// @sa https://json.nlohmann.me/api/basic_json/push_back/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/push_back/
     void push_back(initializer_list_t init)
     {
         if (is_object() && init.size() == 2 && (*init.begin())->is_string())
@@ -22499,7 +22499,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an object
-    /// @sa https://json.nlohmann.me/api/basic_json/operator+=/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator+=/
     reference operator+=(initializer_list_t init)
     {
         push_back(init);
@@ -22507,7 +22507,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an array
-    /// @sa https://json.nlohmann.me/api/basic_json/emplace_back/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/emplace_back/
     template<class... Args>
     reference emplace_back(Args&& ... args)
     {
@@ -22532,7 +22532,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief add an object to an object if key does not exist
-    /// @sa https://json.nlohmann.me/api/basic_json/emplace/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/emplace/
     template<class... Args>
     std::pair<iterator, bool> emplace(Args&& ... args)
     {
@@ -22564,7 +22564,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// Helper for insertion of an iterator
     /// @note: This uses std::distance to support GCC 4.8,
-    ///        see https://github.com/nlohmann/json/pull/1257
+    ///        see https://github.com/nlohmann_loader/json/pull/1257
     template<typename... Args>
     iterator insert_iterator(const_iterator pos, Args&& ... args)
     {
@@ -22584,7 +22584,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief inserts element into array
-    /// @sa https://json.nlohmann.me/api/basic_json/insert/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/insert/
     iterator insert(const_iterator pos, const basic_json& val)
     {
         // insert only works for arrays
@@ -22604,14 +22604,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief inserts element into array
-    /// @sa https://json.nlohmann.me/api/basic_json/insert/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/insert/
     iterator insert(const_iterator pos, basic_json&& val)
     {
         return insert(pos, val);
     }
 
     /// @brief inserts copies of element into array
-    /// @sa https://json.nlohmann.me/api/basic_json/insert/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/insert/
     iterator insert(const_iterator pos, size_type cnt, const basic_json& val)
     {
         // insert only works for arrays
@@ -22631,7 +22631,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief inserts range of elements into array
-    /// @sa https://json.nlohmann.me/api/basic_json/insert/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/insert/
     iterator insert(const_iterator pos, const_iterator first, const_iterator last)
     {
         // insert only works for arrays
@@ -22662,7 +22662,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief inserts elements from initializer list into array
-    /// @sa https://json.nlohmann.me/api/basic_json/insert/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/insert/
     iterator insert(const_iterator pos, initializer_list_t ilist)
     {
         // insert only works for arrays
@@ -22682,7 +22682,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief inserts range of elements into object
-    /// @sa https://json.nlohmann.me/api/basic_json/insert/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/insert/
     void insert(const_iterator first, const_iterator last)
     {
         // insert only works for objects
@@ -22707,14 +22707,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief updates a JSON object from another object, overwriting existing keys
-    /// @sa https://json.nlohmann.me/api/basic_json/update/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/update/
     void update(const_reference j, bool merge_objects = false)
     {
         update(j.begin(), j.end(), merge_objects);
     }
 
     /// @brief updates a JSON object from another object, overwriting existing keys
-    /// @sa https://json.nlohmann.me/api/basic_json/update/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/update/
     void update(const_iterator first, const_iterator last, bool merge_objects = false)
     {
         // implicitly convert null value to an empty object
@@ -22761,7 +22761,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief exchanges the values
-    /// @sa https://json.nlohmann.me/api/basic_json/swap/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/swap/
     void swap(reference other) noexcept (
         std::is_nothrow_move_constructible<value_t>::value&&
         std::is_nothrow_move_assignable<value_t>::value&&
@@ -22778,7 +22778,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief exchanges the values
-    /// @sa https://json.nlohmann.me/api/basic_json/swap/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/swap/
     friend void swap(reference left, reference right) noexcept (
         std::is_nothrow_move_constructible<value_t>::value&&
         std::is_nothrow_move_assignable<value_t>::value&&
@@ -22790,7 +22790,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief exchanges the values
-    /// @sa https://json.nlohmann.me/api/basic_json/swap/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/swap/
     void swap(array_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for arrays
@@ -22806,7 +22806,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief exchanges the values
-    /// @sa https://json.nlohmann.me/api/basic_json/swap/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/swap/
     void swap(object_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for objects
@@ -22822,7 +22822,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief exchanges the values
-    /// @sa https://json.nlohmann.me/api/basic_json/swap/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/swap/
     void swap(string_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for strings
@@ -22838,7 +22838,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief exchanges the values
-    /// @sa https://json.nlohmann.me/api/basic_json/swap/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/swap/
     void swap(binary_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for strings
@@ -22854,7 +22854,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief exchanges the values
-    /// @sa https://json.nlohmann.me/api/basic_json/swap/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/swap/
     void swap(typename binary_t::container_type& other) // NOLINT(bugprone-exception-escape)
     {
         // swap only works for strings
@@ -22879,7 +22879,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     // note parentheses around operands are necessary; see
-    // https://github.com/nlohmann/json/issues/1530
+    // https://github.com/nlohmann_loader/json/issues/1530
 #define JSON_IMPLEMENT_OPERATOR(op, null_result, unordered_result, default_result)                       \
     const auto lhs_type = lhs.type();                                                                    \
     const auto rhs_type = rhs.type();                                                                    \
@@ -22981,7 +22981,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
   public:
 #if JSON_HAS_THREE_WAY_COMPARISON
     /// @brief comparison: equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_eq/
     bool operator==(const_reference rhs) const noexcept
     {
 #ifdef __GNUC__
@@ -22996,7 +22996,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_eq/
     template<typename ScalarType>
     requires std::is_scalar_v<ScalarType>
     bool operator==(ScalarType rhs) const noexcept
@@ -23005,7 +23005,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: not equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ne/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ne/
     bool operator!=(const_reference rhs) const noexcept
     {
         if (compares_unordered(rhs, true))
@@ -23016,7 +23016,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: 3-way
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_spaceship/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_spaceship/
     std::partial_ordering operator<=>(const_reference rhs) const noexcept // *NOPAD*
     {
         const_reference lhs = *this;
@@ -23029,7 +23029,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: 3-way
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_spaceship/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_spaceship/
     template<typename ScalarType>
     requires std::is_scalar_v<ScalarType>
     std::partial_ordering operator<=>(ScalarType rhs) const noexcept // *NOPAD*
@@ -23042,7 +23042,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     // need to be overloaded to emulate the legacy comparison behavior
 
     /// @brief comparison: less than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_le/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_le/
     JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
     bool operator<=(const_reference rhs) const noexcept
     {
@@ -23054,7 +23054,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: less than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_le/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_le/
     template<typename ScalarType>
     requires std::is_scalar_v<ScalarType>
     bool operator<=(ScalarType rhs) const noexcept
@@ -23063,7 +23063,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ge/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ge/
     JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
     bool operator>=(const_reference rhs) const noexcept
     {
@@ -23075,7 +23075,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ge/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ge/
     template<typename ScalarType>
     requires std::is_scalar_v<ScalarType>
     bool operator>=(ScalarType rhs) const noexcept
@@ -23085,7 +23085,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 #endif
 #else
     /// @brief comparison: equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_eq/
     friend bool operator==(const_reference lhs, const_reference rhs) noexcept
     {
 #ifdef __GNUC__
@@ -23099,7 +23099,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_eq/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator==(const_reference lhs, ScalarType rhs) noexcept
@@ -23108,7 +23108,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_eq/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_eq/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator==(ScalarType lhs, const_reference rhs) noexcept
@@ -23117,7 +23117,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: not equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ne/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ne/
     friend bool operator!=(const_reference lhs, const_reference rhs) noexcept
     {
         if (compares_unordered(lhs, rhs, true))
@@ -23128,7 +23128,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: not equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ne/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ne/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator!=(const_reference lhs, ScalarType rhs) noexcept
@@ -23137,7 +23137,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: not equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ne/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ne/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator!=(ScalarType lhs, const_reference rhs) noexcept
@@ -23146,7 +23146,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: less than
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_lt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_lt/
     friend bool operator<(const_reference lhs, const_reference rhs) noexcept
     {
         // default_result is used if we cannot compare values. In that case,
@@ -23156,7 +23156,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: less than
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_lt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_lt/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator<(const_reference lhs, ScalarType rhs) noexcept
@@ -23165,7 +23165,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: less than
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_lt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_lt/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator<(ScalarType lhs, const_reference rhs) noexcept
@@ -23174,7 +23174,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: less than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_le/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_le/
     friend bool operator<=(const_reference lhs, const_reference rhs) noexcept
     {
         if (compares_unordered(lhs, rhs, true))
@@ -23185,7 +23185,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: less than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_le/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_le/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator<=(const_reference lhs, ScalarType rhs) noexcept
@@ -23194,7 +23194,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: less than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_le/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_le/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator<=(ScalarType lhs, const_reference rhs) noexcept
@@ -23203,7 +23203,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_gt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_gt/
     friend bool operator>(const_reference lhs, const_reference rhs) noexcept
     {
         // double inverse
@@ -23215,7 +23215,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_gt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_gt/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator>(const_reference lhs, ScalarType rhs) noexcept
@@ -23224,7 +23224,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_gt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_gt/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator>(ScalarType lhs, const_reference rhs) noexcept
@@ -23233,7 +23233,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ge/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ge/
     friend bool operator>=(const_reference lhs, const_reference rhs) noexcept
     {
         if (compares_unordered(lhs, rhs, true))
@@ -23244,7 +23244,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ge/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ge/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator>=(const_reference lhs, ScalarType rhs) noexcept
@@ -23253,7 +23253,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief comparison: greater than or equal
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ge/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ge/
     template<typename ScalarType, typename std::enable_if<
                  std::is_scalar<ScalarType>::value, int>::type = 0>
     friend bool operator>=(ScalarType lhs, const_reference rhs) noexcept
@@ -23274,7 +23274,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 #ifndef JSON_NO_IO
     /// @brief serialize to stream
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ltlt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ltlt/
     friend std::ostream& operator<<(std::ostream& o, const basic_json& j)
     {
         // read width member and use it as indentation parameter if nonzero
@@ -23291,7 +23291,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief serialize to stream
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_ltlt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_ltlt/
     /// @deprecated This function is deprecated since 3.0.0 and will be removed in
     ///             version 4.0.0 of the library. Please use
     ///             operator<<(std::ostream&, const basic_json&) instead; that is,
@@ -23312,7 +23312,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief deserialize from a compatible input
-    /// @sa https://json.nlohmann.me/api/basic_json/parse/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/parse/
     template<typename InputType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json parse(InputType&& i,
@@ -23326,7 +23326,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief deserialize from a pair of character iterators
-    /// @sa https://json.nlohmann.me/api/basic_json/parse/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/parse/
     template<typename IteratorType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json parse(IteratorType first,
@@ -23353,7 +23353,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief check if the input is valid JSON
-    /// @sa https://json.nlohmann.me/api/basic_json/accept/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/accept/
     template<typename InputType>
     static bool accept(InputType&& i,
                        const bool ignore_comments = false)
@@ -23362,7 +23362,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief check if the input is valid JSON
-    /// @sa https://json.nlohmann.me/api/basic_json/accept/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/accept/
     template<typename IteratorType>
     static bool accept(IteratorType first, IteratorType last,
                        const bool ignore_comments = false)
@@ -23379,7 +23379,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief generate SAX events
-    /// @sa https://json.nlohmann.me/api/basic_json/sax_parse/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/sax_parse/
     template <typename InputType, typename SAX>
     JSON_HEDLEY_NON_NULL(2)
     static bool sax_parse(InputType&& i, SAX* sax,
@@ -23394,7 +23394,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief generate SAX events
-    /// @sa https://json.nlohmann.me/api/basic_json/sax_parse/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/sax_parse/
     template<class IteratorType, class SAX>
     JSON_HEDLEY_NON_NULL(3)
     static bool sax_parse(IteratorType first, IteratorType last, SAX* sax,
@@ -23409,7 +23409,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief generate SAX events
-    /// @sa https://json.nlohmann.me/api/basic_json/sax_parse/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/sax_parse/
     /// @deprecated This function is deprecated since 3.8.0 and will be removed in
     ///             version 4.0.0 of the library. Please use
     ///             sax_parse(ptr, ptr + len) instead.
@@ -23430,7 +23430,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 #ifndef JSON_NO_IO
     /// @brief deserialize from stream
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_gtgt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_gtgt/
     /// @deprecated This stream operator is deprecated since 3.0.0 and will be removed in
     ///             version 4.0.0 of the library. Please use
     ///             operator>>(std::istream&, basic_json&) instead; that is,
@@ -23442,7 +23442,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief deserialize from stream
-    /// @sa https://json.nlohmann.me/api/basic_json/operator_gtgt/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator_gtgt/
     friend std::istream& operator>>(std::istream& i, basic_json& j)
     {
         parser(detail::input_adapter(i)).parse(false, j);
@@ -23456,7 +23456,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ///////////////////////////
 
     /// @brief return the type as string
-    /// @sa https://json.nlohmann.me/api/basic_json/type_name/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/type_name/
     JSON_HEDLEY_RETURNS_NON_NULL
     const char* type_name() const noexcept
     {
@@ -23536,7 +23536,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
   public:
     /// @brief create a CBOR serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_cbor/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_cbor/
     static std::vector<std::uint8_t> to_cbor(const basic_json& j)
     {
         std::vector<std::uint8_t> result;
@@ -23545,21 +23545,21 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a CBOR serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_cbor/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_cbor/
     static void to_cbor(const basic_json& j, detail::output_adapter<std::uint8_t> o)
     {
         binary_writer<std::uint8_t>(o).write_cbor(j);
     }
 
     /// @brief create a CBOR serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_cbor/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_cbor/
     static void to_cbor(const basic_json& j, detail::output_adapter<char> o)
     {
         binary_writer<char>(o).write_cbor(j);
     }
 
     /// @brief create a MessagePack serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_msgpack/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_msgpack/
     static std::vector<std::uint8_t> to_msgpack(const basic_json& j)
     {
         std::vector<std::uint8_t> result;
@@ -23568,21 +23568,21 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a MessagePack serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_msgpack/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_msgpack/
     static void to_msgpack(const basic_json& j, detail::output_adapter<std::uint8_t> o)
     {
         binary_writer<std::uint8_t>(o).write_msgpack(j);
     }
 
     /// @brief create a MessagePack serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_msgpack/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_msgpack/
     static void to_msgpack(const basic_json& j, detail::output_adapter<char> o)
     {
         binary_writer<char>(o).write_msgpack(j);
     }
 
     /// @brief create a UBJSON serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_ubjson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_ubjson/
     static std::vector<std::uint8_t> to_ubjson(const basic_json& j,
             const bool use_size = false,
             const bool use_type = false)
@@ -23593,7 +23593,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a UBJSON serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_ubjson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_ubjson/
     static void to_ubjson(const basic_json& j, detail::output_adapter<std::uint8_t> o,
                           const bool use_size = false, const bool use_type = false)
     {
@@ -23601,7 +23601,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a UBJSON serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_ubjson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_ubjson/
     static void to_ubjson(const basic_json& j, detail::output_adapter<char> o,
                           const bool use_size = false, const bool use_type = false)
     {
@@ -23609,7 +23609,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a BJData serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_bjdata/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_bjdata/
     static std::vector<std::uint8_t> to_bjdata(const basic_json& j,
             const bool use_size = false,
             const bool use_type = false)
@@ -23620,7 +23620,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a BJData serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_bjdata/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_bjdata/
     static void to_bjdata(const basic_json& j, detail::output_adapter<std::uint8_t> o,
                           const bool use_size = false, const bool use_type = false)
     {
@@ -23628,7 +23628,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a BJData serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_bjdata/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_bjdata/
     static void to_bjdata(const basic_json& j, detail::output_adapter<char> o,
                           const bool use_size = false, const bool use_type = false)
     {
@@ -23636,7 +23636,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a BSON serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_bson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_bson/
     static std::vector<std::uint8_t> to_bson(const basic_json& j)
     {
         std::vector<std::uint8_t> result;
@@ -23645,21 +23645,21 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a BSON serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_bson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_bson/
     static void to_bson(const basic_json& j, detail::output_adapter<std::uint8_t> o)
     {
         binary_writer<std::uint8_t>(o).write_bson(j);
     }
 
     /// @brief create a BSON serialization of a given JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/to_bson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/to_bson/
     static void to_bson(const basic_json& j, detail::output_adapter<char> o)
     {
         binary_writer<char>(o).write_bson(j);
     }
 
     /// @brief create a JSON value from an input in CBOR format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_cbor/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_cbor/
     template<typename InputType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_cbor(InputType&& i,
@@ -23675,7 +23675,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in CBOR format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_cbor/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_cbor/
     template<typename IteratorType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_cbor(IteratorType first, IteratorType last,
@@ -23717,7 +23717,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in MessagePack format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_msgpack/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_msgpack/
     template<typename InputType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_msgpack(InputType&& i,
@@ -23732,7 +23732,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in MessagePack format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_msgpack/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_msgpack/
     template<typename IteratorType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_msgpack(IteratorType first, IteratorType last,
@@ -23771,7 +23771,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in UBJSON format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_ubjson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_ubjson/
     template<typename InputType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_ubjson(InputType&& i,
@@ -23786,7 +23786,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in UBJSON format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_ubjson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_ubjson/
     template<typename IteratorType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_ubjson(IteratorType first, IteratorType last,
@@ -23825,7 +23825,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in BJData format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_bjdata/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_bjdata/
     template<typename InputType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bjdata(InputType&& i,
@@ -23840,7 +23840,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in BJData format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_bjdata/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_bjdata/
     template<typename IteratorType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bjdata(IteratorType first, IteratorType last,
@@ -23855,7 +23855,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in BSON format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_bson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_bson/
     template<typename InputType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bson(InputType&& i,
@@ -23870,7 +23870,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief create a JSON value from an input in BSON format
-    /// @sa https://json.nlohmann.me/api/basic_json/from_bson/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/from_bson/
     template<typename IteratorType>
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bson(IteratorType first, IteratorType last,
@@ -23917,63 +23917,63 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief access specified element via JSON Pointer
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     reference operator[](const json_pointer& ptr)
     {
         return ptr.get_unchecked(this);
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    reference operator[](const ::nlohmann::json_pointer<BasicJsonType>& ptr)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann_loader::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    reference operator[](const ::nlohmann_loader::json_pointer<BasicJsonType>& ptr)
     {
         return ptr.get_unchecked(this);
     }
 
     /// @brief access specified element via JSON Pointer
-    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/operator%5B%5D/
     const_reference operator[](const json_pointer& ptr) const
     {
         return ptr.get_unchecked(this);
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    const_reference operator[](const ::nlohmann::json_pointer<BasicJsonType>& ptr) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann_loader::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    const_reference operator[](const ::nlohmann_loader::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.get_unchecked(this);
     }
 
     /// @brief access specified element via JSON Pointer
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     reference at(const json_pointer& ptr)
     {
         return ptr.get_checked(this);
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    reference at(const ::nlohmann::json_pointer<BasicJsonType>& ptr)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann_loader::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    reference at(const ::nlohmann_loader::json_pointer<BasicJsonType>& ptr)
     {
         return ptr.get_checked(this);
     }
 
     /// @brief access specified element via JSON Pointer
-    /// @sa https://json.nlohmann.me/api/basic_json/at/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/at/
     const_reference at(const json_pointer& ptr) const
     {
         return ptr.get_checked(this);
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
-    const_reference at(const ::nlohmann::json_pointer<BasicJsonType>& ptr) const
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or nlohmann_loader::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    const_reference at(const ::nlohmann_loader::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.get_checked(this);
     }
 
     /// @brief return flattened JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/flatten/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/flatten/
     basic_json flatten() const
     {
         basic_json result(value_t::object);
@@ -23982,7 +23982,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief unflatten a previously flattened JSON value
-    /// @sa https://json.nlohmann.me/api/basic_json/unflatten/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/unflatten/
     basic_json unflatten() const
     {
         return json_pointer::unflatten(*this);
@@ -23998,7 +23998,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief applies a JSON patch in-place without copying the object
-    /// @sa https://json.nlohmann.me/api/basic_json/patch/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/patch/
     void patch_inplace(const basic_json& json_patch)
     {
         basic_json& result = *this;
@@ -24269,7 +24269,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief applies a JSON patch to a copy of the current object
-    /// @sa https://json.nlohmann.me/api/basic_json/patch/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/patch/
     basic_json patch(const basic_json& json_patch) const
     {
         basic_json result = *this;
@@ -24278,7 +24278,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     /// @brief creates a diff as a JSON patch
-    /// @sa https://json.nlohmann.me/api/basic_json/diff/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/diff/
     JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json diff(const basic_json& source, const basic_json& target,
                            const std::string& path = "")
@@ -24421,7 +24421,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @{
 
     /// @brief applies a JSON Merge Patch
-    /// @sa https://json.nlohmann.me/api/basic_json/merge_patch/
+    /// @sa https://json.nlohmann_loader.me/api/basic_json/merge_patch/
     void merge_patch(const basic_json& apply_patch)
     {
         if (apply_patch.is_object())
@@ -24452,9 +24452,9 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 };
 
 /// @brief user-defined to_string function for JSON values
-/// @sa https://json.nlohmann.me/api/basic_json/to_string/
-NLOHMANN_BASIC_JSON_TPL_DECLARATION
-std::string to_string(const NLOHMANN_BASIC_JSON_TPL& j)
+/// @sa https://json.nlohmann_loader.me/api/basic_json/to_string/
+NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
+std::string to_string(const NLOHMANN_LOADER_BASIC_JSON_TPL& j)
 {
     return j.dump();
 }
@@ -24465,32 +24465,32 @@ inline namespace json_literals
 {
 
 /// @brief user-defined string literal for JSON values
-/// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/operator_literal_json/
 JSON_HEDLEY_NON_NULL(1)
 #if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
-    inline nlohmann::json operator ""_json(const char* s, std::size_t n)
+    inline nlohmann_loader::json operator ""_json(const char* s, std::size_t n)
 #else
-    inline nlohmann::json operator "" _json(const char* s, std::size_t n)
+    inline nlohmann_loader::json operator "" _json(const char* s, std::size_t n)
 #endif
 {
-    return nlohmann::json::parse(s, s + n);
+    return nlohmann_loader::json::parse(s, s + n);
 }
 
 /// @brief user-defined string literal for JSON pointer
-/// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json_pointer/
+/// @sa https://json.nlohmann_loader.me/api/basic_json/operator_literal_json_pointer/
 JSON_HEDLEY_NON_NULL(1)
 #if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
-    inline nlohmann::json::json_pointer operator ""_json_pointer(const char* s, std::size_t n)
+    inline nlohmann_loader::json::json_pointer operator ""_json_pointer(const char* s, std::size_t n)
 #else
-    inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+    inline nlohmann_loader::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
 #endif
 {
-    return nlohmann::json::json_pointer(std::string(s, n));
+    return nlohmann_loader::json::json_pointer(std::string(s, n));
 }
 
 }  // namespace json_literals
 }  // namespace literals
-NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_LOADER_JSON_NAMESPACE_END
 
 ///////////////////////
 // nonmember support //
@@ -24500,31 +24500,31 @@ namespace std // NOLINT(cert-dcl58-cpp)
 {
 
 /// @brief hash value for JSON objects
-/// @sa https://json.nlohmann.me/api/basic_json/std_hash/
-NLOHMANN_BASIC_JSON_TPL_DECLARATION
-struct hash<nlohmann::NLOHMANN_BASIC_JSON_TPL> // NOLINT(cert-dcl58-cpp)
+/// @sa https://json.nlohmann_loader.me/api/basic_json/std_hash/
+NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
+struct hash<nlohmann_loader::NLOHMANN_LOADER_BASIC_JSON_TPL> // NOLINT(cert-dcl58-cpp)
 {
-    std::size_t operator()(const nlohmann::NLOHMANN_BASIC_JSON_TPL& j) const
+    std::size_t operator()(const nlohmann_loader::NLOHMANN_LOADER_BASIC_JSON_TPL& j) const
     {
-        return nlohmann::detail::hash(j);
+        return nlohmann_loader::detail::hash(j);
     }
 };
 
 // specialization for std::less<value_t>
 template<>
-struct less< ::nlohmann::detail::value_t> // do not remove the space after '<', see https://github.com/nlohmann/json/pull/679
+struct less< ::nlohmann_loader::detail::value_t> // do not remove the space after '<', see https://github.com/nlohmann_loader/json/pull/679
 {
     /*!
     @brief compare two value_t enum values
     @since version 3.0.0
     */
-    bool operator()(::nlohmann::detail::value_t lhs,
-                    ::nlohmann::detail::value_t rhs) const noexcept
+    bool operator()(::nlohmann_loader::detail::value_t lhs,
+                    ::nlohmann_loader::detail::value_t rhs) const noexcept
     {
 #if JSON_HAS_THREE_WAY_COMPARISON
         return std::is_lt(lhs <=> rhs); // *NOPAD*
 #else
-        return ::nlohmann::detail::operator<(lhs, rhs);
+        return ::nlohmann_loader::detail::operator<(lhs, rhs);
 #endif
     }
 };
@@ -24533,11 +24533,11 @@ struct less< ::nlohmann::detail::value_t> // do not remove the space after '<', 
 #ifndef JSON_HAS_CPP_20
 
 /// @brief exchanges the values of two JSON objects
-/// @sa https://json.nlohmann.me/api/basic_json/std_swap/
-NLOHMANN_BASIC_JSON_TPL_DECLARATION
-inline void swap(nlohmann::NLOHMANN_BASIC_JSON_TPL& j1, nlohmann::NLOHMANN_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name, cert-dcl58-cpp)
-    is_nothrow_move_constructible<nlohmann::NLOHMANN_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
-    is_nothrow_move_assignable<nlohmann::NLOHMANN_BASIC_JSON_TPL>::value)
+/// @sa https://json.nlohmann_loader.me/api/basic_json/std_swap/
+NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
+inline void swap(nlohmann_loader::NLOHMANN_LOADER_BASIC_JSON_TPL& j1, nlohmann_loader::NLOHMANN_LOADER_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name, cert-dcl58-cpp)
+    is_nothrow_move_constructible<nlohmann_loader::NLOHMANN_LOADER_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
+    is_nothrow_move_assignable<nlohmann_loader::NLOHMANN_LOADER_BASIC_JSON_TPL>::value)
 {
     j1.swap(j2);
 }
@@ -24548,21 +24548,21 @@ inline void swap(nlohmann::NLOHMANN_BASIC_JSON_TPL& j1, nlohmann::NLOHMANN_BASIC
 
 #if JSON_USE_GLOBAL_UDLS
     #if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
-        using nlohmann::literals::json_literals::operator ""_json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
-        using nlohmann::literals::json_literals::operator ""_json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using nlohmann_loader::literals::json_literals::operator ""_json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using nlohmann_loader::literals::json_literals::operator ""_json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
     #else
-        using nlohmann::literals::json_literals::operator "" _json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
-        using nlohmann::literals::json_literals::operator "" _json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using nlohmann_loader::literals::json_literals::operator "" _json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+        using nlohmann_loader::literals::json_literals::operator "" _json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
     #endif
 #endif
 
-// #include <nlohmann/detail/macro_unscope.hpp>
+// #include <nlohmann_loader/detail/macro_unscope.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -24577,10 +24577,10 @@ inline void swap(nlohmann::NLOHMANN_BASIC_JSON_TPL& j1, nlohmann::NLOHMANN_BASIC
 #undef JSON_INTERNAL_CATCH
 #undef JSON_THROW
 #undef JSON_PRIVATE_UNLESS_TESTED
-#undef NLOHMANN_BASIC_JSON_TPL_DECLARATION
-#undef NLOHMANN_BASIC_JSON_TPL
+#undef NLOHMANN_LOADER_BASIC_JSON_TPL_DECLARATION
+#undef NLOHMANN_LOADER_BASIC_JSON_TPL
 #undef JSON_EXPLICIT
-#undef NLOHMANN_CAN_CALL_STD_FUNC_IMPL
+#undef NLOHMANN_LOADER_CAN_CALL_STD_FUNC_IMPL
 #undef JSON_INLINE_VARIABLE
 #undef JSON_NO_UNIQUE_ADDRESS
 #undef JSON_DISABLE_ENUM_SERIALIZATION
@@ -24601,13 +24601,13 @@ inline void swap(nlohmann::NLOHMANN_BASIC_JSON_TPL& j1, nlohmann::NLOHMANN_BASIC
     #undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
 #endif
 
-// #include <nlohmann/thirdparty/hedley/hedley_undef.hpp>
+// #include <nlohmann_loader/thirdparty/hedley/hedley_undef.hpp>
 //     __ _____ _____ _____
 //  __|  |   __|     |   | |  JSON for Modern C++
 // |  |  |__   |  |  | | | |  version 3.11.3
-// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+// |_____|_____|_____|_|___|  https://github.com/nlohmann_loader/json
 //
-// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann_loader.me>
 // SPDX-License-Identifier: MIT
 
 
@@ -24763,4 +24763,4 @@ inline void swap(nlohmann::NLOHMANN_BASIC_JSON_TPL& j1, nlohmann::NLOHMANN_BASIC
 
 
 
-#endif  // INCLUDE_NLOHMANN_JSON_HPP_
+#endif  // INCLUDE_NLOHMANN_LOADER_JSON_HPP_

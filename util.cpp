@@ -6,6 +6,9 @@
 #include <iostream>
 #include <string>
 
+
+using json = nlohmann_loader::json;
+
 std::string get_file_content(const std::string &fname)
 {
     std::ifstream file{fname};

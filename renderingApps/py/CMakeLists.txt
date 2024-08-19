@@ -45,11 +45,48 @@ target_link_libraries(vistool_py
 			PRIVATE
 			glfw
 			${OPENGL_LIBRARIES}
-			ospray::ospray)
+			ospray::ospray
+)
 
-
-
-
-
+if (True)
+  find_package(VTK COMPONENTS 
+    CommonColor
+    CommonCore
+    CommonDataModel
+    FiltersSources
+    IOImage
+    #IOLegacy
+    InteractionStyle
+    RenderingContextOpenGL2
+    RenderingCore
+    RenderingFreeType
+    RenderingGL2PSOpenGL2
+    RenderingOpenGL2
+    RenderingVolume
+    RenderingVolumeOpenGL2
     
+    )
+
+  if (NOT VTK_FOUND)
+    message(FATAL_ERROR "SimpleRayCast: Unable to find the VTK build folder.")
+  endif()
+
+  pybind11_add_module(vistool_py_vtk 
+    vtkApps.cpp 
+    ../../loader.cpp
+    ../../util.cpp
+    )
+
+  target_link_libraries(vistool_py_vtk PRIVATE ${VTK_LIBRARIES})
+
+  # vtk_module_autoinit is needed
+  vtk_module_autoinit(
+    TARGETS vistool_py_vtk
+    MODULES ${VTK_LIBRARIES}
+    )
+endif()
+
+
+
+		      
 

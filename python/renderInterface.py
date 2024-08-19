@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from OpenVisus import *
 import vistool_py
+import vistool_py_vtk
 
 # common utility functions
 
@@ -132,5 +133,9 @@ class AnimationHandler:
     def renderTaskOffline(self, jsonStr):
         vistool_py.init_app(sys.argv)
         vistool_py.run_offline_app(jsonStr, "", -2)
+
+    # launch vtk rendering
+    def renderTaskOfflineVTK(self, jsonStr):
+        vistool_py_vtk.run_offline_app(jsonStr, "", -2)
 
     
