@@ -23,6 +23,7 @@ int main(int argc, char **argv)
 
     std::vector<std::string> args(argv, argv + argc);
     
+    AniObjHandler aniHandler;
     json config;
     std::string prefix;
     for (int i = 1; i < argc; ++i) {
@@ -30,16 +31,12 @@ int main(int argc, char **argv)
             std::cout << USAGE << "\n";
             return 0;
         } else {
-            std::ifstream cfg_file(args[i].c_str());
-            if (!cfg_file) {
-                std::cerr << "[error]: Failed to open config file " << args[i] << "\n";
-                throw std::runtime_error("Failed to open input config file");
-            }
-            cfg_file >> config;
+            aniHandler.init_modular(args[i].c_str());
         }
     }
     
-    AniObjWidget widget(config);
+   
+    /*AniObjWidget widget(config);
     widget.load_info();
     widget.load_cameras();
     widget.load_tfs();
@@ -49,6 +46,6 @@ int main(int argc, char **argv)
     	widget.print_info();
 	for(auto &c : widget.cameras)
 	    c.print();
-    }
+    }*/
     return 0;
 }

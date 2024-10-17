@@ -50,7 +50,9 @@ namespace visuser{
 	AniObjWidget(std::string type_name, int x, int y, int z, std::vector<float> &z_m);
 	void init();
 	void init_from_json(const nlohmann_loader::json in_file);
+	void init_from_json_modular(const nlohmann_loader::json in_file);
     	void load_info();
+    	void load_info_modular();
     	void print_info();
     	void load_cameras();
     	void load_tfs();
@@ -81,6 +83,7 @@ namespace visuser{
     	AniObjHandler(const char* filename);
 
 	void init(const char* filename);
+	void init_modular(const char* filename);
     };
 }
 

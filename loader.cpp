@@ -43,12 +43,13 @@ visuser::Camera visuser::interpolate(visuser::Camera &a, visuser::Camera &b, glm
     
 void visuser::jsonFromFile(const char* name, nlohmann_loader::json &j){
     std::ifstream cfg_file(name);
+    std::cout << "\nStart reading " << name <<"\n";
     if (!cfg_file) {
         std::cerr << "[error]: Failed to open config file " << name << "\n";
         throw std::runtime_error("Failed to open input config file");
     }
     cfg_file >> j;
-    std::cout << "Reading " << name <<"\n";
+    std::cout << "Done reading " << name <<"\n\n";
 }
     
     
@@ -71,7 +72,30 @@ void visuser::AniObjWidget::init_from_json(const nlohmann_loader::json in_file){
     load_tfs();
 }
 
+void visuser::AniObjWidget::init_from_json_modular(const nlohmann_loader::json in_file){
+    config = in_file;
+    load_info();
+    load_cameras();
+    load_tfs();
+}
+
 void visuser::AniObjWidget::load_info(){
+    file_name 	= config["data"]["name"];
+    type_name 	= config["data"]["type"];
+    world_bbox  = get_vec3f(config["data"]["world_bbox"]);
+    dims 	= get_vec3i(config["data"]["dims"]);
+    frameRange 	= get_vec2i(config["data"]["frameRange"]);
+    currentF 	= frameRange[0];
+    
+    if (config["data"].contains("backgroundMap")) {
+    	bgmap_name = config["data"]["backgroundMap"];
+    }else bgmap_name = "";
+	
+    std::cout << "end load info\n";
+}
+
+void visuser::AniObjWidget::load_info_modular(){
+    type_name 	= config["data"]["type"];
     file_name 	= config["data"]["name"];
     type_name 	= config["data"]["type"];
     world_bbox  = get_vec3f(config["data"]["world_bbox"]);
@@ -168,6 +192,57 @@ void visuser::AniObjHandler::init(const char* filename){
 			      << "\n";
 		}	
 	    }
+    	}
+    }
+}
+
+void visuser::AniObjHandler::init_modular(const char* filename){
+    jsonFromFile(filename, header_config);
+    is_header = header_config["isheader"];
+    
+    if (!is_header){
+    	// not a header, read again as plain kf file
+    	widgets.resize(1);
+    	widgets[0].init_from_json(header_config);
+    }else{
+    	// is a header, read all kf files
+    	// parse current path first
+    	std::filesystem::path p = std::filesystem::absolute(filename).parent_path();
+	std::string p_str = p.generic_string() + "/";
+	std::cout << "path: "<< p_str <<"\n";
+	
+    	// read data list and kf list
+    	nlohmann_loader::json data_list_config;
+    	std::string data_list_name = header_config["data_list"];
+    	jsonFromFile((p_str+data_list_name).c_str(), data_list_config);
+    	auto filenames = header_config["kf_list"].get<std::vector<json>>();
+    	auto datanames = data_list_config["list"].get<std::vector<json>>();
+    	widgets.resize(filenames.size());
+    	
+    	// load all kfs
+    	for (size_t i=0; i<filenames.size(); i++){
+	    nlohmann_loader::json config;
+	    std::string kf_name = filenames[i];
+	    jsonFromFile((p_str+kf_name).c_str(), config);
+	    
+	    std::cout << "key frame " << kf_name << " with data [ ";
+	    auto scene_data_list = config["scene_data_list"].get<std::vector<json>>();
+	    for (size_t idx=0; idx < scene_data_list.size(); idx++){
+	    	std::cout << scene_data_list[idx]["index_in_list"] <<" ";
+	    }
+	    std::cout << "]\n";
+	    //widgets[i].init_from_json_modular(config);
+	    /*if (!filenames[i]["data_i"].is_null()){
+		uint32_t data_i = filenames[i]["data_i"];
+		if (datanames.size() > data_i){ 
+		    widgets[i].overwrite_data_info(datanames[data_i]["src"]["name"], 
+						   get_vec3i(datanames[data_i]["src"]["dims"]));
+		    std::cout << "overwriting " << kf_name 
+			      << " to \n  data: " << widgets[i].file_name
+			      << " \n  dims: " << glm::to_string(widgets[i].dims)
+			      << "\n";
+		}	
+	    }*/
     	}
     }
 }
